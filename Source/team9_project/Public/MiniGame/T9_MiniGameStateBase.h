@@ -14,4 +14,6 @@ class TEAM9_PROJECT_API AT9_MiniGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 	
+public:
+	bool bInGame = false;
 };

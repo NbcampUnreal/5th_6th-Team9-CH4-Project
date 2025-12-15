@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -14,4 +12,18 @@ class TEAM9_PROJECT_API AT9_MiniGamePlayerControllerBase : public APlayerControl
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void BeginPlay() override;
+
+	virtual void ShowReadyScreen();
+
+	virtual void ShowResultScreen();
+
+	virtual void ClearWidget();
+
+	virtual void SetInputEnabled(bool bEnable);
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UUserWidget> CurrentWidget;
 };

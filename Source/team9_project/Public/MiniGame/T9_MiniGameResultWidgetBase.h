@@ -13,5 +13,8 @@ UCLASS()
 class TEAM9_PROJECT_API UT9_MiniGameResultWidgetBase : public UUserWidget
 {
 	GENERATED_BODY()
-	
+public:
+	void OnResultScreenShown();
+
+	virtual void SetWinnerText(const FText& InText);
 };

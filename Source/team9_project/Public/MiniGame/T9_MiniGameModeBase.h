@@ -13,5 +13,13 @@ UCLASS()
 class TEAM9_PROJECT_API AT9_MiniGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void BeginPlay() override;
+
+	virtual void StartGame();
+
+	virtual void EndGame();
+
+	virtual bool CheckGame();
 };

@@ -14,4 +14,8 @@ class TEAM9_PROJECT_API UT9_MiniGameReadyScreenWidgetBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	void OnReadyScreenShown();
+
+	virtual void SetGameNameText(const FText& InText);
 };
