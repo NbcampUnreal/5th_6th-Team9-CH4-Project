@@ -35,10 +35,3 @@ struct FTileData : public FTableRowBase
 
 	int32 Index;
 };
-
-//class TEAM9_PROJECT_API TileData
-//{
-//public:
-//	TileData();
-//	~TileData();
-//};

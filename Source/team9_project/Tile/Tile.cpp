@@ -23,11 +23,7 @@ void ATile::AssignFromData(FTileData* data)
 		SetRootComponent(Root);
 	}
 
-	//_Mesh = NewObject<UStaticMeshComponent>(this, TEXT("Mesh"));
-	//_Mesh->RegisterComponentWithWorld(GetWorld());
 	AssignFromDataAsset(data->DataAsset);
-	//_Mesh->SetWorldTransform(FTransform(data->Location));
-	//_Mesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
 	Index = data->Index;
 
