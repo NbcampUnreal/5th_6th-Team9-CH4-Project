@@ -12,7 +12,7 @@ void UTileManagerWolrdSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 
 void UTileManagerWolrdSubsystem::SpawnTiles()
 {
-    const FString DefaultPath = TEXT("/Game/Data/DataTable/TilesData.TilesData");
+    const FString DefaultPath = TEXT("/Game/KHB/Data/DataTable/TilesData.TilesData");
     UDataTable* datatable = LoadObject<UDataTable>(nullptr, *DefaultPath);
 	checkf(IsValid(datatable), TEXT("DefaultPath is wrong, TileManagerWolrdSubsystem.cpp 16"));
 
