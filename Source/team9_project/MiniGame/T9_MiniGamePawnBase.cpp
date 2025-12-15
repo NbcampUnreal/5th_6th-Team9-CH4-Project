@@ -13,6 +13,14 @@ void AT9_MiniGamePawnBase::BeginPlay()
 	
 }
 
+void AT9_MiniGamePawnBase::EnablePawnInput()
+{
+}
+
+void AT9_MiniGamePawnBase::DisablePawnInput()
+{
+}
+
 // Called every frame
 void AT9_MiniGamePawnBase::Tick(float DeltaTime)
 {
