@@ -4,26 +4,48 @@
 #include "GameFramework/PlayerController.h"
 #include "T9_MiniGamePlayerControllerBase.generated.h"
 
-/**
- * 
- */
+class UT9_MiniGameReadyScreenWidget;
+class UT9_MiniGameResultWidget;
+
+enum class EMiniGamePhase : uint8;
+
 UCLASS()
 class TEAM9_PROJECT_API AT9_MiniGamePlayerControllerBase : public APlayerController
 {
 	GENERATED_BODY()
 	
 public:
+	UFUNCTION(Server, Reliable)
+	virtual void ServerRPCUpdatePlayerReady();
+
 	virtual void BeginPlay() override;
 
-	virtual void ShowReadyScreen();
+	virtual void CreateUI();
 
-	virtual void ShowResultScreen();
+	virtual void ShowReadyUI();
 
-	virtual void ClearWidget();
+	virtual void ShowResultUI();
+
+	virtual void ShowInGameUI();
+
+	virtual void RemoveAllUI();
+
+	virtual void ChangeUI(EMiniGamePhase NewPhase);
 
 	virtual void SetInputEnabled(bool bEnable);
 
-protected:
+
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UT9_MiniGameReadyScreenWidget> ReadyWidgetClass;
+
 	UPROPERTY()
-	TObjectPtr<UUserWidget> CurrentWidget;
+	TObjectPtr<UT9_MiniGameReadyScreenWidget> ReadyWidgetInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UT9_MiniGameResultWidget> ResultWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UT9_MiniGameResultWidget> ResultWidgetInstance;
 };

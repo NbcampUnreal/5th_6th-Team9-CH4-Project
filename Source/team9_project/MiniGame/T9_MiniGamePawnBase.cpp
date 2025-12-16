@@ -2,36 +2,37 @@
 
 AT9_MiniGamePawnBase::AT9_MiniGamePawnBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
-
+	bInputEnabled = false;
 }
 
-// Called when the game starts or when spawned
 void AT9_MiniGamePawnBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	DisablePawnInput();
 }
 
 void AT9_MiniGamePawnBase::EnablePawnInput()
 {
+	bInputEnabled = true;
+
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		EnableInput(PC);
+	}
 }
 
 void AT9_MiniGamePawnBase::DisablePawnInput()
 {
+	bInputEnabled = false;
+
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(PC);
+	}
 }
 
-// Called every frame
-void AT9_MiniGamePawnBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
 void AT9_MiniGamePawnBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
