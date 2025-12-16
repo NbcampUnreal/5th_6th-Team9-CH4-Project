@@ -6,13 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "T9_MiniGameModeBase.generated.h"
 
-UENUM(BlueprintType)
-enum class EMiniGamePhase : uint8
-{
-	Ready,
-	Playing,
-	Result
-};
+enum class EMiniGamePhase : uint8;
 
 UCLASS()
 class TEAM9_PROJECT_API AT9_MiniGameModeBase : public AGameModeBase
@@ -22,22 +16,17 @@ class TEAM9_PROJECT_API AT9_MiniGameModeBase : public AGameModeBase
 public:
 	AT9_MiniGameModeBase();
 
+	void ComeBackMainGame();
+
 	virtual void BeginPlay() override;
 
 	virtual void StartGame();
 
 	virtual void EndGame();
 
-	virtual bool CheckGame();
+	virtual bool CheckPlayer();
 
-protected:
-	UPROPERTY(ReplicatedUsing = OnRep_Phase)
-	EMiniGamePhase CurrentPhase;
+	virtual void CheckStartGame();
 
-	void SetPhase(EMiniGamePhase NewPhase);
-
-	UFUNCTION()
-	void OnRep_Phase();
-
-	virtual void OnPhaseChanged(EMiniGamePhase NewPhase);
+	virtual void SetPhase(EMiniGamePhase NewPhase);
 };
