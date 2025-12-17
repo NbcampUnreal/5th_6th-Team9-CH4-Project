@@ -35,6 +35,17 @@ ACameraPawn::ACameraPawn() :
 	}
 }
 
+void ACameraPawn::PossessedBy(AController* NewControlle)
+{
+	Super::PossessedBy(NewControlle);
+
+	if (HasAuthority())
+	{
+		SetOwner(NewControlle);
+		UE_LOG(LogTemp, Warning, TEXT("Owner set to %s"), *GetNameSafe(NewControlle));
+	}
+}
+
 void ACameraPawn::BeginPlay()
 {
 	Super::BeginPlay();
@@ -47,20 +58,7 @@ void ACameraPawn::BeginPlay()
 	{
 		StateMachine->Initialize(PlayerCharacter);
 	}
-}
 
-void ACameraPawn::PossessedBy(AController* NewControlle)
-{
-	Super::PossessedBy(NewControlle);
-
-	if (HasAuthority())
-	{
-		SetOwner(NewControlle);
-		UE_LOG(LogTemp, Warning, TEXT("Owner set to %s"), *GetNameSafe(NewControlle));
-	}
-
-	MyPlayerController = Cast<AMyPlayerController>(NewControlle);
-	
 	APlayerState* PS = GetPlayerState();
 	if (IsValid(PS))
 	{
@@ -70,7 +68,10 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 			MyPlayerState = TPS;
 		}
 	}
+
+	MyPlayerController = Cast<AMyPlayerController>(GetController());
 }
+
 
 void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -78,6 +79,7 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	if (!IsLocallyControlled())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("SetupPlayerInputComponent Failed"))
 		return;
 	}
 
@@ -86,6 +88,7 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	{
 		if (IsValid(MyPlayerController))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("MyPlayerController"))
 			//BindAction
 			EIC->BindAction(
 				MyPlayerController->LeftClickAction,
@@ -188,18 +191,16 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 	const FVector2D ArrowInput = Value.Get<FVector2D>();
 
 	if (ArrowInput.IsNearlyZero())
+	{
 		return;
-
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
-
-	// 카메라 Yaw 기준 방향
+	}
+	
 	const FRotator YawRotation(0.f, GetActorRotation().Yaw, 0.f);
-
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
+	float DeltaTime = GetWorld()->GetDeltaSeconds();
 	FVector MoveDirection = Forward * ArrowInput.X + Right * ArrowInput.Y;
-
 	AddActorWorldOffset(MoveDirection * ScreenSpeed * DeltaTime, true);
 }
 
@@ -225,13 +226,13 @@ void ACameraPawn::ServerRPCRightClick_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Sever : RightClick"));
 
-	/*UGameplayStatics::ApplyDamage(
-		this,
+	UGameplayStatics::ApplyDamage(
+		PlayerCharacter,
 		50.f,
 		nullptr,
 		this,
 		UDamageType::StaticClass()
-	);*/
+	);
 }
 
 int ACameraPawn::RandDice()

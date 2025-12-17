@@ -44,14 +44,12 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	}
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
+	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), ActualDamage);
 	/*if (!StateMachine || !StateMachine->GetCurrentState()->CanTakeDamage())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Dont TakeDamage"));
 		return 0.f;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), ActualDamage);
 
 	MyPlayerState->CurrentHp = FMath::Clamp(MyPlayerState->CurrentHp - (int)ActualDamage, 0, MyPlayerState->MaxHp);
 	UE_LOG(LogTemp, Warning, TEXT("Current HP : %d"), MyPlayerState->CurrentHp);

@@ -27,7 +27,7 @@ void AMyPlayerController::BeginPlay()
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("ATestPlayerController::BeginPlay"));
+	UE_LOG(LogTemp, Warning, TEXT("APlayerController::BeginPlay"));
 
 	ULocalPlayer* LocalPlayer = GetLocalPlayer();
 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem
