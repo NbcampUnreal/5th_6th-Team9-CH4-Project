@@ -7,12 +7,7 @@
 		{
 			"Name": "team9_project",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine",
-				"UMG",
-				"CoreUObject"
-			]
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [
