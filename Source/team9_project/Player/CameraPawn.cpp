@@ -44,6 +44,8 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 		SetOwner(NewControlle);
 		UE_LOG(LogTemp, Warning, TEXT("Owner set to %s"), *GetNameSafe(NewControlle));
 	}
+
+	MyPlayerController = Cast<AMyPlayerController>(GetController());
 }
 
 void ACameraPawn::BeginPlay()
@@ -69,7 +71,7 @@ void ACameraPawn::BeginPlay()
 		}
 	}
 
-	MyPlayerController = Cast<AMyPlayerController>(GetController());
+	
 }
 
 
@@ -86,6 +88,7 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (IsValid(EIC))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UEnhancedInputComponent"))
 		if (IsValid(MyPlayerController))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("MyPlayerController"))
