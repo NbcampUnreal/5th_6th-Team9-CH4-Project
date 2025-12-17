@@ -21,7 +21,7 @@ public:
 
 	virtual void OnExit();
 
-	virtual void Move();
+	virtual void Move(int Amount);
 
 	virtual bool CanTakeDamage();
 

@@ -22,7 +22,7 @@ void UStateBase::OnExit()
 
 }
 
-void UStateBase::Move()
+void UStateBase::Move(int Amount)
 {
 
 }

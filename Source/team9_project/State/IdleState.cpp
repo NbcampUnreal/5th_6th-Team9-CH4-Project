@@ -17,10 +17,9 @@ void UIdleState::OnExit()
 	UE_LOG(LogTemp, Warning, TEXT("IdleState OnExit"));
 }
 
-void UIdleState::Move()
+void UIdleState::Move(int Amount)
 {
-	int Dice = GetPlayerCharacter()->RandDice();
-	GetPlayerCharacter()->MoveToNextNode(Dice);
+	GetPlayerCharacter()->MoveToNextNode(Amount);
 
 	StateMachine->ChangeState(EStates::Moving);
 }

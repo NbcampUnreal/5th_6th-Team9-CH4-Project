@@ -1,3 +1,5 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -12,6 +14,8 @@ class TEAM9_PROJECT_API AT9_MiniGamePawnBase : public APawn
 public:
 	AT9_MiniGamePawnBase();
 
+	virtual void Tick(float DeltaTime) override;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void BeginPlay() override;
@@ -21,6 +25,6 @@ public:
 	virtual void DisablePawnInput();
 
 protected:
-	bool bInputEnabled;
+	bool bInputEnabled = false;
 
 };
