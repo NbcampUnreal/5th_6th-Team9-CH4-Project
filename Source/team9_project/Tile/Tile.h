@@ -34,7 +34,7 @@ private:
 	int32 Index;
 
 public:
-	void AssignFromData(FTileData* data);
+	void AssignFromData(FTileData* data, int32 index);
 	//void SetConectedTiles(FTileData& data);
 
 protected:

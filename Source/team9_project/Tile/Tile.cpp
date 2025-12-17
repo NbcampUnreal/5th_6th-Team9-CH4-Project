@@ -12,7 +12,7 @@ ATile::ATile()
 	_Mesh->SetupAttachment(GetRootComponent());
 }
 
-void ATile::AssignFromData(FTileData* data)
+void ATile::AssignFromData(FTileData* data, int32 index)
 {
 	if (data == nullptr) return;
 
@@ -25,9 +25,9 @@ void ATile::AssignFromData(FTileData* data)
 
 	AssignFromDataAsset(data->DataAsset);
 
-	Index = data->Index;
+	Index = index;
 
-	data->TileInstance = this;
+	//data->TileInstance = this;
 }
 
 //void ATile::SetConectedTiles(FTileData& data)
