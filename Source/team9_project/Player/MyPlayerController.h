@@ -33,4 +33,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* RightClickAction;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* CameraReturnAction;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* CameraKeyMoveAction;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* CameraWheelAction;
 };
