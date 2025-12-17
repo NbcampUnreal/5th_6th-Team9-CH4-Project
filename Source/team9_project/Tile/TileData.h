@@ -30,8 +30,4 @@ struct FTileData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile")
 	FVector Location;
-
-	TObjectPtr<ATile> TileInstance;
-
-	int32 Index;
 };
