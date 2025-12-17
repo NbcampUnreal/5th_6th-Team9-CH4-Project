@@ -10,5 +10,5 @@ class TEAM9_PROJECT_API AT9_RacingGamePawn : public AT9_MiniGamePawnBase
 	GENERATED_BODY()
 	
 public:
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 };
