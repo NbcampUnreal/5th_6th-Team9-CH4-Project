@@ -23,10 +23,10 @@ struct FTileData : public FTableRowBase
 	TObjectPtr<UTileDataAsset> DataAsset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile")
-	TArray<int32> NextTilesIndex;
+	TArray<int32> BeforeTilesIndex;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile")
-	TArray<int32> BeforeTilesIndex;
+	TArray<int32> NextTilesIndex;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile")
 	FVector Location;

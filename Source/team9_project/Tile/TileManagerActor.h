@@ -22,9 +22,8 @@ protected:
 
 
 private:
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tile", meta = (AllowPrivateAccess = "true"))
-	TArray<FTileData> _TilesData;
+	TObjectPtr<UDataTable> _TilesData;
 
 	UPROPERTY(Transient)
 	TArray<TWeakObjectPtr<ATile>> _Tiles;
@@ -35,6 +34,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	void LoadCSV();
 	void SpawnTiles();
 	void LinkTiles();
 };
