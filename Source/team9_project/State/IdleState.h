@@ -21,7 +21,7 @@ class TEAM9_PROJECT_API UIdleState : public UStateBase
 	virtual void OnExit() override;
 
 
-	virtual void Move() override;
+	virtual void Move(int Amount) override;
 
 	virtual bool CanTakeDamage() override;
 };
