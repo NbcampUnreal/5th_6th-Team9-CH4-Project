@@ -9,6 +9,9 @@ class TEAM9_PROJECT_API ALobbyGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+public:
+	ALobbyGameMode();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
@@ -20,7 +23,13 @@ public:
 	void SetPlayerName(AController* Exiting, const FString& NewPlayerName); 
 
 private:
+	//플레이어에게 부여할 번호, 함수 호출마다 1씩 증가
+	int32 GivePlayerNumber();
+	
 	//로비에 있는 플레이어 목록
 	UPROPERTY()
 	TSet<AController*> PlayersInLobby;
+
+	//접속한 플레이어에게 부여할 번호
+	int32 PlayerNumber;
 };
