@@ -17,6 +17,16 @@ int AMyPlayerState::GetHP()
 	return CurrentHp;
 }
 
+void AMyPlayerState::SetMaxHP(int Amount)
+{
+	MaxHp = Amount;
+}
+
+int AMyPlayerState::GetMaxHP()
+{
+	return MaxHp;
+}
+
 void AMyPlayerState::AddHP(int Amount)
 {
 	CurrentHp += Amount;

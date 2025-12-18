@@ -28,7 +28,7 @@ class TEAM9_PROJECT_API UPlayerStateMachine : public UObject
 	GENERATED_BODY()
 	
 public:
-	virtual void Initialize(APlayerCharacter* InOwner);
+	virtual void Initialize(APawn* Player, APlayerCharacter* Character);
 
 	virtual void OnUpdate(float DeltaTime);
 
@@ -36,11 +36,16 @@ public:
 
 	UStateBase* GetCurrentState() const;
 
-	APlayerCharacter* GetOwnerCharacter() const;
+	APlayerCharacter* GetPlayerCharacter() const;
+
+	APawn* GetCameraPawn() const;
 
 protected:
 	UPROPERTY()
-	TObjectPtr<APlayerCharacter> OwnerCharacter;
+	TObjectPtr<APlayerCharacter> PlayerCharacter;
+
+	UPROPERTY()
+	TObjectPtr<APawn> CameraPawn;
 
 	UPROPERTY()
 	TObjectPtr<UStateBase> CurrentState;
