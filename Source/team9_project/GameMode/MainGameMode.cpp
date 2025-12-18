@@ -36,13 +36,13 @@ int32 AMainGameMode::ThrowDice(AActor* ThrowingPlayerActor)
 
 bool AMainGameMode::CheckPlayerTurn(AActor* CheckPlayerActor)
 {
-	AController* Owner = Cast<AController>(CheckPlayerActor->GetOwner());
-	if (!Owner)
+	AController* OwnerController = Cast<AController>(CheckPlayerActor->GetOwner());
+	if (!OwnerController)
 	{
 		return false;
 	}
 	
-	return PlayersInGame[TurnIndex] == Owner;
+	return PlayersInGame[TurnIndex] == OwnerController;
 }
 
 int8 AMainGameMode::GetTurnIndex()
