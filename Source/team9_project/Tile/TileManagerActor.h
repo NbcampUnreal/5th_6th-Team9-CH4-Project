@@ -34,7 +34,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void LoadCSV();
 	void SpawnTiles();
 	void LinkTiles();
+	TArray<TWeakObjectPtr<ATile>> GetTilesByIndexes(TArray<int32>& Indexes) const ;
 };
