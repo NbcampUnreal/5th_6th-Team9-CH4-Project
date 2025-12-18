@@ -22,19 +22,23 @@ public:
 protected:
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Tile")
 	TObjectPtr<UStaticMeshComponent> _Mesh;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TObjectPtr<USceneComponent> _Root;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
 	TArray<TWeakObjectPtr<ATile>> _BeforeTile;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	TArray<TWeakObjectPtr<ATile>> _AffterTile;
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TWeakObjectPtr<ATile>> _NextTile;
 
 	int32 Index;
 
 public:
 	void AssignFromData(FTileData* data, int32 index);
+	void SetLinkTiles(const TArray<TWeakObjectPtr<ATile>>& BeforeTile, const TArray<TWeakObjectPtr<ATile>>& NextTile);
 	//void SetConectedTiles(FTileData& data);
 
 protected:
@@ -45,5 +49,4 @@ private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void AssignFromDataAsset(UTileDataAsset* asset);
-
 };
