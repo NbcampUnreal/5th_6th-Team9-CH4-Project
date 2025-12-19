@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "Ui/MainTitleWidget.h"
 #include "MyPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -35,10 +34,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	UInputAction* RightClickAction;
 
-public:
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class UUserWidget> MainTitleWidgetClass;
+	UPROPERTY(EditAnywhere)
+	UInputAction* CameraReturnAction;
 
-	UPROPERTY()
-	class UMainTitleWidget* MainTitleWidget;
+	UPROPERTY(EditAnywhere)
+	UInputAction* CameraKeyMoveAction;
+
+	UPROPERTY(EditAnywhere)
+	UInputAction* CameraWheelAction;
 };
