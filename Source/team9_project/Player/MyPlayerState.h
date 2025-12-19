@@ -17,6 +17,8 @@ class TEAM9_PROJECT_API AMyPlayerState : public APlayerState
 public:
 	AMyPlayerState();
 
+	virtual void CopyProperties(APlayerState* NewPlayerState) override;
+
 	void SetHP(int Amount);
 
 	int GetHP();

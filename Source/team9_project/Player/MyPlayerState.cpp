@@ -7,6 +7,18 @@ AMyPlayerState::AMyPlayerState()
 {
 }
 
+void AMyPlayerState::CopyProperties(APlayerState* NewPlayerState)
+{
+	Super::CopyProperties(NewPlayerState);
+
+	AMyPlayerState* NewPS = Cast<AMyPlayerState>(NewPlayerState);
+	if (NewPS)
+	{
+		//Passing by value
+		//ex)NewPS->HP = HP;
+	}
+}
+
 void AMyPlayerState::SetHP(int Amount)
 {
 	CurrentHp = Amount;
