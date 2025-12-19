@@ -33,9 +33,11 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	virtual void BeginDestroy() override;
-
 	virtual void OnRegister() override;
+
+	virtual void OnUnregister() override;
+
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 private:
 		
 };

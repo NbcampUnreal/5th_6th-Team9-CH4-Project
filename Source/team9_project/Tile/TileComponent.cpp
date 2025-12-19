@@ -3,7 +3,7 @@
 
 #include "Tile/TileComponent.h"
 #include "Tile/TileAction.h"
-#include "Tile./Tile.h"
+#include "Tile/Tile.h"
 
 // Sets default values for this component's properties
 UTileComponent::UTileComponent()
@@ -25,12 +25,6 @@ void UTileComponent::BeginPlay()
 
 }
 
-void UTileComponent::BeginDestroy()
-{
-	_TileInstance.Empty();
-	Super::BeginDestroy();
-}
-
 void UTileComponent::OnRegister()
 {
 	Super::OnRegister();
@@ -47,6 +41,18 @@ void UTileComponent::OnRegister()
 			_TileInstance.Add(Inst);
 		}
 	}
+}
+
+void UTileComponent::OnUnregister()
+{
+	Super::OnUnregister();
+	_TileInstance.Empty();
+}
+
+void UTileComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	_TileInstance.Empty();
 }
 
 
