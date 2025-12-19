@@ -28,6 +28,11 @@ void AMainGameMode::Logout(AController* Exiting)
 	PlayersInGame.Remove(Exiting);
 }
 
+int32 AMainGameMode::ThrowDice(AController* Controller)
+{
+	return 1;
+}
+
 int32 AMainGameMode::ThrowDice(const int8 MyTurnIndex)
 {
 	//차례가 아닌 플레이어는 주사위 못던진다.

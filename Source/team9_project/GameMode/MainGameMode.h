@@ -19,6 +19,10 @@ protected:
 public:
 	virtual void Logout(AController* Exiting) override;
 
+	//(제거 예정) 주사위 굴리기
+	UFUNCTION(meta = (DeprecatedFunction, DeprecationMessage = "Use ThrowDice(int8) instead."))
+	int32 ThrowDice(AController* Controller);
+
 	//주사위 굴리기
 	int32 ThrowDice(const int8 MyTurnIndex);
 
