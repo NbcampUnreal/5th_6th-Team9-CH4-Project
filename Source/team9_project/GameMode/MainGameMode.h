@@ -20,10 +20,13 @@ public:
 	virtual void Logout(AController* Exiting) override;
 
 	//주사위 굴리기
-	int32 ThrowDice(AActor* ThrowingPlayerActor);
+	int32 ThrowDice(const int8 MyTurnIndex);
 
 	//지정한 플레이어의 턴인가
-	bool CheckPlayerTurn(AActor* CheckPlayerActor);
+	bool CheckPlayerTurn(const int8 TargetTurnIndex);
+
+	//아이템 사용하기
+	bool UsingItem(int8 MyTurnIndex, int32 InventoryIndex);
 
 	//현재 진행중인 턴인 플레이어 인덱스
 	int8 GetTurnIndex();

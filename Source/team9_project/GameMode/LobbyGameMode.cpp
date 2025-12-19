@@ -37,6 +37,11 @@ void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlaye
 	//TODO : 이름 지정하기 구현
 }
 
+void ALobbyGameMode::MainGameStart()
+{
+	//TODO : 게임 시작 구현
+}
+
 int32 ALobbyGameMode::GivePlayerNumber()
 {
 	if (++PlayerNumber == MAX_int32)
