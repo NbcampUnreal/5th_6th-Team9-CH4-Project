@@ -22,7 +22,7 @@ void ATile::AssignFromData(FTileData* data, int32 index)
 
 	AssignFromDataAsset(data->DataAsset);
 
-	Index = index;
+	_Index = index;
 }
 
 void ATile::SetLinkTiles(const TArray<TWeakObjectPtr<ATile>>& BeforeTile, const TArray<TWeakObjectPtr<ATile>>& NextTile)
@@ -35,6 +35,11 @@ void ATile::PlayerArrive(APlayerCharacter* PlayerCharacter)
 {
 	_InPlayers.Add(PlayerCharacter);
 	OnPlayerArrive.Broadcast(PlayerCharacter);
+}
+
+void ATile::PlayerPassed(APlayerCharacter* PlayerCharacter)
+{
+	OnPlayerPassed.Broadcast(PlayerCharacter);
 }
 
 void ATile::PlayerLeave(APlayerCharacter* PlayerCharacter)

@@ -12,9 +12,11 @@ class APlayerCharacter;
 struct FTileData;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerArrive, APlayerCharacter*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerRollDice, APlayerCharacter*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerLeave, APlayerCharacter*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerUseItem, APlayerCharacter*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerRollDice, APlayerCharacter*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerPassed, APlayerCharacter*);
 //DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRollDiceResult, APlayerCharacter*, int32);
 
 UCLASS()
@@ -41,12 +43,13 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
 	TArray<TWeakObjectPtr<ATile>> _NextTile;
 
-	int32 Index;
+	int32 _Index;
 
 	FOnPlayerArrive OnPlayerArrive;
 	FOnPlayerLeave OnPlayerLeave;
 	FOnPlayerUseItem OnPlayerUseItem;
 	FOnPlayerRollDice OnPlayerRollDice;
+	FOnPlayerPassed OnPlayerPassed;
 
 	TSet<TWeakObjectPtr<APlayerCharacter>> _InPlayers;
 
@@ -55,6 +58,7 @@ public:
 	void SetLinkTiles(const TArray<TWeakObjectPtr<ATile>>& BeforeTile, const TArray<TWeakObjectPtr<ATile>>& NextTile);
 
 	void PlayerArrive(APlayerCharacter* PlayerCharacter);
+	void PlayerPassed(APlayerCharacter* PlayerCharacter);
 	void PlayerLeave(APlayerCharacter* PlayerCharacter);
 	void PlayerUseItem(APlayerCharacter* PlayerCharacter);
 	void PlayerRollDice(APlayerCharacter* PlayerCharacter);
@@ -65,7 +69,7 @@ public:
 	TArray<ATile*> GetBeforeTiles();
 
 	int32 GetIndex() {
-		return Index;
+		return _Index;
 	}
 
 protected:

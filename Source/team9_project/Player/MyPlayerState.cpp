@@ -5,6 +5,7 @@ AMyPlayerState::AMyPlayerState()
 	MaxHp(100),
 	CurrentScore(0)
 {
+	SetTileIndex(0);
 }
 
 void AMyPlayerState::SetHP(int Amount)
@@ -45,4 +46,14 @@ int AMyPlayerState::GetScore()
 void AMyPlayerState::AddScore(int Amount)
 {
 	CurrentScore += Amount;
+}
+
+void AMyPlayerState::SetTileIndex(int Amount)
+{
+	TileIndex = Amount;
+}
+
+int AMyPlayerState::GetTileIndex()
+{
+	return TileIndex;
 }
