@@ -8,7 +8,14 @@
 
 class UStaticMeshComponent;
 class UTileDataAsset;
+class APlayerCharacter;
 struct FTileData;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerArrive, APlayerCharacter*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerLeave, APlayerCharacter*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerUseItem, APlayerCharacter*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerRollDice, APlayerCharacter*);
+//DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRollDiceResult, APlayerCharacter*, int32);
 
 UCLASS()
 class TEAM9_PROJECT_API ATile : public AActor
@@ -36,10 +43,23 @@ private:
 
 	int32 Index;
 
+	FOnPlayerArrive OnPlayerArrive;
+	FOnPlayerLeave OnPlayerLeave;
+	FOnPlayerUseItem OnPlayerUseItem;
+	FOnPlayerRollDice OnPlayerRollDice;
+
+	TSet<TWeakObjectPtr<APlayerCharacter>> _InPlayers;
+
 public:
 	void AssignFromData(FTileData* data, int32 index);
 	void SetLinkTiles(const TArray<TWeakObjectPtr<ATile>>& BeforeTile, const TArray<TWeakObjectPtr<ATile>>& NextTile);
-	//void SetConectedTiles(FTileData& data);
+
+	void PlayerArrive(APlayerCharacter* PlayerCharacter);
+	void PlayerLeave(APlayerCharacter* PlayerCharacter);
+	void PlayerUseItem(APlayerCharacter* PlayerCharacter);
+	void PlayerRollDice(APlayerCharacter* PlayerCharacter);
+
+	TArray<APlayerCharacter*> GetInPlayers();
 
 protected:
 	// Called when the game starts or when spawned
@@ -48,5 +68,5 @@ protected:
 private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void AssignFromDataAsset(UTileDataAsset* asset);
+	void AssignFromDataAsset(UTileDataAsset* asset); 
 };

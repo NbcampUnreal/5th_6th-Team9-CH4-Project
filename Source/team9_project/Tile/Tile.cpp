@@ -30,6 +30,42 @@ void ATile::SetLinkTiles(const TArray<TWeakObjectPtr<ATile>>& BeforeTile, const 
 	_NextTile = NextTile;
 }
 
+void ATile::PlayerArrive(APlayerCharacter* PlayerCharacter)
+{
+	_InPlayers.Add(PlayerCharacter);
+	OnPlayerArrive.Broadcast(PlayerCharacter);
+}
+
+void ATile::PlayerLeave(APlayerCharacter* PlayerCharacter)
+{
+	_InPlayers.Remove(PlayerCharacter);
+	OnPlayerLeave.Broadcast(PlayerCharacter);
+}
+
+void ATile::PlayerUseItem(APlayerCharacter* PlayerCharacter)
+{
+	OnPlayerUseItem.Broadcast(PlayerCharacter);
+}
+
+void ATile::PlayerRollDice(APlayerCharacter* PlayerCharacter)
+{
+	OnPlayerRollDice.Broadcast(PlayerCharacter);
+}
+
+TArray<APlayerCharacter*> ATile::GetInPlayers()
+{
+	TArray<APlayerCharacter*> Result;
+	for (TWeakObjectPtr<APlayerCharacter> Character: _InPlayers)
+	{
+		if (Character.IsValid())
+		{
+			Result.Add(Character.Get());
+		}
+	}
+
+	return Result;
+}
+
 
 // Called when the game starts or when spawned
 void ATile::BeginPlay()
