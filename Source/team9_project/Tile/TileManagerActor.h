@@ -18,10 +18,20 @@ public:
 	// Sets default values for this actor's properties
 	ATileManagerActor();
 
+	static ATileManagerActor* Get(UWorld* World)
+	{
+		if (SingletonInstance.IsValid()) return SingletonInstance.Get();
+		return nullptr;
+	}
+
+	ATile* GetTile(int32 Index);
+
 protected:
 
 
 private:
+	static TWeakObjectPtr<ATileManagerActor> SingletonInstance;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tile", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDataTable> _TilesData;
 
@@ -33,8 +43,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	void LoadCSV();
+private:	
 	void SpawnTiles();
 	void LinkTiles();
+	TArray<TWeakObjectPtr<ATile>> GetTilesByIndexes(TArray<int32>& Indexes) const ;
 };

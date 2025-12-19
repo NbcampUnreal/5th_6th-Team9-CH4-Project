@@ -21,6 +21,10 @@ public:
 
 	int GetHP();
 
+	void SetMaxHP(int Amount);
+
+	int GetMaxHP();
+
 	void AddHP(int Amount);
 
 	void SetScore(int Amount);
@@ -29,10 +33,18 @@ public:
 
 	void AddScore(int Amount);
 
-public:
+	void SetTileIndex(int Amount);
+
+	int GetTileIndex();
+
+
+
+private:
 	int CurrentHp;
 
 	int MaxHp;
 
 	int CurrentScore;
+
+	int TileIndex;
 };

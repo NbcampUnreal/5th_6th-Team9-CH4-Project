@@ -8,9 +8,10 @@
 #include "State/DieState.h"
 #include "State/HitState.h"
 
-void UPlayerStateMachine::Initialize(APlayerCharacter* InOwner)
+void UPlayerStateMachine::Initialize(APawn* InPlayer, APlayerCharacter* InCharacter)
 {
-	OwnerCharacter = InOwner;
+	PlayerCharacter = InCharacter;
+	CameraPawn = InPlayer;
 	CurrentState = nullptr;
 
 	IdleState = NewObject<UIdleState>(this);
@@ -69,6 +70,9 @@ void UPlayerStateMachine::ChangeState(EStates NewState)
 	case EStates::Hit:
 		CurrentState = HitState;
 		break;
+	case EStates::ItemUse:
+		//CurrentState = ItemUseState;
+		break;
 
 	default:
 		CurrentState = IdleState;
@@ -86,7 +90,12 @@ UStateBase* UPlayerStateMachine::GetCurrentState() const
 	return CurrentState;
 }
 
-APlayerCharacter* UPlayerStateMachine::GetOwnerCharacter() const
+APlayerCharacter* UPlayerStateMachine::GetPlayerCharacter() const
 {
-	return OwnerCharacter;
+	return PlayerCharacter;
+}
+
+APawn* UPlayerStateMachine::GetCameraPawn() const
+{
+	return CameraPawn;
 }
