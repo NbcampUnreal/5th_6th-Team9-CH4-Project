@@ -8,6 +8,7 @@
 #include "Tile/Tile.h"
 #include "EnhancedInputComponent.h"
 #include "CameraPawn.h"
+#include "Tile/TileManagerActor.h"
 
 
 APlayerCharacter::APlayerCharacter() :
@@ -71,8 +72,13 @@ void APlayerCharacter::MoveToNextNode(int DiceValue)
 	remainingMove = DiceValue;
 
 
-	/*MoveStart = 
-	MoveTarget = 
+	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+
+	MoveStart = TileManager->GetTile(Currnet_index_Tile)->GetActorLocation();
+	
+	TArray<ATile*> NextTiles = TileManager->GetTile(Currnet_index_Tile)->GetNextTiles();
+	
+	MoveTarget = NextTiles[0]->GetActorLocation();
 
 	FVector ToTarget = (MoveTarget - MoveStart).GetSafeNormal();
 	FRotator TargetRotation = ToTarget.Rotation();
@@ -82,7 +88,7 @@ void APlayerCharacter::MoveToNextNode(int DiceValue)
 
 	float Distance = FVector::Dist(MoveStart, MoveTarget);
 	MoveDuration = Distance / MoveSpeed;
-	MoveElapsed = 0.f;*/
+	MoveElapsed = 0.f;
 
 	// 0.01초 간격으로 이동 업데이트
 	GetWorldTimerManager().SetTimer(
@@ -104,8 +110,11 @@ void APlayerCharacter::UpdateMove()
 
 	if (Alpha >= 1.f)
 	{
-		/*CurrentNode = CurrentNode->NextNode;
-		SetActorLocation(CurrentNode->WorldLocation);*/
+		ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+		TArray<ATile*> NextTiles = TileManager->GetTile(Currnet_index_Tile)->GetNextTiles();
+
+		Currnet_index_Tile = NextTiles[0]->GetIndex();
+
 		GetWorldTimerManager().ClearTimer(MoveTimerHandle);
 
 		remainingMove--;

@@ -61,6 +61,13 @@ public:
 
 	TArray<APlayerCharacter*> GetInPlayers();
 
+	TArray<ATile*> GetNextTiles();
+	TArray<ATile*> GetBeforeTiles();
+
+	int32 GetIndex() {
+		return Index;
+	}
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

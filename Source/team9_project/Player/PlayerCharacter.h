@@ -68,5 +68,5 @@ private:
 
 	float MoveElapsed;
 
-	
+	int32 Currnet_index_Tile = 0;
 };

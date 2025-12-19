@@ -2,6 +2,7 @@
 
 #include "Tile.h"
 #include "TileData.h"
+#include "Player/PlayerCharacter.h"
 
 // Sets default values
 ATile::ATile()
@@ -60,6 +61,36 @@ TArray<APlayerCharacter*> ATile::GetInPlayers()
 		if (Character.IsValid())
 		{
 			Result.Add(Character.Get());
+		}
+	}
+
+	return Result;
+}
+
+TArray<ATile*> ATile::GetNextTiles()
+{
+	TArray<ATile*> Result;
+
+	for (auto Tile : _NextTile)
+	{
+		if (Tile.IsValid())
+		{
+			Result.Add(Tile.Get());
+		}
+	}
+
+	return Result;
+}
+
+TArray<ATile*> ATile::GetBeforeTiles()
+{
+	TArray<ATile*> Result;
+
+	for (auto Tile : _BeforeTile)
+	{
+		if (Tile.IsValid())
+		{
+			Result.Add(Tile.Get());
 		}
 	}
 
