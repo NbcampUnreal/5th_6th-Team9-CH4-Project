@@ -18,6 +18,8 @@ public:
 	// Sets default values for this actor's properties
 	ATileManagerActor();
 
+	static ATileManagerActor* Get(UWorld* World);
+
 protected:
 
 
@@ -37,4 +39,5 @@ private:
 	void SpawnTiles();
 	void LinkTiles();
 	TArray<TWeakObjectPtr<ATile>> GetTilesByIndexes(TArray<int32>& Indexes) const ;
+	static TWeakObjectPtr<ATileManagerActor> SingletonInstance;
 };

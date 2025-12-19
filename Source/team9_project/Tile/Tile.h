@@ -68,5 +68,5 @@ protected:
 private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void AssignFromDataAsset(UTileDataAsset* asset); 
+	void AssignFromDataAsset(UTileDataAsset* asset);
 };

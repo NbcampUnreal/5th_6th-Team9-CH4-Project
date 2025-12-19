@@ -13,6 +13,27 @@ ATileManagerActor::ATileManagerActor()
 
 }
 
+ATileManagerActor* ATileManagerActor::Get(UWorld* World) {
+	if (!World) return nullptr;
+
+	if (SingletonInstance.IsValid())
+	{
+		return SingletonInstance.Get();
+	}
+
+	//for (TActorIterator<ATileManagerActor> It(World); It; ++It)
+	//{
+	//	ATileManagerActor* Found = *It;
+	//	if (Found)
+	//	{
+	//		SingletonInstance = Found;
+	//		return Found;
+	//	}
+	//}
+
+	return nullptr;
+}
+
 // Called when the game starts or when spawned
 void ATileManagerActor::BeginPlay()
 {
