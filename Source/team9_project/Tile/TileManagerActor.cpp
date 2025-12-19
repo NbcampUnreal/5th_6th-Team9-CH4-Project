@@ -33,6 +33,7 @@ void ATileManagerActor::BeginPlay()
 	Super::BeginPlay();
 	SpawnTiles();
 	LinkTiles();
+	SingletonInstance = this;
 }
 
 void ATileManagerActor::SpawnTiles(){

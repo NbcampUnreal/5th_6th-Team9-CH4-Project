@@ -2,6 +2,7 @@
 
 #include "Tile.h"
 #include "TileData.h"
+#include "Player/PlayerCharacter.h"
 
 // Sets default values
 ATile::ATile()
@@ -21,7 +22,7 @@ void ATile::AssignFromData(FTileData* data, int32 index)
 
 	AssignFromDataAsset(data->DataAsset);
 
-	Index = index;
+	_Index = index;
 }
 
 void ATile::SetLinkTiles(const TArray<TWeakObjectPtr<ATile>>& BeforeTile, const TArray<TWeakObjectPtr<ATile>>& NextTile)
@@ -34,6 +35,11 @@ void ATile::PlayerArrive(APlayerCharacter* PlayerCharacter)
 {
 	_InPlayers.Add(PlayerCharacter);
 	OnPlayerArrive.Broadcast(PlayerCharacter);
+}
+
+void ATile::PlayerPassed(APlayerCharacter* PlayerCharacter)
+{
+	OnPlayerPassed.Broadcast(PlayerCharacter);
 }
 
 void ATile::PlayerLeave(APlayerCharacter* PlayerCharacter)
@@ -60,6 +66,36 @@ TArray<APlayerCharacter*> ATile::GetInPlayers()
 		if (Character.IsValid())
 		{
 			Result.Add(Character.Get());
+		}
+	}
+
+	return Result;
+}
+
+TArray<ATile*> ATile::GetNextTiles()
+{
+	TArray<ATile*> Result;
+
+	for (auto Tile : _NextTile)
+	{
+		if (Tile.IsValid())
+		{
+			Result.Add(Tile.Get());
+		}
+	}
+
+	return Result;
+}
+
+TArray<ATile*> ATile::GetBeforeTiles()
+{
+	TArray<ATile*> Result;
+
+	for (auto Tile : _BeforeTile)
+	{
+		if (Tile.IsValid())
+		{
+			Result.Add(Tile.Get());
 		}
 	}
 

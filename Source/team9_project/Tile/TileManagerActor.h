@@ -30,6 +30,8 @@ protected:
 
 
 private:
+	static TWeakObjectPtr<ATileManagerActor> SingletonInstance;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tile", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDataTable> _TilesData;
 
@@ -41,9 +43,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
+private:	
 	void SpawnTiles();
 	void LinkTiles();
 	TArray<TWeakObjectPtr<ATile>> GetTilesByIndexes(TArray<int32>& Indexes) const ;
-	static TWeakObjectPtr<ATileManagerActor> SingletonInstance;
 };
