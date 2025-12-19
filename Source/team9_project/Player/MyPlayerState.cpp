@@ -17,6 +17,7 @@ void AMyPlayerState::CopyProperties(APlayerState* NewPlayerState)
 	{
 		//Passing by value
 		//ex)NewPS->HP = HP;
+		NewPS->PlayerNumber = PlayerNumber;
 	}
 }
 
@@ -70,12 +71,12 @@ int AMyPlayerState::GetTileIndex()
 	return TileIndex;
 }
 
-int32 AMyPlayerState::GetPlayerId()
+int32 AMyPlayerState::GetPlayerNumber()
 {
-	return PlayerId;
+	return PlayerNumber;
 }
 
-void AMyPlayerState::SetPlayerId(int32 PId)
+void AMyPlayerState::SetPlayerNumber(int32 PNumber)
 {
-	PlayerId = PId;
+	PlayerNumber = PNumber;
 }

@@ -39,9 +39,9 @@ public:
 
 	int GetTileIndex();
 
-	int32 GetPlayerId();
+	int32 GetPlayerNumber();
 
-	void SetPlayerId(int32 PId);
+	void SetPlayerNumber(int32 PNumber);
 
 private:
 	int CurrentHp;
@@ -52,5 +52,5 @@ private:
 
 	int TileIndex;
 
-	int32 PlayerId;
+	int32 PlayerNumber;
 };

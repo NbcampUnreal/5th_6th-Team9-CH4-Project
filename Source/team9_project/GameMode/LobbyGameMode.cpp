@@ -19,7 +19,7 @@ void ALobbyGameMode::OnPostLogin(AController* NewPlayer)
 	//번호 부여하기
 	if (AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>())
 	{
-		//TODO : 번호 부여 기능 완성
+		MyPlayerState->SetPlayerNumber(GivePlayerNumber());
 	}
 
 	PlayersInLobby.Add(NewPlayer);
