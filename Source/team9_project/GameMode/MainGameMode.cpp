@@ -1,7 +1,8 @@
 #include "MainGameMode.h"
-
+#include "Team9GameInstance.h"
 AMainGameMode::AMainGameMode()
 {
+	bUseSeamlessTravel = true;
 	TurnIndex = 0;
 	CurrentRound = 0;
 }
@@ -9,9 +10,14 @@ AMainGameMode::AMainGameMode()
 void AMainGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	UTeam9GameInstance* GI = GetWorld()->GetGameInstance<UTeam9GameInstance>();
+	if (GI && HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GI CurrentTurn = %d"), GI->GetCurrentRound());
+		CurrentRound = GI->GetCurrentRound();
+	}
 	TurnIndex = 0;
-	CurrentRound = 1;
+
 }
 
 void AMainGameMode::OnPostLogin(AController* NewPlayer)

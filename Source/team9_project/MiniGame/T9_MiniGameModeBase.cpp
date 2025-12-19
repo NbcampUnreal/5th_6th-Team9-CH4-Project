@@ -47,6 +47,7 @@ void AT9_MiniGameModeBase::CheckStartGame()
 void AT9_MiniGameModeBase::ComeBackMainGame()
 {
 	UE_LOG(LogTemp, Error, TEXT("SeverTravel"));
+	//GetWorld()->ServerTravel(TEXT("/Game/MiniGame/Maps/RapidInputRacingMinigame.RapidInputRacingMinigame?listen"), true);
 }
 
 void AT9_MiniGameModeBase::SetPhase(EMiniGamePhase NewPhase)

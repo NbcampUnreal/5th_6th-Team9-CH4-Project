@@ -39,7 +39,9 @@ public:
 
 	int GetTileIndex();
 
+	int32 GetPlayerId();
 
+	void SetPlayerId(int32 PId);
 
 private:
 	int CurrentHp;
@@ -49,4 +51,6 @@ private:
 	int CurrentScore;
 
 	int TileIndex;
+
+	int32 PlayerId;
 };

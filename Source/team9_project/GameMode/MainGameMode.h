@@ -35,6 +35,7 @@ public:
 	//현재 진행중인 턴인 플레이어 인덱스
 	int8 GetTurnIndex();
 
+
 private:
 	//다음 플레이어 턴 시작
 	void NextPlayerTurn();

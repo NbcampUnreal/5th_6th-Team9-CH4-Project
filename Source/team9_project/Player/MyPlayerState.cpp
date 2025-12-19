@@ -69,3 +69,13 @@ int AMyPlayerState::GetTileIndex()
 {
 	return TileIndex;
 }
+
+int32 AMyPlayerState::GetPlayerId()
+{
+	return PlayerId;
+}
+
+void AMyPlayerState::SetPlayerId(int32 PId)
+{
+	PlayerId = PId;
+}
