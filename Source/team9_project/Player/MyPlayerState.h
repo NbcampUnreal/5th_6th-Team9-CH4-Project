@@ -21,6 +21,10 @@ public:
 
 	int GetHP();
 
+	void SetMaxHP(int Amount);
+
+	int GetMaxHP();
+
 	void AddHP(int Amount);
 
 	void SetScore(int Amount);
@@ -29,7 +33,7 @@ public:
 
 	void AddScore(int Amount);
 
-public:
+private:
 	int CurrentHp;
 
 	int MaxHp;

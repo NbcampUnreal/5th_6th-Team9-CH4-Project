@@ -18,6 +18,14 @@ public:
 	// Sets default values for this actor's properties
 	ATileManagerActor();
 
+	static ATileManagerActor* Get(UWorld* World)
+	{
+		if (SingletonInstance.IsValid()) return SingletonInstance.Get();
+		return nullptr;
+	}
+
+	ATile* GetTile(int32 Index);
+
 protected:
 
 
@@ -34,7 +42,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void LoadCSV();
 	void SpawnTiles();
 	void LinkTiles();
+	TArray<TWeakObjectPtr<ATile>> GetTilesByIndexes(TArray<int32>& Indexes) const ;
+	static TWeakObjectPtr<ATileManagerActor> SingletonInstance;
 };

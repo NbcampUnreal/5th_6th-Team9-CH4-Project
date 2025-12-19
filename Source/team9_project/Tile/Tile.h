@@ -8,7 +8,14 @@
 
 class UStaticMeshComponent;
 class UTileDataAsset;
+class APlayerCharacter;
 struct FTileData;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerArrive, APlayerCharacter*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerLeave, APlayerCharacter*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerUseItem, APlayerCharacter*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerRollDice, APlayerCharacter*);
+//DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRollDiceResult, APlayerCharacter*, int32);
 
 UCLASS()
 class TEAM9_PROJECT_API ATile : public AActor
@@ -22,20 +29,44 @@ public:
 protected:
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Tile")
 	TObjectPtr<UStaticMeshComponent> _Mesh;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TObjectPtr<USceneComponent> _Root;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
 	TArray<TWeakObjectPtr<ATile>> _BeforeTile;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	TArray<TWeakObjectPtr<ATile>> _AffterTile;
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TWeakObjectPtr<ATile>> _NextTile;
 
 	int32 Index;
 
+	FOnPlayerArrive OnPlayerArrive;
+	FOnPlayerLeave OnPlayerLeave;
+	FOnPlayerUseItem OnPlayerUseItem;
+	FOnPlayerRollDice OnPlayerRollDice;
+
+	TSet<TWeakObjectPtr<APlayerCharacter>> _InPlayers;
+
 public:
 	void AssignFromData(FTileData* data, int32 index);
-	//void SetConectedTiles(FTileData& data);
+	void SetLinkTiles(const TArray<TWeakObjectPtr<ATile>>& BeforeTile, const TArray<TWeakObjectPtr<ATile>>& NextTile);
+
+	void PlayerArrive(APlayerCharacter* PlayerCharacter);
+	void PlayerLeave(APlayerCharacter* PlayerCharacter);
+	void PlayerUseItem(APlayerCharacter* PlayerCharacter);
+	void PlayerRollDice(APlayerCharacter* PlayerCharacter);
+
+	TArray<APlayerCharacter*> GetInPlayers();
+
+	TArray<ATile*> GetNextTiles();
+	TArray<ATile*> GetBeforeTiles();
+
+	int32 GetIndex() {
+		return Index;
+	}
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,5 +76,4 @@ private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void AssignFromDataAsset(UTileDataAsset* asset);
-
 };

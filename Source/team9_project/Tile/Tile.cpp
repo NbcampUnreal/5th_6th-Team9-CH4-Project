@@ -2,38 +2,101 @@
 
 #include "Tile.h"
 #include "TileData.h"
+#include "Player/PlayerCharacter.h"
 
 // Sets default values
 ATile::ATile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	_Root = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	SetRootComponent(_Root);
+
 	_Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	_Mesh->SetupAttachment(GetRootComponent());
+	
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void ATile::AssignFromData(FTileData* data, int32 index)
 {
 	if (data == nullptr) return;
 
-	if (IsValid(GetRootComponent()) == false)
-	{
-		USceneComponent* Root = NewObject<USceneComponent>(this, TEXT("RootSceneComp"));
-		Root->RegisterComponentWithWorld(GetWorld());
-		SetRootComponent(Root);
-	}
-
 	AssignFromDataAsset(data->DataAsset);
 
 	Index = index;
-
-	//data->TileInstance = this;
 }
 
-//void ATile::SetConectedTiles(FTileData& data)
-//{
-//	
-//}
+void ATile::SetLinkTiles(const TArray<TWeakObjectPtr<ATile>>& BeforeTile, const TArray<TWeakObjectPtr<ATile>>& NextTile)
+{
+	_BeforeTile = BeforeTile;
+	_NextTile = NextTile;
+}
+
+void ATile::PlayerArrive(APlayerCharacter* PlayerCharacter)
+{
+	_InPlayers.Add(PlayerCharacter);
+	OnPlayerArrive.Broadcast(PlayerCharacter);
+}
+
+void ATile::PlayerLeave(APlayerCharacter* PlayerCharacter)
+{
+	_InPlayers.Remove(PlayerCharacter);
+	OnPlayerLeave.Broadcast(PlayerCharacter);
+}
+
+void ATile::PlayerUseItem(APlayerCharacter* PlayerCharacter)
+{
+	OnPlayerUseItem.Broadcast(PlayerCharacter);
+}
+
+void ATile::PlayerRollDice(APlayerCharacter* PlayerCharacter)
+{
+	OnPlayerRollDice.Broadcast(PlayerCharacter);
+}
+
+TArray<APlayerCharacter*> ATile::GetInPlayers()
+{
+	TArray<APlayerCharacter*> Result;
+	for (TWeakObjectPtr<APlayerCharacter> Character: _InPlayers)
+	{
+		if (Character.IsValid())
+		{
+			Result.Add(Character.Get());
+		}
+	}
+
+	return Result;
+}
+
+TArray<ATile*> ATile::GetNextTiles()
+{
+	TArray<ATile*> Result;
+
+	for (auto Tile : _NextTile)
+	{
+		if (Tile.IsValid())
+		{
+			Result.Add(Tile.Get());
+		}
+	}
+
+	return Result;
+}
+
+TArray<ATile*> ATile::GetBeforeTiles()
+{
+	TArray<ATile*> Result;
+
+	for (auto Tile : _BeforeTile)
+	{
+		if (Tile.IsValid())
+		{
+			Result.Add(Tile.Get());
+		}
+	}
+
+	return Result;
+}
+
 
 // Called when the game starts or when spawned
 void ATile::BeginPlay()
