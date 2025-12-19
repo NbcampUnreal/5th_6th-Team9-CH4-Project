@@ -13,6 +13,27 @@ ATileManagerActor::ATileManagerActor()
 
 }
 
+ATileManagerActor* ATileManagerActor::Get(UWorld* World) {
+	if (!World) return nullptr;
+
+	if (SingletonInstance.IsValid())
+	{
+		return SingletonInstance.Get();
+	}
+
+	//for (TActorIterator<ATileManagerActor> It(World); It; ++It)
+	//{
+	//	ATileManagerActor* Found = *It;
+	//	if (Found)
+	//	{
+	//		SingletonInstance = Found;
+	//		return Found;
+	//	}
+	//}
+
+	return nullptr;
+}
+
 // Called when the game starts or when spawned
 void ATileManagerActor::BeginPlay()
 {
@@ -21,30 +42,25 @@ void ATileManagerActor::BeginPlay()
 	LinkTiles();
 }
 
-void ATileManagerActor::LoadCSV()
-{
-
-}
-
 void ATileManagerActor::SpawnTiles(){
 	checkf(IsValid(_TilesData), TEXT("TilesData is Not Valid, ATileManagerActor::SpawnTiles"));
 
-	const TArray<FName> RowNames = _TilesData->GetRowNames();
+	const int32 Count = _TilesData->GetRowNames().Num();
 	FString Context = TEXT("FTileData Lookup");
 
-	int32 index = 0; 
-	for (size_t i = 0; i < RowNames.Num(); ++i)
+	for (size_t i = 0; i < Count; ++i)
 	{
-		FTileData* tiledata = _TilesData->FindRow<FTileData>(RowNames[i], Context);
+		FName RowName(FString::Printf(TEXT("%d"), i));
+		FTileData* Tiledata = _TilesData->FindRow<FTileData>(RowName, Context);
 
-		if (!tiledata)
+		if (!Tiledata)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("tiledata %s not found or invalid."), *RowNames[i].ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Tiledata's index : %d is not found or invalid."), i);
 			continue;
 		}
 
 		FTransform SpawnTransform;
-		SpawnTransform.SetLocation(tiledata->Location);
+		SpawnTransform.SetLocation(Tiledata->Location);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -53,29 +69,59 @@ void ATileManagerActor::SpawnTiles(){
 
 		if (!SpawnedTile)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to spawn tile for row %s"), *RowNames[i].ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Failed to spawn tile for row index : %d"), i);
 			continue;
 		}
 
-		SpawnedTile->AssignFromData(tiledata, index);
-
 		_Tiles.Add(SpawnedTile);
-		index++;
-		UE_LOG(LogTemp, Warning, TEXT("complete spawn Tile name : %s"), *RowNames[i].ToString());
 
+		SpawnedTile->AssignFromData(Tiledata, i);
+		UE_LOG(LogTemp, Warning, TEXT("complete spawn Tile index : %d"), i);
 	}
 }
 
 void ATileManagerActor::LinkTiles()
 {
 	checkf(IsValid(_TilesData), TEXT("TilesData is Not Valid, ATileManagerActor::LinkTiles"));
-	UE_LOG(LogTemp, Warning, TEXT("Nums : %d"), _Tiles.Num());
 
-	for (TWeakObjectPtr<ATile>& Tile : _Tiles)
+	const int32 Count = _Tiles.Num();
+	FString Context = TEXT("FTileData Lookup");
+
+	ATile* TempTile;
+	for (size_t i = 0; i < Count; ++i)
 	{
-		//Tile->
+		FName RowName(FString::Printf(TEXT("%d"), i));
+		FTileData* Tiledata = _TilesData->FindRow<FTileData>(RowName, Context);
+
+		if (!Tiledata)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Tiledata's index : %d is not found or invalid."), i);
+			continue;
+		}
+
+		if (_Tiles[i].IsValid())
+		{
+			TempTile = _Tiles[i].Get();
+
+			TArray<TWeakObjectPtr<ATile>> BeforeTilesIndex = GetTilesByIndexes(Tiledata->BeforeTilesIndex);
+			TArray<TWeakObjectPtr<ATile>> NextTilesIndex = GetTilesByIndexes(Tiledata->NextTilesIndex);
+
+			TempTile->SetLinkTiles(BeforeTilesIndex, NextTilesIndex);
+		}
+	}
+}
+
+TArray<TWeakObjectPtr<ATile>> ATileManagerActor::GetTilesByIndexes(TArray<int32>& Indexes) const
+{
+	TArray<TWeakObjectPtr<ATile>> result;
+
+	for (const int32 index : Indexes)
+	{
+		if (_Tiles[index].IsValid())
+		{
+			result.Add(_Tiles[index]);
+		}
 	}
 
-
-
+	return result;
 }
