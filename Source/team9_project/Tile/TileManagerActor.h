@@ -21,9 +21,10 @@ public:
 	static ATileManagerActor* Get(UWorld* World)
 	{
 		if (SingletonInstance.IsValid()) return SingletonInstance.Get();
-		// 월드에서 찾아보고 없으면 서버에서 스폰 시도 등 로직
 		return nullptr;
 	}
+
+	ATile* GetTile(int32 Index);
 
 protected:
 

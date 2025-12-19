@@ -15,6 +15,18 @@ ATileManagerActor::ATileManagerActor()
 
 }
 
+ATile* ATileManagerActor::GetTile(int32 Index)
+{
+	ATile* Result = nullptr;
+
+	if (_Tiles[Index].IsValid())
+	{
+		Result = _Tiles[Index].Get();
+	}
+
+	return Result;
+}
+
 // Called when the game starts or when spawned
 void ATileManagerActor::BeginPlay()
 {
