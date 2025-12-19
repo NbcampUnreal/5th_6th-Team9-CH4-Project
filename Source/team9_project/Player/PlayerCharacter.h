@@ -9,6 +9,7 @@
 class USkeletalMeshComponent;
 class AMyPlayerState;
 class ACameraPawn;
+class ATile;
 struct FTimerHandle;
 
 UCLASS()
@@ -35,17 +36,24 @@ public:
 	void MoveToNextNode(int DiceValue);
 
 	void SetPlayerState(AMyPlayerState* InPlayerState);
+
 	AMyPlayerState* GetPlayerState();
+
+	ATile* GetCurrentTile();
+
+	void SetCurrentTile(ATile* TileNode);
 
 	bool OnDie();
 
 private:
 	void UpdateMove();
 
+
 public:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* MeshComp;
 
+	
 	int remainingMove;
 
 private:
@@ -55,7 +63,10 @@ private:
 	UPROPERTY()
 	AMyPlayerState* MyPlayerState;
 
+	UPROPERTY(EditAnywhere)
+	ATile* CurrentTile;
 
+	// 타일 이동 변수
 	FTimerHandle MoveTimerHandle;
 
 	FVector MoveStart;
@@ -67,6 +78,10 @@ private:
 	float MoveDuration;
 
 	float MoveElapsed;
+	//
 
-	int32 Currnet_index_Tile = 0;
+	// 타일 인덱스
+	int32 CurrentIndex;
+
+	bool bIsMoving;
 };

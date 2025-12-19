@@ -32,6 +32,10 @@ void UStateBase::Hit()
 {
 }
 
+void UStateBase::ItemUse()
+{
+}
+
 bool UStateBase::CanTakeDamage()
 {
 	return false;

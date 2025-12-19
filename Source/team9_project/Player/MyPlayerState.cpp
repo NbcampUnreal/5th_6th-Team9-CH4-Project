@@ -3,9 +3,21 @@
 AMyPlayerState::AMyPlayerState()
 	: CurrentHp(100),
 	MaxHp(100),
-	CurrentScore(0)
+	CurrentScore(0),
+	TileIndex(0),
+	PlayerID(0)
 {
-	SetTileIndex(0);
+
+}
+
+void AMyPlayerState::SetPlayerID(int Amount)
+{
+	PlayerID = Amount;
+}
+
+int AMyPlayerState::GetPlayerID()
+{
+	return PlayerID;
 }
 
 void AMyPlayerState::SetHP(int Amount)

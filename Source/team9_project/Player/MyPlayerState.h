@@ -17,6 +17,10 @@ class TEAM9_PROJECT_API AMyPlayerState : public APlayerState
 public:
 	AMyPlayerState();
 
+	void SetPlayerID(int Amount);
+
+	int GetPlayerID();
+
 	void SetHP(int Amount);
 
 	int GetHP();
@@ -40,6 +44,8 @@ public:
 
 
 private:
+	int PlayerID;
+
 	int CurrentHp;
 
 	int MaxHp;

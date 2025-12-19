@@ -2,11 +2,11 @@
 
 #include "Player/PlayerCharacter.h"
 #include "State/StateBase.h"
-#include "State/PlayerStateMachine.h"
 #include "State/IdleState.h"
 #include "State/MoveState.h"
 #include "State/DieState.h"
 #include "State/HitState.h"
+#include "State/ItemUseState.h"
 
 void UPlayerStateMachine::Initialize(APawn* InPlayer, APlayerCharacter* InCharacter)
 {
@@ -36,6 +36,12 @@ void UPlayerStateMachine::Initialize(APawn* InPlayer, APlayerCharacter* InCharac
 	if (HitState)
 	{
 		HitState->Initialize(this);
+	}
+
+	ItemUseState = NewObject<UItemUseState>(this);
+	if (ItemUseState)
+	{
+		ItemUseState->Initialize(this);
 	}
 
 	ChangeState(EStates::Idle);
@@ -71,7 +77,7 @@ void UPlayerStateMachine::ChangeState(EStates NewState)
 		CurrentState = HitState;
 		break;
 	case EStates::ItemUse:
-		//CurrentState = ItemUseState;
+		CurrentState = ItemUseState;
 		break;
 
 	default:

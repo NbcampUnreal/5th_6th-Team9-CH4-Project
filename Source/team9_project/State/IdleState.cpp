@@ -27,6 +27,11 @@ void UIdleState::Hit()
 	StateMachine->ChangeState(EStates::Hit);
 }
 
+void UIdleState::ItemUse()
+{
+	StateMachine->ChangeState(EStates::ItemUse);
+}
+
 bool UIdleState::CanTakeDamage()
 {
 	return true;

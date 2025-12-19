@@ -15,7 +15,8 @@ APlayerCharacter::APlayerCharacter() :
 	MoveSpeed(300.f),
 	MoveDuration(0.f),
 	MoveElapsed(0.f),
-	remainingMove(0)
+	remainingMove(0),
+	bIsMoving(false)
 {
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = false;
@@ -60,24 +61,21 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return ActualDamage;
 }
 
-
-
 void APlayerCharacter::MoveToNextNode(int DiceValue)
 {
 	if (!HasAuthority())
 	{
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("MoveToNextNode On"));
+
 	remainingMove = DiceValue;
 
-
 	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+	CurrentIndex = MyPlayerState->GetTileIndex();
+	MoveStart = TileManager->GetTile(CurrentIndex)->GetActorLocation();
 
-	MoveStart = TileManager->GetTile(Currnet_index_Tile)->GetActorLocation();
-	
-	TArray<ATile*> NextTiles = TileManager->GetTile(Currnet_index_Tile)->GetNextTiles();
-	
+	// 현재 타일에서 이동가능한 타일 배열
+	TArray<ATile*> NextTiles = TileManager->GetTile(CurrentIndex)->GetNextTiles();
 	MoveTarget = NextTiles[0]->GetActorLocation();
 
 	FVector ToTarget = (MoveTarget - MoveStart).GetSafeNormal();
@@ -85,10 +83,17 @@ void APlayerCharacter::MoveToNextNode(int DiceValue)
 
 	SetActorRotation(TargetRotation);
 
-
 	float Distance = FVector::Dist(MoveStart, MoveTarget);
 	MoveDuration = Distance / MoveSpeed;
 	MoveElapsed = 0.f;
+
+	if (bIsMoving == false)
+	{
+		//타일 델리게이트 호출
+		NextTiles[0]->PlayerLeave(this);
+	}
+
+	bIsMoving = true;
 
 	// 0.01초 간격으로 이동 업데이트
 	GetWorldTimerManager().SetTimer(
@@ -111,16 +116,29 @@ void APlayerCharacter::UpdateMove()
 	if (Alpha >= 1.f)
 	{
 		ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
-		TArray<ATile*> NextTiles = TileManager->GetTile(Currnet_index_Tile)->GetNextTiles();
+		TArray<ATile*> NextTiles = TileManager->GetTile(CurrentIndex)->GetNextTiles();
 
-		Currnet_index_Tile = NextTiles[0]->GetIndex();
+		CurrentIndex = NextTiles[0]->GetIndex();
 
 		GetWorldTimerManager().ClearTimer(MoveTimerHandle);
 
 		remainingMove--;
-		if (remainingMove > 0)
+		if (remainingMove > 0) // 지나가는중
 		{
+			// playerState Index 저장
+			MyPlayerState->SetTileIndex(CurrentIndex);
+	
+			//타일 델리게이트 호출
+			NextTiles[0]->PlayerPassed(this);
+			UE_LOG(LogTemp, Warning, TEXT("PlayerPassed"));
 			MoveToNextNode(remainingMove);
+		}
+		else // 도착
+		{
+			bIsMoving = false;
+			//타일 델리게이트 호출
+			NextTiles[0]->PlayerArrive(this);
+			UE_LOG(LogTemp, Warning, TEXT("PlayerArrive"));
 		}
 	}
 }
@@ -142,4 +160,14 @@ void APlayerCharacter::SetPlayerState(AMyPlayerState* InPlayerState)
 AMyPlayerState* APlayerCharacter::GetPlayerState()
 {
 	return MyPlayerState;
+}
+
+void APlayerCharacter::SetCurrentTile(ATile* TileNode)
+{
+	CurrentTile = TileNode;
+}
+
+ATile* APlayerCharacter::GetCurrentTile()
+{
+	return CurrentTile;
 }
