@@ -2,11 +2,13 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Player/MyPlayerController.h"
+#include "Player/MyPlayerState.h"
 #include "State/PlayerStateMachine.h"
 #include "State/StateBase.h"
 #include "Tile/Tile.h"
 #include "EnhancedInputComponent.h"
 #include "CameraPawn.h"
+#include "Tile/TileManagerActor.h"
 
 
 APlayerCharacter::APlayerCharacter() :
@@ -26,14 +28,20 @@ void APlayerCharacter::BeginPlay()
 
 }
 
+void APlayerCharacter::InitCharacter(ACameraPawn* InCameraPawn)
+{
+	CameraPawn = InCameraPawn;
+
+	/*FVector StartPosition = InCameraPawn->GetCurrentTile()->GetActorLocation();
+	SetActorLocation(StartPosition);*/
+
+}
+
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*if (IsValid(StateMachine))
-	{
-		StateMachine->OnUpdate(DeltaTime);
-	}*/
+	
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -45,27 +53,14 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), ActualDamage);
-	/*if (!StateMachine || !StateMachine->GetCurrentState()->CanTakeDamage())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Dont TakeDamage"));
-		return 0.f;
-	}
 
-	MyPlayerState->CurrentHp = FMath::Clamp(MyPlayerState->CurrentHp - (int)ActualDamage, 0, MyPlayerState->MaxHp);
-	UE_LOG(LogTemp, Warning, TEXT("Current HP : %d"), MyPlayerState->CurrentHp);
-	if (MyPlayerState->CurrentHp <= 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Die"));
-		OnDie();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit"));
-		StateMachine->ChangeState(EStates::Hit);
-	}*/
+	GetPlayerState()->SetHP(FMath::Clamp(GetPlayerState()->GetHP() - (int)ActualDamage, 0, GetPlayerState()->GetMaxHP()));
+	UE_LOG(LogTemp, Warning, TEXT("Current HP : %d"), GetPlayerState()->GetHP());
 
 	return ActualDamage;
 }
+
+
 
 void APlayerCharacter::MoveToNextNode(int DiceValue)
 {
@@ -73,16 +68,22 @@ void APlayerCharacter::MoveToNextNode(int DiceValue)
 	{
 		return;
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("MoveToNextNode On"));
 	remainingMove = DiceValue;
 
-	/*MoveStart = CurrentNode->WorldLocation;
-	MoveTarget = CurrentNode->NextNode->WorldLocation;*/
+
+	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+
+	MoveStart = TileManager->GetTile(Currnet_index_Tile)->GetActorLocation();
+	
+	TArray<ATile*> NextTiles = TileManager->GetTile(Currnet_index_Tile)->GetNextTiles();
+	
+	MoveTarget = NextTiles[0]->GetActorLocation();
 
 	FVector ToTarget = (MoveTarget - MoveStart).GetSafeNormal();
 	FRotator TargetRotation = ToTarget.Rotation();
-	//MulticastRPCSetRotation(TargetRotation);
-	//SetActorRotation(TargetRotation);
+
+	SetActorRotation(TargetRotation);
 
 
 	float Distance = FVector::Dist(MoveStart, MoveTarget);
@@ -109,8 +110,11 @@ void APlayerCharacter::UpdateMove()
 
 	if (Alpha >= 1.f)
 	{
-		/*CurrentNode = CurrentNode->NextNode;
-		SetActorLocation(CurrentNode->WorldLocation);*/
+		ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+		TArray<ATile*> NextTiles = TileManager->GetTile(Currnet_index_Tile)->GetNextTiles();
+
+		Currnet_index_Tile = NextTiles[0]->GetIndex();
+
 		GetWorldTimerManager().ClearTimer(MoveTimerHandle);
 
 		remainingMove--;
@@ -118,14 +122,24 @@ void APlayerCharacter::UpdateMove()
 		{
 			MoveToNextNode(remainingMove);
 		}
-		else
-		{
-			//StateMachine->ChangeState(EStates::Idle);
-		}
 	}
 }
 
-void APlayerCharacter::OnDie()
+bool APlayerCharacter::OnDie()
 {
-	//StateMachine->ChangeState(EStates::Die);
+	if (MyPlayerState->GetHP() <= 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+void APlayerCharacter::SetPlayerState(AMyPlayerState* InPlayerState)
+{
+	MyPlayerState = InPlayerState;
+}
+
+AMyPlayerState* APlayerCharacter::GetPlayerState()
+{
+	return MyPlayerState;
 }

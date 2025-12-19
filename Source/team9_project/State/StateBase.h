@@ -21,7 +21,9 @@ public:
 
 	virtual void OnExit();
 
-	virtual void Move(int Amount);
+	virtual void Move();
+
+	virtual void Hit();
 
 	virtual bool CanTakeDamage();
 
@@ -29,6 +31,9 @@ public:
 	UPlayerStateMachine* GetStateMachine() const;
 
 	APlayerCharacter* GetPlayerCharacter() const;
+
+	APawn* GetCameraPawn() const;
+
 
 protected:
 	UPROPERTY()

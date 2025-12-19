@@ -3,11 +3,13 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "GameMode/MainGameMode.h"
 #include "Player/MyPlayerController.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/MyPlayerState.h"
 #include "State/PlayerStateMachine.h"
 #include "State/StateBase.h"
+#include "Tile/Tile.h"
 #include "Kismet/GameplayStatics.h"
 
 ACameraPawn::ACameraPawn() :
@@ -51,14 +53,15 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 void ACameraPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	PlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>
 		(CharacterClass, GetActorLocation(), GetActorRotation());
+	PlayerCharacter->InitCharacter(this);
 
 	StateMachine = NewObject<UPlayerStateMachine>(this);
 	if (IsValid(StateMachine))
 	{
-		StateMachine->Initialize(PlayerCharacter);
+		StateMachine->Initialize(this, PlayerCharacter);
 	}
 
 	APlayerState* PS = GetPlayerState();
@@ -67,13 +70,10 @@ void ACameraPawn::BeginPlay()
 		AMyPlayerState* TPS = Cast<AMyPlayerState>(PS);
 		if (IsValid(TPS))
 		{
-			MyPlayerState = TPS;
+			PlayerCharacter->SetPlayerState(TPS);
 		}
 	}
-
-	
 }
-
 
 void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -136,6 +136,11 @@ void ACameraPawn::Tick(float DeltaTime)
 		return;
 	}
 
+	if (IsValid(StateMachine))
+	{
+		StateMachine->OnUpdate(DeltaTime);
+	}
+
 	if (IsValid(MyPlayerController))
 	{
 		if (ViewX == 0 || ViewY == 0)
@@ -187,6 +192,16 @@ void ACameraPawn::RightClickHandle(const FInputActionValue& Value)
 	ServerRPCRightClick();
 }
 
+void ACameraPawn::SetCurrentTile(ATile* TileNode)
+{
+	CurrentTile = TileNode;
+}
+
+ATile* ACameraPawn::GetCurrentTile()
+{
+	return CurrentTile;
+}
+
 void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraKeyMoveHandle"));
@@ -218,16 +233,20 @@ void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 	SetActorLocation(PlayerCharacter->GetActorLocation());
 }
 
+// 이동 테스트
 void ACameraPawn::ServerRPCLeftClick_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Sever : LeftClick"));
-
-	StateMachine->GetCurrentState()->Move(RandDice());
+	
+	StateMachine->GetCurrentState()->Move();
 }
 
+// 공격받기 테스트
 void ACameraPawn::ServerRPCRightClick_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Sever : RightClick"));
+
+	StateMachine->GetCurrentState()->Hit();
 
 	UGameplayStatics::ApplyDamage(
 		PlayerCharacter,
@@ -236,17 +255,4 @@ void ACameraPawn::ServerRPCRightClick_Implementation()
 		this,
 		UDamageType::StaticClass()
 	);
-}
-
-int ACameraPawn::RandDice()
-{
-	int DiceValue = FMath::RandRange(1, 6);
-
-	UE_LOG(LogTemp, Warning, TEXT("ATestCharacter::RandDice() Count : %d"), DiceValue);
-	return DiceValue;
-}
-
-void ACameraPawn::SetCurrentNode(ATile* TileNode)
-{
-	//CurrentNode = TileNode;
 }

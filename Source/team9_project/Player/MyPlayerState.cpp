@@ -5,6 +5,7 @@ AMyPlayerState::AMyPlayerState()
 	MaxHp(100),
 	CurrentScore(0)
 {
+	SetTileIndex(0);
 }
 
 void AMyPlayerState::CopyProperties(APlayerState* NewPlayerState)
@@ -29,6 +30,16 @@ int AMyPlayerState::GetHP()
 	return CurrentHp;
 }
 
+void AMyPlayerState::SetMaxHP(int Amount)
+{
+	MaxHp = Amount;
+}
+
+int AMyPlayerState::GetMaxHP()
+{
+	return MaxHp;
+}
+
 void AMyPlayerState::AddHP(int Amount)
 {
 	CurrentHp += Amount;
@@ -47,4 +58,14 @@ int AMyPlayerState::GetScore()
 void AMyPlayerState::AddScore(int Amount)
 {
 	CurrentScore += Amount;
+}
+
+void AMyPlayerState::SetTileIndex(int Amount)
+{
+	TileIndex = Amount;
+}
+
+int AMyPlayerState::GetTileIndex()
+{
+	return TileIndex;
 }

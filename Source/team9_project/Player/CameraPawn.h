@@ -47,9 +47,8 @@ public:
 	void LeftClickHandle(const FInputActionValue&);
 	void RightClickHandle(const FInputActionValue&);
 	
-	int RandDice();
-
-	void SetCurrentNode(ATile* TileNode);
+	void SetCurrentTile(ATile* TileNode);
+	ATile* GetCurrentTile();
 
 protected:
 	UPROPERTY()
@@ -61,6 +60,9 @@ protected:
 	UPROPERTY()
 	UCameraComponent* CameraComp;
 
+	UPROPERTY()
+	AMyPlayerController* MyPlayerController;
+
 	// 케릭터 스폰용
 	UPROPERTY()
 	TSubclassOf<APlayerCharacter> CharacterClass;
@@ -68,17 +70,13 @@ protected:
 	UPROPERTY()
 	APlayerCharacter* PlayerCharacter;
 
-	UPROPERTY()
-	AMyPlayerController* MyPlayerController;
-
-	UPROPERTY()
-	AMyPlayerState* MyPlayerState;
+	UPROPERTY(EditAnywhere)
+	ATile* CurrentTile;
 
 	UPROPERTY()
 	UPlayerStateMachine* StateMachine;
 
-	UPROPERTY(EditAnywhere)
-	ATile* CurrentNode;
+	
 
 	UPROPERTY(EditAnywhere)
 	float ScreenSpeed;
