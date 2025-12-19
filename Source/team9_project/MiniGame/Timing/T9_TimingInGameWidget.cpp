@@ -9,8 +9,10 @@ void UT9_TimingInGameWidget::NativeTick(const FGeometry& MyGeometry, float InDel
     Super::NativeTick(MyGeometry, InDeltaTime);
 
     AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
-    if (!GS) return;
-
+    if (!GS)
+    {
+        return;
+    }
     float Elapsed = GetWorld()->GetTimeSeconds() - GS->GameStartTime;
     float Remaining = (GS->TargetTime / 1000.f) - Elapsed;
 

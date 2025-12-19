@@ -13,10 +13,12 @@ void AT9_RacingGameMode::BeginPlay()
 void AT9_RacingGameMode::StartGame()
 {
 	Super::StartGame();
-	UE_LOG(LogTemp, Error, TEXT("StartGame"));
+	UE_LOG(LogTemp, Error, TEXT("StartRacingGame"));
 }
 
 void AT9_RacingGameMode::EndGame()
 {
+	Super::EndGame();
+	UE_LOG(LogTemp, Error, TEXT("EndRacingGame"));
 
 }

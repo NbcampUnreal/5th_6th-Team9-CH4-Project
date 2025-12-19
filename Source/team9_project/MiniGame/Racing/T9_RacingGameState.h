@@ -9,4 +9,6 @@ class TEAM9_PROJECT_API AT9_RacingGameState : public AT9_MiniGameStateBase
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void OnPhaseChanged(EMiniGamePhase NewPhase) override;
 };

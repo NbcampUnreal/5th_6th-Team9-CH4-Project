@@ -17,11 +17,6 @@ void AT9_TimingGamePlayerController::ServerRPC_StopTimer_Implementation()
 void AT9_TimingGamePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (IsLocalController())
-	{
-		CreateUI();
-		ShowReadyUI();
-	}
 }
 
 void AT9_TimingGamePlayerController::CreateUI()
@@ -91,7 +86,7 @@ void AT9_TimingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 
 	case EMiniGamePhase::Playing:
 		ShowInGameUI();
-		SetInputEnabled(true);
+		SetInputEnabled(false);
 		break;
 
 	case EMiniGamePhase::Result:

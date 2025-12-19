@@ -26,6 +26,11 @@ void AT9_MiniGamePlayerControllerBase::SetInputEnabled(bool bEnable)
 void AT9_MiniGamePlayerControllerBase::BeginPlay()
 {
 	Super::BeginPlay();
+	if (IsLocalController())
+	{
+		CreateUI();
+		ShowReadyUI();
+	}
 }
 
 void AT9_MiniGamePlayerControllerBase::CreateUI()

@@ -9,4 +9,7 @@ class TEAM9_PROJECT_API UT9_RacingInGameWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Distance;
 };

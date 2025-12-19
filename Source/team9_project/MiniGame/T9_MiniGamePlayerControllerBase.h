@@ -44,5 +44,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UT9_MiniGameResultWidget> ResultWidgetClass;
 
+	UPROPERTY()
 	TObjectPtr<UT9_MiniGameResultWidget> ResultWidgetInstance;
 };
