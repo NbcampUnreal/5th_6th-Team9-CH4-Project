@@ -5,33 +5,14 @@
 #include "TileData.h"
 #include "Tile/Tile.h"
 
+TWeakObjectPtr<ATileManagerActor> ATileManagerActor::SingletonInstance = nullptr;
+
 // Sets default values
 ATileManagerActor::ATileManagerActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-}
-
-ATileManagerActor* ATileManagerActor::Get(UWorld* World) {
-	if (!World) return nullptr;
-
-	if (SingletonInstance.IsValid())
-	{
-		return SingletonInstance.Get();
-	}
-
-	//for (TActorIterator<ATileManagerActor> It(World); It; ++It)
-	//{
-	//	ATileManagerActor* Found = *It;
-	//	if (Found)
-	//	{
-	//		SingletonInstance = Found;
-	//		return Found;
-	//	}
-	//}
-
-	return nullptr;
 }
 
 // Called when the game starts or when spawned

@@ -18,7 +18,12 @@ public:
 	// Sets default values for this actor's properties
 	ATileManagerActor();
 
-	static ATileManagerActor* Get(UWorld* World);
+	static ATileManagerActor* Get(UWorld* World)
+	{
+		if (SingletonInstance.IsValid()) return SingletonInstance.Get();
+		// 월드에서 찾아보고 없으면 서버에서 스폰 시도 등 로직
+		return nullptr;
+	}
 
 protected:
 
