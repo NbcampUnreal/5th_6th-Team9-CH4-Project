@@ -20,6 +20,19 @@ int AMyPlayerState::GetPlayerID()
 	return PlayerID;
 }
 
+void AMyPlayerState::CopyProperties(APlayerState* NewPlayerState)
+{
+	Super::CopyProperties(NewPlayerState);
+
+	AMyPlayerState* NewPS = Cast<AMyPlayerState>(NewPlayerState);
+	if (NewPS)
+	{
+		//Passing by value
+		//ex)NewPS->HP = HP;
+		NewPS->PlayerNumber = PlayerNumber;
+	}
+}
+
 void AMyPlayerState::SetHP(int Amount)
 {
 	CurrentHp = Amount;
@@ -68,4 +81,14 @@ void AMyPlayerState::SetTileIndex(int Amount)
 int AMyPlayerState::GetTileIndex()
 {
 	return TileIndex;
+}
+
+int32 AMyPlayerState::GetPlayerNumber()
+{
+	return PlayerNumber;
+}
+
+void AMyPlayerState::SetPlayerNumber(int32 PNumber)
+{
+	PlayerNumber = PNumber;
 }

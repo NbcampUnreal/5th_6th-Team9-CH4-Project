@@ -1,16 +1,25 @@
-#include "MiniGame/Racing/T9_RacingGamePlayerController.h"
+#include "MiniGame/Timing/T9_TimingGamePlayerController.h"
 #include "MiniGame/T9_MiniGameReadyWidget.h"
 #include "MiniGame/T9_MiniGameResultWidget.h"
-#include "MiniGame/Racing/T9_RacingInGameWidget.h"
-#include "MiniGame/Racing/T9_RacingGameMode.h"
-#include "MiniGame/Racing/T9_RacingGameState.h"
+#include "MiniGame/Timing/T9_TimingGameState.h"
+#include "MiniGame/Timing/T9_TimingGameMode.h"
+#include "MiniGame/Timing/T9_TimingInGameWidget.h"
+#include "Net/UnrealNetwork.h"
 
-void AT9_RacingGamePlayerController::BeginPlay()
+void AT9_TimingGamePlayerController::ServerRPC_StopTimer_Implementation()
+{
+	AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
+	if (!GS) return;
+
+	GS->AddPlayerPress(1, GetWorld()->GetTimeSeconds());//PlayerId Change
+}
+
+void AT9_TimingGamePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AT9_RacingGamePlayerController::CreateUI()
+void AT9_TimingGamePlayerController::CreateUI()
 {
 	if (IsLocalController())
 	{
@@ -24,12 +33,12 @@ void AT9_RacingGamePlayerController::CreateUI()
 		}
 		if (InGameWidgetClass)
 		{
-			InGameWidgetInstance = CreateWidget<UT9_RacingInGameWidget>(this, InGameWidgetClass);
+			InGameWidgetInstance = CreateWidget<UT9_TimingInGameWidget>(this, InGameWidgetClass);
 		}
 	}
 }
 
-void AT9_RacingGamePlayerController::ShowInGameUI()
+void AT9_TimingGamePlayerController::ShowInGameUI()
 {
 	RemoveAllUI();
 	if (InGameWidgetInstance)
@@ -43,7 +52,7 @@ void AT9_RacingGamePlayerController::ShowInGameUI()
 	}
 }
 
-void AT9_RacingGamePlayerController::RemoveAllUI()
+void AT9_TimingGamePlayerController::RemoveAllUI()
 {
 	if (ReadyWidgetInstance)
 	{
@@ -61,7 +70,7 @@ void AT9_RacingGamePlayerController::RemoveAllUI()
 	}
 }
 
-void AT9_RacingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
+void AT9_TimingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 {
 	UE_LOG(LogTemp, Error, TEXT("ChangeUI"));
 	if (!IsLocalController())
@@ -77,7 +86,7 @@ void AT9_RacingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 
 	case EMiniGamePhase::Playing:
 		ShowInGameUI();
-		SetInputEnabled(true);
+		SetInputEnabled(false);
 		break;
 
 	case EMiniGamePhase::Result:
