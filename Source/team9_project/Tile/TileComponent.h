@@ -1,0 +1,41 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "TileComponent.generated.h"
+
+class UTileAction;
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class TEAM9_PROJECT_API UTileComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:	
+	// Sets default values for this component's properties
+	UTileComponent();
+
+protected:
+
+private:
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TSubclassOf<UTileAction>> _TileActions;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UTileAction>> _TileInstance;
+
+public:	
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	virtual void BeginDestroy() override;
+
+	virtual void OnRegister() override;
+private:
+		
+};
