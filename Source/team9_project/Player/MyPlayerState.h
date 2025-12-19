@@ -33,10 +33,18 @@ public:
 
 	void AddScore(int Amount);
 
+	void SetTileIndex(int Amount);
+
+	int GetTileIndex();
+
+
+
 private:
 	int CurrentHp;
 
 	int MaxHp;
 
 	int CurrentScore;
+
+	int TileIndex;
 };
