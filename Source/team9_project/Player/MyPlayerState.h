@@ -17,6 +17,8 @@ class TEAM9_PROJECT_API AMyPlayerState : public APlayerState
 public:
 	AMyPlayerState();
 
+	virtual void CopyProperties(APlayerState* NewPlayerState) override;
+
 	void SetHP(int Amount);
 
 	int GetHP();
@@ -37,7 +39,9 @@ public:
 
 	int GetTileIndex();
 
+	int32 GetPlayerId();
 
+	void SetPlayerId(int32 PId);
 
 private:
 	int CurrentHp;
@@ -47,4 +51,6 @@ private:
 	int CurrentScore;
 
 	int TileIndex;
+
+	int32 PlayerId;
 };

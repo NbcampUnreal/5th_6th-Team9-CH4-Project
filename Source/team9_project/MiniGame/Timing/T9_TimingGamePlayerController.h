@@ -1,16 +1,20 @@
 #pragma once
+
 #include "CoreMinimal.h"
 #include "MiniGame/T9_MiniGamePlayerControllerBase.h"
-#include "T9_RacingGamePlayerController.generated.h"
+#include "T9_TimingGamePlayerController.generated.h"
 
-class UT9_RacingInGameWidget;
+class UT9_TimingInGameWidget;
 
 UCLASS()
-class TEAM9_PROJECT_API AT9_RacingGamePlayerController : public AT9_MiniGamePlayerControllerBase
+class TEAM9_PROJECT_API AT9_TimingGamePlayerController : public AT9_MiniGamePlayerControllerBase
 {
 	GENERATED_BODY()
 	
 public:
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_StopTimer();
+
 	virtual void BeginPlay() override;
 
 	virtual void CreateUI() override;
@@ -23,8 +27,8 @@ public:
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UT9_RacingInGameWidget> InGameWidgetClass;
+	TSubclassOf<UT9_TimingInGameWidget> InGameWidgetClass;
 
 	UPROPERTY()
-	TObjectPtr<UT9_RacingInGameWidget> InGameWidgetInstance;
+	TObjectPtr<UT9_TimingInGameWidget> InGameWidgetInstance;
 };
