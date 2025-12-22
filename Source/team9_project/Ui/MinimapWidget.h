@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "MinimapWidget.generated.h"
