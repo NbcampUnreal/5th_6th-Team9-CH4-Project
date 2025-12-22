@@ -65,7 +65,7 @@ void ATileManagerActor::SpawnTiles(){
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Failed to spawn tile for row index : %d"), i);
 			continue;
-		}
+		} 
 
 		_Tiles.Add(SpawnedTile);
 
