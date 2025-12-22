@@ -9,13 +9,13 @@
 class UStaticMeshComponent;
 class UTileDataAsset;
 class APlayerCharacter;
+class UTileComponent;
 struct FTileData;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerArrive, APlayerCharacter*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerRollDice, APlayerCharacter*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerLeave, APlayerCharacter*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerUseItem, APlayerCharacter*);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerRollDice, APlayerCharacter*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerPassed, APlayerCharacter*);
 //DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRollDiceResult, APlayerCharacter*, int32);
 
@@ -27,6 +27,12 @@ class TEAM9_PROJECT_API ATile : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ATile();
+
+	FOnPlayerArrive OnPlayerArrive;
+	FOnPlayerLeave OnPlayerLeave;
+	FOnPlayerUseItem OnPlayerUseItem;
+	FOnPlayerRollDice OnPlayerRollDice;
+	FOnPlayerPassed OnPlayerPassed;
 
 protected:
 
@@ -43,13 +49,10 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
 	TArray<TWeakObjectPtr<ATile>> _NextTile;
 
-	int32 _Index;
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TObjectPtr<UTileComponent>> _TileComponents;
 
-	FOnPlayerArrive OnPlayerArrive;
-	FOnPlayerLeave OnPlayerLeave;
-	FOnPlayerUseItem OnPlayerUseItem;
-	FOnPlayerRollDice OnPlayerRollDice;
-	FOnPlayerPassed OnPlayerPassed;
+	int32 _Index;	
 
 	TSet<TWeakObjectPtr<APlayerCharacter>> _InPlayers;
 
