@@ -3,16 +3,19 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "GameMode/MainGameMode.h"
 #include "Player/MyPlayerController.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/MyPlayerState.h"
 #include "State/PlayerStateMachine.h"
 #include "State/StateBase.h"
+#include "Tile/Tile.h"
 #include "Kismet/GameplayStatics.h"
 
 ACameraPawn::ACameraPawn() :
 	ScreenSpeed(1500.f),
-	EdgeSize(50.f)
+	EdgeSize(50.f),
+	bisUsingItem(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -51,14 +54,15 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 void ACameraPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	PlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>
 		(CharacterClass, GetActorLocation(), GetActorRotation());
+	PlayerCharacter->InitCharacter(this);
 
 	StateMachine = NewObject<UPlayerStateMachine>(this);
 	if (IsValid(StateMachine))
 	{
-		StateMachine->Initialize(PlayerCharacter);
+		StateMachine->Initialize(this, PlayerCharacter);
 	}
 
 	APlayerState* PS = GetPlayerState();
@@ -67,13 +71,10 @@ void ACameraPawn::BeginPlay()
 		AMyPlayerState* TPS = Cast<AMyPlayerState>(PS);
 		if (IsValid(TPS))
 		{
-			MyPlayerState = TPS;
+			PlayerCharacter->SetPlayerState(TPS);
 		}
 	}
-
-	
 }
-
 
 void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -130,8 +131,13 @@ void ACameraPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsValid(StateMachine))
+	{
+		StateMachine->OnUpdate(DeltaTime);
+	}
+
 	//내화면에서만 적용
-	if (!IsLocallyControlled())
+	if (IsLocallyControlled() == false)
 	{
 		return;
 	}
@@ -187,9 +193,30 @@ void ACameraPawn::RightClickHandle(const FInputActionValue& Value)
 	ServerRPCRightClick();
 }
 
+void ACameraPawn::ItemUseStart()
+{
+	bisUsingItem = true;
+	StateMachine->GetCurrentState()->ItemUse();
+}
+
+void ACameraPawn::ItemUseEnd()
+{
+	bisUsingItem = false;
+} 
+
+bool ACameraPawn::GetIsUsingItem()
+{
+	return bisUsingItem;
+}
+
 void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraKeyMoveHandle"));
+
+	if (IsLocallyControlled() == false)
+	{
+		return;
+	}
 
 	const FVector2D ArrowInput = Value.Get<FVector2D>();
 
@@ -209,25 +236,39 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 
 void ACameraPawn::CameraWheelHandle(const FInputActionValue& Value)
 {
+	if (IsLocallyControlled() == false)
+	{
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraWheelHandle"));
 }
 
 void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 {
+	if (IsLocallyControlled() == false)
+	{
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraReturnHandle"));
 	SetActorLocation(PlayerCharacter->GetActorLocation());
 }
 
+// 이동 테스트
 void ACameraPawn::ServerRPCLeftClick_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Sever : LeftClick"));
-
-	StateMachine->GetCurrentState()->Move(RandDice());
+	
+	StateMachine->GetCurrentState()->Move();
 }
 
+// 공격받기 테스트
 void ACameraPawn::ServerRPCRightClick_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Sever : RightClick"));
+
+	StateMachine->GetCurrentState()->Hit();
 
 	UGameplayStatics::ApplyDamage(
 		PlayerCharacter,
@@ -236,17 +277,4 @@ void ACameraPawn::ServerRPCRightClick_Implementation()
 		this,
 		UDamageType::StaticClass()
 	);
-}
-
-int ACameraPawn::RandDice()
-{
-	int DiceValue = FMath::RandRange(1, 6);
-
-	UE_LOG(LogTemp, Warning, TEXT("ATestCharacter::RandDice() Count : %d"), DiceValue);
-	return DiceValue;
-}
-
-void ACameraPawn::SetCurrentNode(ATile* TileNode)
-{
-	//CurrentNode = TileNode;
 }

@@ -1,6 +1,7 @@
 #include "State/HitState.h"
 
 #include "Player/PlayerCharacter.h"
+#include "Player/MyPlayerState.h"
 #include "State/PlayerStateMachine.h"
 
 void UHitState::OnEnter()
@@ -17,6 +18,11 @@ void UHitState::OnUpdate(float DeltaTime)
 	if (ElapsedTime >= HitDuration)
 	{
 		GetStateMachine()->ChangeState(EStates::Idle);
+	}
+	
+	if (GetPlayerCharacter()->OnDie())
+	{
+		GetStateMachine()->ChangeState(EStates::Die);
 	}
 }
 

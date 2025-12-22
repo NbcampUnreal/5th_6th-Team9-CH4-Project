@@ -1,6 +1,7 @@
 #include "State/StateBase.h"
 
 #include "State/PlayerStateMachine.h"
+#include "Player/PlayerCharacter.h"
 
 void UStateBase::Initialize(UPlayerStateMachine* NewStateMachine)
 {
@@ -22,9 +23,17 @@ void UStateBase::OnExit()
 
 }
 
-void UStateBase::Move(int Amount)
+void UStateBase::Move()
 {
 
+}
+
+void UStateBase::Hit()
+{
+}
+
+void UStateBase::ItemUse()
+{
 }
 
 bool UStateBase::CanTakeDamage()
@@ -40,5 +49,10 @@ UPlayerStateMachine* UStateBase::GetStateMachine() const
 
 APlayerCharacter* UStateBase::GetPlayerCharacter() const
 {
-	return StateMachine->GetOwnerCharacter();;
+	return StateMachine->GetPlayerCharacter();
+}
+
+APawn* UStateBase::GetCameraPawn() const
+{
+	return StateMachine->GetCameraPawn();
 }

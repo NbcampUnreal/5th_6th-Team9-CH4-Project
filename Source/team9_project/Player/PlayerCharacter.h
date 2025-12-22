@@ -7,6 +7,9 @@
 #include "PlayerCharacter.generated.h"
 
 class USkeletalMeshComponent;
+class AMyPlayerState;
+class ACameraPawn;
+class ATile;
 struct FTimerHandle;
 
 UCLASS()
@@ -28,12 +31,22 @@ public:
 		AActor* DamageCauser
 	) override;
 
+	void InitCharacter(ACameraPawn* InCameraPawn);
+
 	void MoveToNextNode(int DiceValue);
+
+	void SetPlayerState(AMyPlayerState* InPlayerState);
+
+	AMyPlayerState* GetPlayerState();
+
+	ATile* GetCurrentTile();
+
+	void SetCurrentTile(ATile* TileNode);
+
+	bool OnDie();
 
 private:
 	void UpdateMove();
-	
-	void OnDie();
 
 
 public:
@@ -41,9 +54,19 @@ public:
 	USkeletalMeshComponent* MeshComp;
 
 	
+	int remainingMove;
 
-	
 private:
+	UPROPERTY()
+	ACameraPawn* CameraPawn;
+
+	UPROPERTY()
+	AMyPlayerState* MyPlayerState;
+
+	UPROPERTY(EditAnywhere)
+	ATile* CurrentTile;
+
+	// 타일 이동 변수
 	FTimerHandle MoveTimerHandle;
 
 	FVector MoveStart;
@@ -55,6 +78,10 @@ private:
 	float MoveDuration;
 
 	float MoveElapsed;
+	//
 
-	int remainingMove;
+	// 타일 인덱스
+	int32 CurrentIndex;
+
+	bool bIsMoving;
 };

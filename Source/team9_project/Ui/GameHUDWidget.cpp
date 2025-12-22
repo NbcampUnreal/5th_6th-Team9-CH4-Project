@@ -1,21 +1,46 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+#include "GameHUDWidget.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
+#include "Components/Button.h"
 
+void UGameHUDWidget::NativeConstruct()
+{
+    Super::NativeConstruct();
 
-#include "Ui/GameHUDWidget.h"
+    if (Btn_Dice)
+    {
+        Btn_Dice->OnClicked.AddDynamic(this, &UGameHUDWidget::OnDiceClicked);
+    }
+
+    if (Btn_ItemUse)
+    {
+        Btn_ItemUse->OnClicked.AddDynamic(this, &UGameHUDWidget::OnItemUseClicked);
+    }
+
+    UpdateHP(100.f, 100.f);
+}
 
 void UGameHUDWidget::UpdateHP(float CurrentHp, float MaxHp)
 {
-    if (HP_Bar && MaxHp > 0)
+    if (HP_Bar && MaxHp > 0.f)
     {
-        float Percent = CurrentHp / MaxHp;
-        HP_Bar->SetPercent(Percent);
+        HP_Bar->SetPercent(CurrentHp / MaxHp);
+    }
+
+    if (Text_PlayerHP)
+    {
+        Text_PlayerHP->SetText(FText::FromString(TEXT("Player HP")));
     }
 }
 
-void UGameHUDWidget::SetTurnTextVisibility(bool bIsMyTurn)
+void UGameHUDWidget::OnDiceClicked()
 {
-    if (Text_TurnAlert)
-    {
-        Text_TurnAlert->SetVisibility(bIsMyTurn ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-    }
+    UE_LOG(LogTemp, Warning, TEXT("[GameHUD] Dice button clicked"));
+    BP_OnDiceButtonClicked();
+}
+
+void UGameHUDWidget::OnItemUseClicked()
+{
+    UE_LOG(LogTemp, Warning, TEXT("[GameHUD] Item button clicked"));
+    BP_OnItemUseButtonClicked();
 }

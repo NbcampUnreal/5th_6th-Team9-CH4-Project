@@ -17,11 +17,19 @@ void UIdleState::OnExit()
 	UE_LOG(LogTemp, Warning, TEXT("IdleState OnExit"));
 }
 
-void UIdleState::Move(int Amount)
+void UIdleState::Move()
 {
-	GetPlayerCharacter()->MoveToNextNode(Amount);
-
 	StateMachine->ChangeState(EStates::Moving);
+}
+
+void UIdleState::Hit()
+{
+	StateMachine->ChangeState(EStates::Hit);
+}
+
+void UIdleState::ItemUse()
+{
+	StateMachine->ChangeState(EStates::ItemUse);
 }
 
 bool UIdleState::CanTakeDamage()

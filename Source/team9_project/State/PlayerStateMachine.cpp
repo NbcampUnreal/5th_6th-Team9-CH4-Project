@@ -2,15 +2,16 @@
 
 #include "Player/PlayerCharacter.h"
 #include "State/StateBase.h"
-#include "State/PlayerStateMachine.h"
 #include "State/IdleState.h"
 #include "State/MoveState.h"
 #include "State/DieState.h"
 #include "State/HitState.h"
+#include "State/ItemUseState.h"
 
-void UPlayerStateMachine::Initialize(APlayerCharacter* InOwner)
+void UPlayerStateMachine::Initialize(APawn* InPlayer, APlayerCharacter* InCharacter)
 {
-	OwnerCharacter = InOwner;
+	PlayerCharacter = InCharacter;
+	CameraPawn = InPlayer;
 	CurrentState = nullptr;
 
 	IdleState = NewObject<UIdleState>(this);
@@ -35,6 +36,12 @@ void UPlayerStateMachine::Initialize(APlayerCharacter* InOwner)
 	if (HitState)
 	{
 		HitState->Initialize(this);
+	}
+
+	ItemUseState = NewObject<UItemUseState>(this);
+	if (ItemUseState)
+	{
+		ItemUseState->Initialize(this);
 	}
 
 	ChangeState(EStates::Idle);
@@ -69,6 +76,9 @@ void UPlayerStateMachine::ChangeState(EStates NewState)
 	case EStates::Hit:
 		CurrentState = HitState;
 		break;
+	case EStates::ItemUse:
+		CurrentState = ItemUseState;
+		break;
 
 	default:
 		CurrentState = IdleState;
@@ -86,7 +96,12 @@ UStateBase* UPlayerStateMachine::GetCurrentState() const
 	return CurrentState;
 }
 
-APlayerCharacter* UPlayerStateMachine::GetOwnerCharacter() const
+APlayerCharacter* UPlayerStateMachine::GetPlayerCharacter() const
 {
-	return OwnerCharacter;
+	return PlayerCharacter;
+}
+
+APawn* UPlayerStateMachine::GetCameraPawn() const
+{
+	return CameraPawn;
 }

@@ -1,7 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Ui/MainTitleWidget.h"
+#include "UIManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -16,16 +14,21 @@ void UMainTitleWidget::NativeConstruct()
 
 void UMainTitleWidget::OnCreateGameClicked()
 {
-    // [TODO] GameInstance에 이름 저장 로직 추가 (Input_Name->GetText())
-
-    // 리슨 서버로 맵 열기
-    UGameplayStatics::OpenLevel(this, FName("MainMap"), true, TEXT("listen"));
+    // Subsystem을 통해 중앙 집중식으로 게임 시작 제어
+    if (UUIManagerSubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUIManagerSubsystem>())
+    {        
+        // 실제 로비로 사용할 레벨 이름을 넣으세요 (예: UISubsystem->StartHostGame(TEXT("/Game/Maps/LobbyMap"));)
+        UISubsystem->StartHostGame(TEXT("/Game/KJH/Test/NewMap"));
+    }
 }
 
 void UMainTitleWidget::OnJoinGameClicked()
 {
-    // 실제 구현시 IP 입력 팝업 필요. 여기서는 로컬호스트로 가정.
-    UGameplayStatics::OpenLevel(this, FName("127.0.0.1"));
+    if (UUIManagerSubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUIManagerSubsystem>())
+    {
+        FString IP = Input_Name ? Input_Name->GetText().ToString() : TEXT("127.0.0.1");
+        UISubsystem->StartJoinGame(IP);
+    }
 }
 
 void UMainTitleWidget::OnQuitClicked()
