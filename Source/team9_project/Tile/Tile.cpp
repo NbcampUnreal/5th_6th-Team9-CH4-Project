@@ -3,6 +3,7 @@
 #include "Tile.h"
 #include "TileData.h"
 #include "Player/PlayerCharacter.h"
+#include "TileComponent.h"
 
 // Sets default values
 ATile::ATile()
@@ -44,8 +45,8 @@ void ATile::PlayerPassed(APlayerCharacter* PlayerCharacter)
 
 void ATile::PlayerLeave(APlayerCharacter* PlayerCharacter)
 {
-	_InPlayers.Remove(PlayerCharacter);
 	OnPlayerLeave.Broadcast(PlayerCharacter);
+	_InPlayers.Remove(PlayerCharacter);
 }
 
 void ATile::PlayerUseItem(APlayerCharacter* PlayerCharacter)
@@ -125,5 +126,18 @@ void ATile::AssignFromDataAsset(UTileDataAsset* asset)
 	if (IsValid(asset->Mesh)) {
 		_Mesh->SetStaticMesh(asset->Mesh);
 	}
+
+	TArray<TSubclassOf<UTileComponent>>& TileComponents = asset->TileComponents;
+
+	for (const TSubclassOf<UTileComponent>& SubClass : TileComponents)
+    {
+        if (!SubClass) continue;
+
+        UTileComponent* NewComp = NewObject<UTileComponent>(this, SubClass);
+        if (!NewComp) continue;
+
+		NewComp->RegisterComponent(); 
+		_TileComponents.Add(NewComp);
+    }
 }
 

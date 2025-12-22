@@ -12,7 +12,7 @@ class APlayerCharacter;
 class AMyPlayerController;
 class AMyPlayerState;
 class UPlayerStateMachine;
-class ATile;
+class UItemEffectBase;
 struct FInputActionValue;
 
 UCLASS()
@@ -33,6 +33,9 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	bool GetIsUsingItem();
+
 	UFUNCTION(Server, Reliable)
 	void ServerRPCLeftClick();
 
@@ -46,19 +49,19 @@ public:
 
 	void LeftClickHandle(const FInputActionValue&);
 	void RightClickHandle(const FInputActionValue&);
-	
-	void SetCurrentTile(ATile* TileNode);
-	ATile* GetCurrentTile();
+
+
+	void ItemUseStart();
+	void ItemUseEnd();
 
 protected:
 	UPROPERTY()
 	USceneComponent* Root;
-
 	UPROPERTY()
 	USpringArmComponent* SpringArmComp;
-
 	UPROPERTY()
 	UCameraComponent* CameraComp;
+
 
 	UPROPERTY()
 	AMyPlayerController* MyPlayerController;
@@ -70,23 +73,21 @@ protected:
 	UPROPERTY()
 	APlayerCharacter* PlayerCharacter;
 
-	UPROPERTY(EditAnywhere)
-	ATile* CurrentTile;
 
 	UPROPERTY()
 	UPlayerStateMachine* StateMachine;
 
 	
-
+	// 화면 이동용
 	UPROPERTY(EditAnywhere)
 	float ScreenSpeed;
-
 	UPROPERTY(EditAnywhere)
 	float EdgeSize;
-
 	int32 ViewX;
 	int32 ViewY;
-
 	float MouseX;
 	float MouseY;
+
+	// 아이템 사용중 체크
+	bool bisUsingItem;
 };

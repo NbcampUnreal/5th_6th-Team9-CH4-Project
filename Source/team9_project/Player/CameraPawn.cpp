@@ -14,7 +14,8 @@
 
 ACameraPawn::ACameraPawn() :
 	ScreenSpeed(1500.f),
-	EdgeSize(50.f)
+	EdgeSize(50.f),
+	bisUsingItem(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -130,15 +131,15 @@ void ACameraPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//내화면에서만 적용
-	if (!IsLocallyControlled())
-	{
-		return;
-	}
-
 	if (IsValid(StateMachine))
 	{
 		StateMachine->OnUpdate(DeltaTime);
+	}
+
+	//내화면에서만 적용
+	if (IsLocallyControlled() == false)
+	{
+		return;
 	}
 
 	if (IsValid(MyPlayerController))
@@ -192,19 +193,30 @@ void ACameraPawn::RightClickHandle(const FInputActionValue& Value)
 	ServerRPCRightClick();
 }
 
-void ACameraPawn::SetCurrentTile(ATile* TileNode)
+void ACameraPawn::ItemUseStart()
 {
-	CurrentTile = TileNode;
+	bisUsingItem = true;
+	StateMachine->GetCurrentState()->ItemUse();
 }
 
-ATile* ACameraPawn::GetCurrentTile()
+void ACameraPawn::ItemUseEnd()
 {
-	return CurrentTile;
+	bisUsingItem = false;
+} 
+
+bool ACameraPawn::GetIsUsingItem()
+{
+	return bisUsingItem;
 }
 
 void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraKeyMoveHandle"));
+
+	if (IsLocallyControlled() == false)
+	{
+		return;
+	}
 
 	const FVector2D ArrowInput = Value.Get<FVector2D>();
 
@@ -224,11 +236,21 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 
 void ACameraPawn::CameraWheelHandle(const FInputActionValue& Value)
 {
+	if (IsLocallyControlled() == false)
+	{
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraWheelHandle"));
 }
 
 void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 {
+	if (IsLocallyControlled() == false)
+	{
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraReturnHandle"));
 	SetActorLocation(PlayerCharacter->GetActorLocation());
 }

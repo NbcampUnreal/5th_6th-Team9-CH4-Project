@@ -62,4 +62,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr <UHitState> HitState;
 
+	UPROPERTY()
+	TObjectPtr <UItemUseState> ItemUseState;
+
 };

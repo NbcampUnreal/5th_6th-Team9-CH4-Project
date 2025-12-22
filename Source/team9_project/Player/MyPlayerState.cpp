@@ -3,9 +3,34 @@
 AMyPlayerState::AMyPlayerState()
 	: CurrentHp(100),
 	MaxHp(100),
-	CurrentScore(0)
+	CurrentScore(0),
+	TileIndex(0),
+	PlayerID(0)
 {
-	SetTileIndex(0);
+
+}
+
+void AMyPlayerState::SetPlayerID(int Amount)
+{
+	PlayerID = Amount;
+}
+
+int AMyPlayerState::GetPlayerID()
+{
+	return PlayerID;
+}
+
+void AMyPlayerState::CopyProperties(APlayerState* NewPlayerState)
+{
+	Super::CopyProperties(NewPlayerState);
+
+	AMyPlayerState* NewPS = Cast<AMyPlayerState>(NewPlayerState);
+	if (NewPS)
+	{
+		//Passing by value
+		//ex)NewPS->HP = HP;
+		NewPS->PlayerNumber = PlayerNumber;
+	}
 }
 
 void AMyPlayerState::SetHP(int Amount)
@@ -56,4 +81,14 @@ void AMyPlayerState::SetTileIndex(int Amount)
 int AMyPlayerState::GetTileIndex()
 {
 	return TileIndex;
+}
+
+int32 AMyPlayerState::GetPlayerNumber()
+{
+	return PlayerNumber;
+}
+
+void AMyPlayerState::SetPlayerNumber(int32 PNumber)
+{
+	PlayerNumber = PNumber;
 }

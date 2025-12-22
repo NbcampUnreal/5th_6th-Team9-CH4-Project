@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "State/StateBase.h"
 #include "IdleState.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class TEAM9_PROJECT_API UIdleState : public UStateBase
 {
@@ -24,6 +19,8 @@ class TEAM9_PROJECT_API UIdleState : public UStateBase
 	virtual void Move() override;
 
 	virtual void Hit() override;
+
+	virtual void ItemUse() override;
 
 	virtual bool CanTakeDamage() override;
 };

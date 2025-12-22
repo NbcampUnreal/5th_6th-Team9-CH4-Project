@@ -25,6 +25,8 @@ public:
 
 	virtual void Hit();
 
+	virtual void ItemUse();
+
 	virtual bool CanTakeDamage();
 
 
