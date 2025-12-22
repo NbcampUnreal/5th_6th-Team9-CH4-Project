@@ -19,6 +19,8 @@ void UIdleState::OnExit()
 
 void UIdleState::Move()
 {
+	/*if (!ensureAlwaysMsgf(StateMachine->GetPlayerCharacter(), TEXT("State::Move: PlayerCharacter NULL"))) return;
+	if (!ensureAlwaysMsgf(StateMachine->GetCameraPawn(), TEXT("State::Move: ContextPawn NULL"))) return;*/
 	StateMachine->ChangeState(EStates::Moving);
 }
 

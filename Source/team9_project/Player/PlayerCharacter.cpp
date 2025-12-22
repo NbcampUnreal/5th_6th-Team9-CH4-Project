@@ -5,10 +5,11 @@
 #include "Player/MyPlayerState.h"
 #include "State/PlayerStateMachine.h"
 #include "State/StateBase.h"
-#include "Tile/Tile.h"
 #include "EnhancedInputComponent.h"
 #include "CameraPawn.h"
 #include "Tile/TileManagerActor.h"
+#include "Tile/Tile.h"
+#include "Net/UnrealNetwork.h"
 
 
 APlayerCharacter::APlayerCharacter() :
@@ -29,13 +30,11 @@ void APlayerCharacter::BeginPlay()
 
 }
 
-void APlayerCharacter::InitCharacter(ACameraPawn* InCameraPawn)
+void APlayerCharacter::InitCharacter(ACameraPawn* InCameraPawn, AMyPlayerState* InPlyaerState)
 {
+	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::InitCharacter"));
 	CameraPawn = InCameraPawn;
-
-	/*FVector StartPosition = InCameraPawn->GetCurrentTile()->GetActorLocation();
-	SetActorLocation(StartPosition);*/
-
+	MyPlayerState = InPlyaerState;
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -43,6 +42,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(APlayerCharacter, CameraPawn);
+	DOREPLIFETIME(APlayerCharacter, MyPlayerState);
+	DOREPLIFETIME(APlayerCharacter, CurrentTile);
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -63,16 +69,26 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 void APlayerCharacter::MoveToNextNode(int DiceValue)
 {
-	if (!HasAuthority())
-	{
-		return;
-	}
+	UE_LOG(LogTemp, Warning, TEXT("MoveToNextNode"));
 
+
+	MultiRPCMove(DiceValue);
+
+}
+
+void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
+{
 	remainingMove = DiceValue;
 
 	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
 	CurrentIndex = MyPlayerState->GetTileIndex();
-	MoveStart = TileManager->GetTile(CurrentIndex)->GetActorLocation();
+	UE_LOG(LogTemp, Warning, TEXT("CurrentTileIndex : %d"), MyPlayerState->GetTileIndex());
+
+	ATile* Tile = TileManager->GetTile(CurrentIndex);
+	if (IsValid(Tile))
+	{
+		MoveStart = Tile->GetActorLocation();
+	}
 
 	// 현재 타일에서 이동가능한 타일 배열
 	TArray<ATile*> NextTiles = TileManager->GetTile(CurrentIndex)->GetNextTiles();
@@ -91,6 +107,7 @@ void APlayerCharacter::MoveToNextNode(int DiceValue)
 	{
 		//타일 델리게이트 호출
 		NextTiles[0]->PlayerLeave(this);
+		UE_LOG(LogTemp, Warning, TEXT("PlayerLeave"));
 	}
 
 	bIsMoving = true;
@@ -125,9 +142,6 @@ void APlayerCharacter::UpdateMove()
 		remainingMove--;
 		if (remainingMove > 0) // 지나가는중
 		{
-			// playerState Index 저장
-			MyPlayerState->SetTileIndex(CurrentIndex);
-	
 			//타일 델리게이트 호출
 			NextTiles[0]->PlayerPassed(this);
 			UE_LOG(LogTemp, Warning, TEXT("PlayerPassed"));
@@ -135,6 +149,10 @@ void APlayerCharacter::UpdateMove()
 		}
 		else // 도착
 		{
+			// playerState Index 저장
+			MyPlayerState->SetTileIndex(CurrentIndex);
+			UE_LOG(LogTemp, Warning, TEXT("EndTileIndex : %d"), MyPlayerState->GetTileIndex());
+
 			bIsMoving = false;
 			//타일 델리게이트 호출
 			NextTiles[0]->PlayerArrive(this);
