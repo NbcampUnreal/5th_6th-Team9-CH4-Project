@@ -68,10 +68,11 @@ void ATileManagerActor::SpawnTiles(){
 			continue;
 		} 
 
-		_Tiles.Add(SpawnedTile);
-
 		SpawnedTile->AssignFromData(Tiledata, i);
+
 		UE_LOG(LogTemp, Warning, TEXT("complete spawn Tile index : %d"), i);
+
+		_Tiles.Add(SpawnedTile);
 	}
 }
 

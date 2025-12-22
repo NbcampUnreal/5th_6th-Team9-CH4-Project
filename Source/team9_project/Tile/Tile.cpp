@@ -59,6 +59,26 @@ void ATile::PlayerRollDice(APlayerCharacter* PlayerCharacter)
 	OnPlayerRollDice.Broadcast(PlayerCharacter);
 }
 
+void ATile::ServerRPC_PlayerLeave_Implementation(APlayerCharacter* PlayerCharacter)
+{
+}
+
+void ATile::ServerRPC_PlayerPassed_Implementation(APlayerCharacter* PlayerCharacter)
+{
+}
+
+void ATile::ServerRPC_PlayerArrive_Implementation(APlayerCharacter* PlayerCharacter)
+{
+}
+
+void ATile::ServerRPC_PlayerUseItem_Implementation(APlayerCharacter* PlayerCharacter)
+{
+}
+
+void ATile::ServerRPC_PlayerRollDice_Implementation(APlayerCharacter* PlayerCharacter)
+{
+}
+
 TArray<APlayerCharacter*> ATile::GetInPlayers()
 {
 	TArray<APlayerCharacter*> Result;

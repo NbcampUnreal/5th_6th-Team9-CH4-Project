@@ -113,7 +113,7 @@ void UTileComponent::SetOnPlayerPassedTileActions()
 {
 	ATile* Tile = Cast<ATile>(GetOwner());
 	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerPassedTileActions)
-	{
+	{ 
 		if (!SubTileAction) continue;
 		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
 		if (IsValid(Inst))
