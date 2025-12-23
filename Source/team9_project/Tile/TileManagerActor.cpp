@@ -12,7 +12,7 @@ ATileManagerActor::ATileManagerActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
+	bReplicates = true;
 }
 
 ATile* ATileManagerActor::GetTile(int32 Index)
@@ -37,7 +37,7 @@ void ATileManagerActor::BeginPlay()
 }
 
 void ATileManagerActor::SpawnTiles(){
-	//if (HasAuthority()) return; // if Server Not Spawn Tiles
+	//if (HasAuthority() == false) return; // if Server Not Spawn Tiles
 	checkf(IsValid(_TilesData), TEXT("TilesData is Not Valid, ATileManagerActor::SpawnTiles"));
 
 	const int32 Count = _TilesData->GetRowNames().Num();
