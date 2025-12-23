@@ -24,6 +24,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual float TakeDamage(
 		float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
@@ -31,7 +33,7 @@ public:
 		AActor* DamageCauser
 	) override;
 
-	void InitCharacter(ACameraPawn* InCameraPawn);
+	void InitCharacter(ACameraPawn* InCameraPawn, AMyPlayerState* InPlyaerState);
 
 	void MoveToNextNode(int DiceValue);
 
@@ -45,9 +47,13 @@ public:
 
 	bool OnDie();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRPCMove(int DiceValue);
+
 private:
 	void UpdateMove();
 
+	
 
 public:
 	UPROPERTY(EditAnywhere)
@@ -57,13 +63,13 @@ public:
 	int remainingMove;
 
 private:
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	ACameraPawn* CameraPawn;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	AMyPlayerState* MyPlayerState;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	ATile* CurrentTile;
 
 	// 타일 이동 변수

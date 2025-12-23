@@ -23,7 +23,6 @@ ATile* ATileManagerActor::GetTile(int32 Index)
 	{
 		Result = _Tiles[Index].Get();
 	}
-
 	return Result;
 }
 
