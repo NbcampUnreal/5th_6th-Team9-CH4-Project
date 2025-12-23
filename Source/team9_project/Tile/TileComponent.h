@@ -8,7 +8,7 @@
 
 class UTileAction;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(BlueprintType, Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TEAM9_PROJECT_API UTileComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -20,11 +20,23 @@ public:
 protected:
 
 private:
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
-	TArray<TSubclassOf<UTileAction>> _TileActions;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite ,meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TSubclassOf<UTileAction>> _OnPlayerArriveTileActions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TSubclassOf<UTileAction>> _OnPlayerRollDiceTileActions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TSubclassOf<UTileAction>> _OnPlayerLeaveTileActions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TSubclassOf<UTileAction>> _OnPlayerUseItemTileActions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Tile")
+	TArray<TSubclassOf<UTileAction>> _OnPlayerPassedTileActions;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UTileAction>> _TileInstance;
+	TArray<TObjectPtr<UTileAction>> _TileActionInstance;
 
 public:	
 	// Called every frame
@@ -33,9 +45,15 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	virtual void BeginDestroy() override;
-
 	virtual void OnRegister() override;
+
+	virtual void OnUnregister() override;
+
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 private:
-		
+	void SetOnPlayerArriveTileActions();
+	void SetOnPlayerRollDiceTileActions();
+	void SetOnPlayerLeaveTileActions();
+	void SetOnPlayerUseItemTileActions();
+	void SetOnPlayerPassedTileActions();
 };

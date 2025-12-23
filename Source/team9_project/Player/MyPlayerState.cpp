@@ -5,19 +5,9 @@ AMyPlayerState::AMyPlayerState()
 	MaxHp(100),
 	CurrentScore(0),
 	TileIndex(0),
-	PlayerID(0)
+	PlayerNumber(0)
 {
 
-}
-
-void AMyPlayerState::SetPlayerID(int Amount)
-{
-	PlayerID = Amount;
-}
-
-int AMyPlayerState::GetPlayerID()
-{
-	return PlayerID;
 }
 
 void AMyPlayerState::CopyProperties(APlayerState* NewPlayerState)

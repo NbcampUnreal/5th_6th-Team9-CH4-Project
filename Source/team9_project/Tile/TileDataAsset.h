@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+class UTileComponent;
+
 UCLASS()
 class TEAM9_PROJECT_API UTileDataAsset : public UDataAsset
 {
@@ -17,6 +20,9 @@ class TEAM9_PROJECT_API UTileDataAsset : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile")
 	TObjectPtr<UStaticMesh> Mesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile")
+	TArray<TSubclassOf<UTileComponent>> TileComponents;
 
 protected:
 

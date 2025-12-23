@@ -13,9 +13,6 @@ public:
 	AMyPlayerState();
 
 
-	void SetPlayerID(int Amount);
-
-	int GetPlayerID();
 
 	virtual void CopyProperties(APlayerState* NewPlayerState) override;
 
@@ -45,8 +42,6 @@ public:
 	void SetPlayerNumber(int32 PNumber);
 
 private:
-	int PlayerID;
-
 	int CurrentHp;
 
 	int MaxHp;
@@ -56,4 +51,7 @@ private:
 	int TileIndex;
 
 	int32 PlayerNumber;
+
+
+
 };

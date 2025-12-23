@@ -133,9 +133,11 @@ void ATile::AssignFromDataAsset(UTileDataAsset* asset)
     {
         if (!SubClass) continue;
 
+        // Outer는 보통 소유 액터(this)로 준다 -> GC 안전(또는 UObject인 별도 Outer)
         UTileComponent* NewComp = NewObject<UTileComponent>(this, SubClass);
         if (!NewComp) continue;
 
+        // 반드시 RegisterComponent 호출해서 엔진에 등록
 		NewComp->RegisterComponent(); 
 		_TileComponents.Add(NewComp);
     }

@@ -25,26 +25,101 @@ void UTileComponent::BeginPlay()
 
 }
 
-void UTileComponent::BeginDestroy()
-{
-	_TileInstance.Empty();
-	Super::BeginDestroy();
-}
-
 void UTileComponent::OnRegister()
 {
 	Super::OnRegister();
-
 	ATile* Tile = Cast<ATile>(GetOwner());
 	checkf(IsValid(Tile), TEXT("Tile is Not Valid, UTileComponent::OnRegister"));
+	SetOnPlayerArriveTileActions();
+	SetOnPlayerRollDiceTileActions();
+	SetOnPlayerLeaveTileActions();
+	SetOnPlayerUseItemTileActions();
+	SetOnPlayerPassedTileActions();
+}
 
-	for (TSubclassOf<UTileAction>& SubTileAction : _TileActions)
+void UTileComponent::OnUnregister()
+{
+	Super::OnUnregister();
+	_TileActionInstance.Empty();
+}
+
+void UTileComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	_TileActionInstance.Empty();
+}
+
+void UTileComponent::SetOnPlayerArriveTileActions()
+{
+	ATile* Tile = Cast<ATile>(GetOwner());
+	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerArriveTileActions)
 	{
 		if (!SubTileAction) continue;
-		UTileAction* Inst = NewObject<UTileAction>(this, SubTileAction);
+		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
 		if (IsValid(Inst))
 		{
-			_TileInstance.Add(Inst);
+			_TileActionInstance.Add(Inst);
+			Tile->OnPlayerArrive.AddUObject(Inst, &UTileAction::Active);
+		}
+	}
+}
+
+void UTileComponent::SetOnPlayerRollDiceTileActions()
+{
+	ATile* Tile = Cast<ATile>(GetOwner());
+	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerRollDiceTileActions)
+	{
+		if (!SubTileAction) continue;
+		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
+		if (IsValid(Inst))
+		{
+			_TileActionInstance.Add(Inst);
+			Tile->OnPlayerRollDice.AddUObject(Inst, &UTileAction::Active);
+		}
+	}
+}
+
+void UTileComponent::SetOnPlayerLeaveTileActions()
+{
+	ATile* Tile = Cast<ATile>(GetOwner());
+	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerLeaveTileActions)
+	{
+		if (!SubTileAction) continue;
+		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
+		if (IsValid(Inst))
+		{
+			_TileActionInstance.Add(Inst);
+			Tile->OnPlayerLeave.AddUObject(Inst, &UTileAction::Active);
+		}
+	}
+}
+
+void UTileComponent::SetOnPlayerUseItemTileActions()
+{
+	ATile* Tile = Cast<ATile>(GetOwner());
+	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerUseItemTileActions)
+	{
+		if (!SubTileAction) continue;
+		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
+		if (IsValid(Inst))
+		{
+			_TileActionInstance.Add(Inst);
+			Tile->OnPlayerUseItem.AddUObject(Inst, &UTileAction::Active);
+		}
+	}
+}
+
+void UTileComponent::SetOnPlayerPassedTileActions()
+{
+	ATile* Tile = Cast<ATile>(GetOwner());
+	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerPassedTileActions)
+	{
+		if (!SubTileAction) continue;
+		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
+		if (IsValid(Inst))
+		{
+			_TileActionInstance.Add(Inst);
+			Tile->OnPlayerPassed.AddUObject(Inst, &UTileAction::Active);
 		}
 	}
 }

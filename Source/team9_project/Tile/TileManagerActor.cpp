@@ -23,7 +23,6 @@ ATile* ATileManagerActor::GetTile(int32 Index)
 	{
 		Result = _Tiles[Index].Get();
 	}
-
 	return Result;
 }
 
@@ -37,7 +36,7 @@ void ATileManagerActor::BeginPlay()
 }
 
 void ATileManagerActor::SpawnTiles(){
-	if (HasAuthority()) return; // if Server Not Spawn Tiles
+	//if (HasAuthority()) return; // if Server Not Spawn Tiles
 	checkf(IsValid(_TilesData), TEXT("TilesData is Not Valid, ATileManagerActor::SpawnTiles"));
 
 	const int32 Count = _TilesData->GetRowNames().Num();
@@ -66,7 +65,7 @@ void ATileManagerActor::SpawnTiles(){
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Failed to spawn tile for row index : %d"), i);
 			continue;
-		}
+		} 
 
 		_Tiles.Add(SpawnedTile);
 
