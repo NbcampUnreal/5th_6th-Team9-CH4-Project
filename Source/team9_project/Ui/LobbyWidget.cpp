@@ -5,9 +5,11 @@
 #include "Components/PanelWidget.h"
 #include "Components/Button.h"
 #include "Components/SpinBox.h"
+#include "Components/VerticalBoxSlot.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "Blueprint/WidgetTree.h"
+#include "Ui/Test/MyTestPlayerState.h"
 
 void ULobbyWidget::NativeConstruct()
 {
@@ -33,63 +35,93 @@ void ULobbyWidget::NativeDestruct()
 void ULobbyWidget::UpdatePlayerList()
 {
     if (!PlayerListContainer) return;
+    PlayerListContainer->ClearChildren();
 
     AGameStateBase* GS = GetWorld()->GetGameState();
     if (!GS) return;
 
-    // 현재 플레이어 배열 가져오기
+    const int32 MaxPlayers = 4; // 슬롯 수 (UI에 보여줄 최대 칸 수)
+    const int32 RequiredPlayers = 4; // 자동 시작에 필요한 최소 인원
+
     TArray<APlayerState*> Players = GS->PlayerArray;
 
-    // 로그를 찍어서 현재 몇 명이 잡히는지 확인 (출력 창에서 확인 가능)
-    // UE_LOG(LogTemp, Warning, TEXT("Current Player Count: %d"), Players.Num());
-
-    // UI 갱신 (기존 항목 삭제 후 재생성)
-    PlayerListContainer->ClearChildren();
-
-    const int32 MaxPlayers = 4;
+    // === 플레이어 리스트 생성 ===
     for (int32 i = 0; i < MaxPlayers; ++i)
     {
         UBorder* PlayerBorder = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
         if (PlayerBorder)
         {
-            PlayerBorder->SetPadding(FMargin(20.f, 15.f));
+            PlayerBorder->SetBrushColor(FLinearColor(0.05f, 0.05f, 0.05f, 0.5f));
+            PlayerBorder->SetPadding(FMargin(20.f, 10.f));
 
             UTextBlock* NameText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
             if (NameText)
             {
-                // 플레이어 상태가 유효하고 이름이 아직 초기값("Player")이 아닐 때만 이름 표시
-                FString DisplayName = TEXT("Empty Slot");
+                FString NameToDisplay = TEXT("Empty Slot");
+
                 if (Players.IsValidIndex(i) && Players[i])
                 {
-                    DisplayName = Players[i]->GetPlayerName();
+                    if (AMyTestPlayerState* TestPS = Cast<AMyTestPlayerState>(Players[i]))
+                    {
+                        NameToDisplay = TestPS->DisplayName.IsEmpty() ? TestPS->GetPlayerName() : TestPS->DisplayName;
+                    }
+                    else
+                    {
+                        NameToDisplay = Players[i]->GetPlayerName();
+                    }
                 }
 
-                NameText->SetText(FText::FromString(DisplayName));
+                NameText->SetText(FText::FromString(NameToDisplay));
 
                 FSlateFontInfo FontInfo = NameText->GetFont();
-                FontInfo.Size = 26;
+                FontInfo.Size = 24;
                 NameText->SetFont(FontInfo);
+                NameText->SetColorAndOpacity(FSlateColor(FLinearColor::White));
 
                 PlayerBorder->SetContent(NameText);
             }
-            PlayerListContainer->AddChild(PlayerBorder);
+
+            UPanelSlot* PanelSlot = PlayerListContainer->AddChild(PlayerBorder);
+            if (UVerticalBoxSlot* VertSlot = Cast<UVerticalBoxSlot>(PanelSlot))
+            {
+                FSlateChildSize FillSize;
+                FillSize.SizeRule = ESlateSizeRule::Fill;
+                FillSize.Value = 1.0f;
+                VertSlot->SetSize(FillSize);
+                VertSlot->SetPadding(FMargin(0.f, 2.f));
+                VertSlot->SetHorizontalAlignment(HAlign_Fill);
+                VertSlot->SetVerticalAlignment(VAlign_Fill);
+            }
         }
     }
 
-    // --- 자동 시작 및 버튼 활성화 로직 ---
-    bool bIsHost = GetOwningPlayer()->HasAuthority();
+    // === 버튼 및 자동 시작 로직 ===
+    APlayerController* PC = GetOwningPlayer();
+    bool bIsHost = PC && PC->HasAuthority();
     int32 CurrentCount = Players.Num();
 
-    if (CurrentCount >= MaxPlayers)
+    // 1. 4명 모이면 자동 시작 (이미 시작된 경우 중복 방지)
+    if (CurrentCount >= RequiredPlayers)
     {
-        if (bIsHost) OnActionClicked();
-    }
-    else
-    {
-        if (Btn_Action) Btn_Action->SetIsEnabled(bIsHost);
+        if (bIsHost && !bGameStarted)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("[Lobby] Outo Start"));
+            OnActionClicked();
+            bGameStarted = true; // 중복 시작 방지
+        }
     }
 
-    if (RoundSettingSpinner) RoundSettingSpinner->SetIsEnabled(bIsHost);
+    // 2. Start 버튼 활성화: 호스트에게만 항상 보이고 클릭 가능
+    if (Btn_Action)
+    {
+        Btn_Action->SetIsEnabled(bIsHost);                         // 클릭 가능
+        Btn_Action->SetVisibility(bIsHost ? ESlateVisibility::Visible : ESlateVisibility::Hidden); // 호스트에게만 보임
+    }
+
+    if (RoundSettingSpinner)
+    {
+        RoundSettingSpinner->SetIsEnabled(bIsHost);
+    }
 }
 
 void ULobbyWidget::OnActionClicked()
@@ -100,6 +132,18 @@ void ULobbyWidget::OnActionClicked()
     if (GetOwningPlayer()->HasAuthority())
     {
         if (Btn_Action) Btn_Action->SetIsEnabled(false);
-        UISubsystem->StartHostGame(TEXT("/Game/KJH/Test/MainMap"));
+        FString PlayerName = TEXT("Player");  // 기본값
+
+        // 현재 플레이어 이름 가져오기 (예: PlayerState에서)
+        if (APlayerState* PS = GetOwningPlayerState())
+        {
+            if (AMyTestPlayerState* TestPS = Cast<AMyTestPlayerState>(PS))
+            {
+                PlayerName = TestPS->DisplayName;  // 또는 GetPlayerName()
+            }
+        }
+
+        // 이름 전달
+        UISubsystem->StartHostGame(TEXT("/Game/KJH/Test/MainMap"), PlayerName);
     }
 }

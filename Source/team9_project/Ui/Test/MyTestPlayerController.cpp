@@ -1,5 +1,5 @@
 #include "MyTestPlayerController.h"
-#include "MyTestGameMode.h" // AMyTestGameMode를 사용하도록 수정됨
+#include "MyTestGameMode.h"
 #include "Ui/UIManagerSubsystem.h"
 
 // 핵심: 모든 RPC는 뒤에 _Implementation을 붙여서 본체를 만듭니다.

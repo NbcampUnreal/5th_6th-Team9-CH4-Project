@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableText.h"
+#include "Components/TextBlock.h" // 추가
 #include "MainTitleWidget.generated.h"
 
 UCLASS()
@@ -13,6 +14,9 @@ class TEAM9_PROJECT_API UMainTitleWidget : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnConfirmNameClicked(); // 이름 확정 버튼 핸들러
 
 	UFUNCTION()
 	void OnCreateGameClicked();
@@ -28,6 +32,12 @@ public:
 	UEditableText* Input_Name;
 
 	UPROPERTY(meta = (BindWidget))
+	UEditableText* Input_Port; // IP 주소 입력창
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* Btn_ConfirmName; // 새 버튼: 이름 확정
+
+	UPROPERTY(meta = (BindWidget))
 	UButton* Btn_CreateGame;
 
 	UPROPERTY(meta = (BindWidget))
@@ -35,4 +45,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* Btn_Quit;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* Text_CurrentName; // 현재 확정된 이름을 보여줄 텍스트 (선택사항)
 };

@@ -14,8 +14,9 @@ public:
     void RegisterUIWidget(EGameUIState State, TSubclassOf<UUserWidget> WidgetClass);
 
     // FString으로 통일 (FName → 에러 방지)
-    void StartHostGame(const FString& MapName = TEXT("LobbyMap"));
-    void StartJoinGame(const FString& IPAddress = TEXT("127.0.0.1"));
+    void StartHostGame(const FString& MapName, const FString& PlayerName);
+    void StartJoinGame(const FString& IPAddress, const FString& PlayerName);
+    //void StartJoinGame(const FString& IPAddress = TEXT("127.0.0.1"));
 
     template<typename T = UUserWidget>
     T* GetActiveWidget() const { return Cast<T>(ActiveStateWidget); }

@@ -2,6 +2,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
+#include "GenericPlatform/GenericPlatformHttp.h"
 
 void UUIManagerSubsystem::SetUIState(EGameUIState NewState)
 {
@@ -40,22 +41,31 @@ void UUIManagerSubsystem::RegisterUIWidget(EGameUIState State, TSubclassOf<UUser
     }
 }
 
-void UUIManagerSubsystem::StartHostGame(const FString& MapName)
+void UUIManagerSubsystem::StartHostGame(const FString& MapName, const FString& PlayerName)
 {
     if (UWorld* World = GetWorld())
     {
-        // ?listen 붙여서 listen 서버 생성 + Seamless Travel 자동 지원
-        FString URL = MapName + TEXT("?listen");
+        //MapName?listen?Name=플레이어이름
+        FString URL = FString::Printf(TEXT("%s?listen?Name=%s"), *MapName, *PlayerName);
+        UE_LOG(LogTemp, Warning, TEXT("Host URL: %s"), *URL);
         World->ServerTravel(URL);
     }
 }
 
-void UUIManagerSubsystem::StartJoinGame(const FString& IPAddress)
+void UUIManagerSubsystem::StartJoinGame(const FString& IPAddress, const FString& PlayerName)
 {
     if (UWorld* World = GetWorld())
     {
         FString Address = IPAddress.IsEmpty() ? TEXT("127.0.0.1") : IPAddress;
-        GetWorld()->GetFirstPlayerController()->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+        //IP주소?Name=플레이어이름
+        FString URL = FString::Printf(TEXT("%s?Name=%s"), *Address, *PlayerName);
+        UE_LOG(LogTemp, Warning, TEXT("Join URL: %s"), *URL);
+        GetWorld()->GetFirstPlayerController()->ClientTravel(URL, ETravelType::TRAVEL_Absolute);
+
+        if (APlayerController* PC = World->GetFirstPlayerController())
+        {
+            PC->ClientTravel(URL, ETravelType::TRAVEL_Absolute);
+        }
     }
 }
 

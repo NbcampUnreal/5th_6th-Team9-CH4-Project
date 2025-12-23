@@ -12,6 +12,7 @@ class TEAM9_PROJECT_API ULobbyWidget : public UUserWidget
 protected:
     virtual void NativeConstruct() override;
     virtual void NativeDestruct() override; // 위젯이 사라질 때 타이머 해제용
+    bool bGameStarted = false;
 
 public:
     UFUNCTION(BlueprintCallable)
