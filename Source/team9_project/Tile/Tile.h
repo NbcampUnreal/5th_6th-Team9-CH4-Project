@@ -52,7 +52,6 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
 	TArray<TObjectPtr<UTileComponent>> _TileComponents;
 
-
 	int32 _Index;
 
 	TSet<TWeakObjectPtr<APlayerCharacter>> _InPlayers;
@@ -99,4 +98,6 @@ private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void AssignFromDataAsset(UTileDataAsset* asset);
+
+	bool IsServer();
 };
