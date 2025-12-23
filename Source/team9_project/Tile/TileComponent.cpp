@@ -3,7 +3,7 @@
 
 #include "Tile/TileComponent.h"
 #include "Tile/TileAction.h"
-#include "Tile./Tile.h"
+#include "Tile/Tile.h"
 
 // Sets default values for this component's properties
 UTileComponent::UTileComponent()

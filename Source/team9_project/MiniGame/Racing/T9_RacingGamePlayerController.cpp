@@ -72,7 +72,7 @@ void AT9_RacingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 	{
 	case EMiniGamePhase::Ready:
 		ShowReadyUI();
-		SetInputEnabled(false);
+		SetInputEnabled(true);
 		break;
 
 	case EMiniGamePhase::Playing:
@@ -82,7 +82,7 @@ void AT9_RacingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 
 	case EMiniGamePhase::Result:
 		ShowResultUI();
-		SetInputEnabled(false);
+		SetInputEnabled(true);
 		break;
 	}
 }
