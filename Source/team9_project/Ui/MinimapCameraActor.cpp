@@ -1,4 +1,4 @@
-#include "MinimapCameraActor.h"
+#include "Ui/MinimapCameraActor.h"
 #include "Engine/TextureRenderTarget2D.h"
 
 AMinimapCameraActor::AMinimapCameraActor()

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/SceneCaptureComponent2D.h"
+#include "Components/SceneCaptureComponent2D.h"  // 이 include 필수!
 #include "MinimapCameraActor.generated.h"
 
 UCLASS()
@@ -17,11 +17,15 @@ protected:
     virtual void BeginPlay() override;
 
 public:
-    // 캡처를 담당하는 컴포넌트
+    // 캡처 컴포넌트
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Minimap")
     USceneCaptureComponent2D* CaptureComp;
 
-    // 렌더링 결과가 저장될 텍스처 (에디터에서 생성한 RT를 할당)
+    // 렌더 타겟
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Minimap")
-    class UTextureRenderTarget2D* MinimapRT;
+    UTextureRenderTarget2D* MinimapRT;
+
+    //OrthoWidth 등 에디터에서 조정 가능
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Minimap")
+    float OrthoWidth = 12000.0f;
 };

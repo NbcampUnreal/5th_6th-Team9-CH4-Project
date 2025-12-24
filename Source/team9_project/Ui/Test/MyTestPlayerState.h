@@ -22,5 +22,12 @@ public:
     UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
     int32 PlayerNumber = -1;
 
+    // 점수와 순위 변수 (복제 설정)
+    UPROPERTY(Replicated, BlueprintReadOnly, Category = "Result")
+    int32 FinalScore = 0;
+
+    UPROPERTY(Replicated, BlueprintReadOnly, Category = "Result")
+    int32 FinalRank = 0;
+
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

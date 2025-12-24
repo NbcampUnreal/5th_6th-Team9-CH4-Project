@@ -99,3 +99,41 @@ void UUIManagerSubsystem::ClearActiveWidgets()
         ActiveStateWidget = nullptr;
     }
 }
+
+void UUIManagerSubsystem::ReturnToMainTitle()
+{
+    UWorld* World = GetWorld();
+    if (!World) return;
+
+    // 호스트만 ServerTravel 호출 (모든 클라이언트 이동)
+    if (APlayerController* PC = World->GetFirstPlayerController())
+    {
+        if (PC->HasAuthority())
+        {
+            // 메인 타이틀 맵 경로
+            FString MainTitleMap = TEXT("/Game/KJH/Test/MainTitleLevel");
+            World->ServerTravel(MainTitleMap);
+            UE_LOG(LogTemp, Warning, TEXT("[UIManager] All Player Move To MainTitle: %s"), *MainTitleMap);
+        }
+    }
+
+    // UI 상태 초기화
+    SetUIState(EGameUIState::MainMenu);
+}
+
+void UUIManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+    Super::Initialize(Collection);
+
+    // === 임시 테스트용 Result 위젯 직접 등록 ===
+    TSubclassOf<UUserWidget> ResultWidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/All/Game/KJH/WBP_ResultWidget"));
+    if (ResultWidgetClass)
+    {
+        RegisterUIWidget(EGameUIState::Result, ResultWidgetClass);
+        UE_LOG(LogTemp, Log, TEXT("[UIManager] ResultWidget Success!"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("[UIManager] ResultWidget Surch Fail: /All/Game/KJH/WBP_ResultWidget"));
+    }
+}

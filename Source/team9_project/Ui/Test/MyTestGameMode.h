@@ -15,4 +15,11 @@ public:
 
     // 주사위 로직 (서버 실행)
     void ProcessDiceThrow(class AMyTestPlayerController* Requester);
+
+    UFUNCTION(BlueprintCallable, Category = "GameFlow")
+    void EndMatch();
+
+protected:
+    //순위 계산 (Test 임시)
+    void CalculateFinalResults();
 };

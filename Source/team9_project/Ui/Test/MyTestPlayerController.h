@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Ui/EGameUIState.h"
+#include "Ui/MinimapCameraActor.h"
 #include "MyTestPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDiceResultReceived, int32, Result);
@@ -13,6 +14,12 @@ class TEAM9_PROJECT_API AMyTestPlayerController : public APlayerController
     GENERATED_BODY()
 
 public:
+
+    virtual void BeginPlay() override;
+
+    UPROPERTY()
+    AMinimapCameraActor* MinimapCamera;
+
     // 서버 주사위 요청 RPC
     UFUNCTION(Server, Reliable)
     void Server_RequestThrowDice();
@@ -27,4 +34,15 @@ public:
 
     UPROPERTY(BlueprintAssignable, Category = "Dice")
     FOnDiceResultReceived OnDiceResultReceived;
+
+    UFUNCTION(NetMulticast, Reliable)
+    void Multicast_ShowResult();
+
+    void Multicast_ShowResult_Implementation();
+
+protected:
+    void TestShowResult();
+
+    //TEST
+    virtual void SetupInputComponent() override;
 };

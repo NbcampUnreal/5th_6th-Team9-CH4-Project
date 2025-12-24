@@ -14,4 +14,6 @@ void AMyTestPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
     DOREPLIFETIME(AMyTestPlayerState, DisplayName);
     DOREPLIFETIME(AMyTestPlayerState, bIsReady);
     DOREPLIFETIME(AMyTestPlayerState, PlayerNumber);
+    DOREPLIFETIME(AMyTestPlayerState, FinalScore);
+    DOREPLIFETIME(AMyTestPlayerState, FinalRank);
 }

@@ -23,6 +23,10 @@ public:
 
     void ClearActiveWidgets();
 
+    void ReturnToMainTitle();
+
+    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
 protected:
     UPROPERTY()
     EGameUIState CurrentState = EGameUIState::None;
@@ -31,7 +35,6 @@ protected:
     UUserWidget* ActiveStateWidget = nullptr;
 
     TMap<EGameUIState, TSubclassOf<UUserWidget>> UIWidgetMap;
-
 private:
     void UpdateInputMode(EGameUIState State);
 };
