@@ -39,12 +39,20 @@ private:
 	UPROPERTY(Transient)
 	TArray<TWeakObjectPtr<ATile>> _Tiles;
 
-public:	
-	//void PlayerArrive();
+public:
+	UFUNCTION(Server, Reliable)
 	void PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
 	void PlayerPassed(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
 	void PlayerLeave(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
 	void PlayerUseItem(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
 	void PlayerRollDice(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 
 protected:
@@ -56,17 +64,17 @@ private:
 	TArray<TWeakObjectPtr<ATile>> GetTilesByIndexes(TArray<int32>& Indexes) const ;
 
 	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticastRPC_PlayerArrive(ATile* Tile, APlayerCharacter* PlayerCharacter);
+	void NetMulticastRPC_PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticastRPC_PlayerPassed(ATile* Tile, APlayerCharacter* PlayerCharacter);
+	void NetMulticastRPC_PlayerPassed(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticastRPC_PlayerLeave(ATile* Tile, APlayerCharacter* PlayerCharacter);
+	void NetMulticastRPC_PlayerLeave(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticastRPC_PlayerUseItem(ATile* Tile, APlayerCharacter* PlayerCharacter);
+	void NetMulticastRPC_PlayerUseItem(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticastRPC_PlayerRollDice(ATile* Tile, APlayerCharacter* PlayerCharacter);
+	void NetMulticastRPC_PlayerRollDice(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 };
