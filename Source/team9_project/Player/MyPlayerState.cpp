@@ -82,3 +82,13 @@ void AMyPlayerState::SetPlayerNumber(int32 PNumber)
 {
 	PlayerNumber = PNumber;
 }
+
+FString AMyPlayerState::GetPlayerName()
+{
+	return PlayerName;
+}
+
+void AMyPlayerState::SetPlayerName(FString InName)
+{
+	PlayerName = InName;
+}

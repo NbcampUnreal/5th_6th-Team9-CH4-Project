@@ -41,6 +41,10 @@ public:
 
 	void SetPlayerNumber(int32 PNumber);
 
+	FString GetPlayerName();
+
+	void SetPlayerName(FString InName);
+
 private:
 	int CurrentHp;
 
@@ -52,6 +56,6 @@ private:
 
 	int32 PlayerNumber;
 
-
+	FString PlayerName;
 
 };
