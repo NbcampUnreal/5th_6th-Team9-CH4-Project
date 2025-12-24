@@ -7,6 +7,7 @@
 #include "TileManagerActor.generated.h"
 
 class ATile;
+class APlayerCharacter;
 struct FTileData;
 
 UCLASS()
@@ -38,7 +39,21 @@ private:
 	UPROPERTY(Transient)
 	TArray<TWeakObjectPtr<ATile>> _Tiles;
 
-public:	
+public:
+	UFUNCTION(Server, Reliable)
+	void PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void PlayerPassed(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void PlayerLeave(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void PlayerUseItem(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void PlayerRollDice(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,4 +62,19 @@ private:
 	void SpawnTiles();
 	void LinkTiles();
 	TArray<TWeakObjectPtr<ATile>> GetTilesByIndexes(TArray<int32>& Indexes) const ;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastRPC_PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastRPC_PlayerPassed(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastRPC_PlayerLeave(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastRPC_PlayerUseItem(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastRPC_PlayerRollDice(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 };

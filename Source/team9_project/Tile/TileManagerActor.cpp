@@ -4,15 +4,16 @@
 #include "Tile/TileManagerActor.h"
 #include "TileData.h"
 #include "Tile/Tile.h"
+#include "Player/PlayerCharacter.h"
 
 TWeakObjectPtr<ATileManagerActor> ATileManagerActor::SingletonInstance = nullptr;
 
 // Sets default values
 ATileManagerActor::ATileManagerActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
+	bReplicates = true;
 }
 
 ATile* ATileManagerActor::GetTile(int32 Index)
@@ -23,8 +24,72 @@ ATile* ATileManagerActor::GetTile(int32 Index)
 	{
 		Result = _Tiles[Index].Get();
 	}
-
 	return Result;
+}
+
+void ATileManagerActor::PlayerArrive_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	if (HasAuthority() == false) return;
+
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerArrive(TileIndex, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::PlayerPassed_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	if (HasAuthority() == false) return;
+
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerPassed(TileIndex, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::PlayerLeave_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	if (HasAuthority() == false) return;
+
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerLeave(TileIndex, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::PlayerUseItem_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	if (HasAuthority() == false) return;
+
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerUseItem(TileIndex, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::PlayerRollDice_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	if (HasAuthority() == false) return;
+
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerRollDice(TileIndex, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -33,11 +98,14 @@ void ATileManagerActor::BeginPlay()
 	Super::BeginPlay();
 	SpawnTiles();
 	LinkTiles();
-	SingletonInstance = this;
+
+	if (IsValid(SingletonInstance.Get()) == false)
+	{
+		SingletonInstance = this;
+	}
 }
 
-void ATileManagerActor::SpawnTiles(){
-	if (HasAuthority()) return; // if Server Not Spawn Tiles
+void ATileManagerActor::SpawnTiles() {
 	checkf(IsValid(_TilesData), TEXT("TilesData is Not Valid, ATileManagerActor::SpawnTiles"));
 
 	const int32 Count = _TilesData->GetRowNames().Num();
@@ -68,10 +136,11 @@ void ATileManagerActor::SpawnTiles(){
 			continue;
 		}
 
-		_Tiles.Add(SpawnedTile);
-
 		SpawnedTile->AssignFromData(Tiledata, i);
+
 		UE_LOG(LogTemp, Warning, TEXT("complete spawn Tile index : %d"), i);
+
+		_Tiles.Add(SpawnedTile);
 	}
 }
 
@@ -119,4 +188,59 @@ TArray<TWeakObjectPtr<ATile>> ATileManagerActor::GetTilesByIndexes(TArray<int32>
 	}
 
 	return result;
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerRollDice_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		Tile->PlayerRollDice(PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerUseItem_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		Tile->PlayerUseItem(PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerLeave_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		Tile->PlayerLeave(PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerPassed_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		Tile->PlayerPassed(PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerArrive_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		Tile->PlayerArrive(PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
 }

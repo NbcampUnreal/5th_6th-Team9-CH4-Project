@@ -14,6 +14,8 @@ class AMyPlayerState;
 class UPlayerStateMachine;
 class UItemEffectBase;
 struct FInputActionValue;
+// Cho_Sungmin
+class UInventoryComponent;
 
 UCLASS()
 class TEAM9_PROJECT_API ACameraPawn : public APawn
@@ -26,13 +28,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void PossessedBy(AController* NewControlle) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	bool GetIsUsingItem();
 
@@ -54,6 +57,26 @@ public:
 	void ItemUseStart();
 	void ItemUseEnd();
 
+	// Cho_Sungmin - InventoryComponent 접근
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	UInventoryComponent* GetInventoryComponent() const;
+
+	// Cho_Sungmin - 아이템 사용 (SlotIndex 지정)
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool UseItem(int32 SlotIndex);
+
+	// Cho_Sungmin - 아이템 사용 확정 (조작형 아이템용)
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void ConfirmItemUse();
+
+	// Cho_Sungmin - 아이템 사용 취소
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void CancelItemUse();
+
+	// Cho_Sungmin - PlayerCharacter 접근
+	UFUNCTION(BlueprintCallable, Category = "Character")
+	APlayerCharacter* GetPlayerCharacter() const;
+
 protected:
 	UPROPERTY()
 	USceneComponent* Root;
@@ -70,14 +93,14 @@ protected:
 	UPROPERTY()
 	TSubclassOf<APlayerCharacter> CharacterClass;
 	// 스폰 케릭터 관리
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	APlayerCharacter* PlayerCharacter;
 
 
 	UPROPERTY()
 	UPlayerStateMachine* StateMachine;
 
-	
+
 	// 화면 이동용
 	UPROPERTY(EditAnywhere)
 	float ScreenSpeed;
@@ -90,4 +113,8 @@ protected:
 
 	// 아이템 사용중 체크
 	bool bisUsingItem;
+
+	// Cho_Sungmin
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	UInventoryComponent* InventoryComponent;
 };

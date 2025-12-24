@@ -11,6 +11,9 @@
 #include "State/StateBase.h"
 #include "Tile/Tile.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+// Cho_Sungmin
+#include "Inventory/InventoryComponent.h"
 
 ACameraPawn::ACameraPawn() :
 	ScreenSpeed(1500.f),
@@ -18,6 +21,9 @@ ACameraPawn::ACameraPawn() :
 	bisUsingItem(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Cho_Sungmin - InventoryComponent 생성
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
@@ -38,26 +44,33 @@ ACameraPawn::ACameraPawn() :
 	}
 }
 
+void ACameraPawn::BeginPlay()
+{
+	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("ACameraPawn::BeginPlay"));
+
+	if (HasAuthority())
+	{
+		PlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>
+			(CharacterClass, GetActorLocation(), GetActorRotation());
+
+
+		AMyPlayerState* PS = Cast<AMyPlayerState>(GetPlayerState());
+
+		PlayerCharacter->InitCharacter(this, PS);
+	}
+}
+
 void ACameraPawn::PossessedBy(AController* NewControlle)
 {
 	Super::PossessedBy(NewControlle);
+	UE_LOG(LogTemp, Warning, TEXT("ACameraPawn::PossessedBy"));
 
 	if (HasAuthority())
 	{
 		SetOwner(NewControlle);
 		UE_LOG(LogTemp, Warning, TEXT("Owner set to %s"), *GetNameSafe(NewControlle));
 	}
-
-	MyPlayerController = Cast<AMyPlayerController>(GetController());
-}
-
-void ACameraPawn::BeginPlay()
-{
-	Super::BeginPlay();
-
-	PlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>
-		(CharacterClass, GetActorLocation(), GetActorRotation());
-	PlayerCharacter->InitCharacter(this);
 
 	StateMachine = NewObject<UPlayerStateMachine>(this);
 	if (IsValid(StateMachine))
@@ -89,6 +102,7 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (IsValid(EIC))
 	{
+		MyPlayerController = Cast<AMyPlayerController>(GetController());
 		UE_LOG(LogTemp, Warning, TEXT("UEnhancedInputComponent"))
 		if (IsValid(MyPlayerController))
 		{
@@ -127,6 +141,12 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 }
 
+void ACameraPawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACameraPawn, PlayerCharacter);
+}
+
 void ACameraPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -150,7 +170,7 @@ void ACameraPawn::Tick(float DeltaTime)
 			UE_LOG(LogTemp, Warning, TEXT("ViewX : %d"), ViewX);
 			UE_LOG(LogTemp, Warning, TEXT("ViewX : %d"), ViewY);
 		}
-		
+
 		MyPlayerController->GetMousePosition(MouseX, MouseY);
 
 		FVector2D MoveInput(0.f, 0.f);
@@ -196,17 +216,73 @@ void ACameraPawn::RightClickHandle(const FInputActionValue& Value)
 void ACameraPawn::ItemUseStart()
 {
 	bisUsingItem = true;
+	// Cho_Sungmin
 	StateMachine->GetCurrentState()->ItemUse();
 }
 
 void ACameraPawn::ItemUseEnd()
 {
 	bisUsingItem = false;
-} 
+}
 
 bool ACameraPawn::GetIsUsingItem()
 {
+	// Cho_Sungmin - InventoryComponent 연동
+	if (InventoryComponent)
+	{
+		return InventoryComponent->IsUsingItem();
+	}
 	return bisUsingItem;
+}
+
+// Cho_Sungmin - InventoryComponent Getter
+UInventoryComponent* ACameraPawn::GetInventoryComponent() const
+{
+	return InventoryComponent;
+}
+
+// Cho_Sungmin - 아이템 사용
+bool ACameraPawn::UseItem(int32 SlotIndex)
+{
+	if (!InventoryComponent)
+	{
+		return false;
+	}
+
+	bool bSuccess = InventoryComponent->UseItem(SlotIndex);
+	if (bSuccess)
+	{
+		// 조작형 아이템인 경우 ItemUseState로 전환
+		if (InventoryComponent->IsUsingItem())
+		{
+			StateMachine->GetCurrentState()->ItemUse();
+		}
+	}
+	return bSuccess;
+}
+
+// Cho_Sungmin - 아이템 사용 확정
+void ACameraPawn::ConfirmItemUse()
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->ConfirmItemUse();
+	}
+}
+
+// Cho_Sungmin - 아이템 사용 취소
+void ACameraPawn::CancelItemUse()
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->CancelItemUse();
+	}
+}
+
+// Cho_Sungmin - PlayerCharacter 접근
+APlayerCharacter* ACameraPawn::GetPlayerCharacter() const
+{
+	return PlayerCharacter;
 }
 
 void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
@@ -224,7 +300,7 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 	{
 		return;
 	}
-	
+
 	const FRotator YawRotation(0.f, GetActorRotation().Yaw, 0.f);
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
@@ -246,12 +322,14 @@ void ACameraPawn::CameraWheelHandle(const FInputActionValue& Value)
 
 void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 {
-	if (IsLocallyControlled() == false)
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraReturnHandle"));
+
+	if (PlayerCharacter == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CLIENT: PlayerCharacter not"));
 		return;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraReturnHandle"));
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT: PlayerCharacter"));
 	SetActorLocation(PlayerCharacter->GetActorLocation());
 }
 
@@ -259,7 +337,7 @@ void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 void ACameraPawn::ServerRPCLeftClick_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Sever : LeftClick"));
-	
+
 	StateMachine->GetCurrentState()->Move();
 }
 

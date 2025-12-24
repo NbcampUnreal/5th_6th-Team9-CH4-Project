@@ -1,5 +1,8 @@
 #include "MainGameMode.h"
 #include "Team9GameInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/MyPlayerState.h"
+
 AMainGameMode::AMainGameMode()
 {
 	bUseSeamlessTravel = true;
@@ -24,14 +27,20 @@ void AMainGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
 
-	PlayersInGame.Add(NewPlayer);
+	if (AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>())
+	{
+		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), NewPlayer);
+	}
 }
 
 void AMainGameMode::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
 
-	PlayersInGame.Remove(Exiting);
+	if (AMyPlayerState* MyPlayerState = Exiting->GetPlayerState<AMyPlayerState>())
+	{
+		PlayersInGame.Remove(MyPlayerState->GetPlayerNumber());
+	}
 }
 
 int32 AMainGameMode::ThrowDice(AController* Controller)
@@ -39,10 +48,10 @@ int32 AMainGameMode::ThrowDice(AController* Controller)
 	return 1;
 }
 
-int32 AMainGameMode::ThrowDice(const int8 MyTurnIndex)
+int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 {
 	//차례가 아닌 플레이어는 주사위 못던진다.
-	if (CheckPlayerTurn(MyTurnIndex))
+	if (CheckPlayerTurn(MyPlayerNumber))
 	{
 		return 0;
 	}
@@ -51,15 +60,21 @@ int32 AMainGameMode::ThrowDice(const int8 MyTurnIndex)
 	return DiceNum;
 }
 
-bool AMainGameMode::CheckPlayerTurn(const int8 TargetTurnIndex)
+int32 AMainGameMode::ThrowDice()
 {
-	return TurnIndex == TargetTurnIndex;
+	const int32 DiceNum = FMath::RandRange(1, 6);
+	return DiceNum;
 }
 
-bool AMainGameMode::UsingItem(int8 MyTurnIndex, int32 InventoryIndex)
+bool AMainGameMode::CheckPlayerTurn(const int32 MyPlayerNumber)
+{	
+	return TurnPlayerNumber == MyPlayerNumber;
+}
+
+bool AMainGameMode::UsingItem(const int32 MyPlayerNumber, const int32 InventoryIndex)
 {
 	//차례가 아닌 플레이어는 아이템 사용 불가능
-	if (CheckPlayerTurn(MyTurnIndex))
+	if (CheckPlayerTurn(MyPlayerNumber))
 	{
 		return false;
 	}
@@ -71,19 +86,31 @@ bool AMainGameMode::UsingItem(int8 MyTurnIndex, int32 InventoryIndex)
 	return true;
 }
 
-int8 AMainGameMode::GetTurnIndex()
+int8 AMainGameMode::GetTurnPlayerNumber()
 {
-	return TurnIndex;
+	return TurnPlayerNumber;
+}
+
+void AMainGameMode::SetPlayerNumbersOrder()
+{
+	//TODO : 플레이어 순서 정하기
 }
 
 void AMainGameMode::NextPlayerTurn()
 {
-	//턴 인덱스를 1 추가하는데 마지막 플레이어가 진행하면 라운드 증가 미니게임 시작
+	//턴 인덱스를 1 추가하는데 마지막 플레이어가 진행하면 현재 라운드 종료 미니게임 시작
 	if (PlayersInGame.Num() > ++TurnIndex)
 	{
 		TurnIndex = 0;
 		++CurrentRound;
 
-		//TODO : 미니게임 시작 구현
+		OnRoundEnd.Broadcast();
+
+		UGameplayStatics::OpenLevel(this, TEXT("MiniGame"));
+
+		return;
 	}
+
+	//아직 라운드 종료가 아니라면 다음 플레이어의 차례 진행
+	TurnPlayerNumber = OrderedPlayerNumbers[TurnIndex];
 }

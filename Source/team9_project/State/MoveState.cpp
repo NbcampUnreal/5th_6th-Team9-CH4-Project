@@ -22,7 +22,7 @@ void UMoveState::OnEnter()
 	}
 
 	const int32 DiceNumber = GM->ThrowDice(MPC);
-	UE_LOG(LogTemp, Error, TEXT("ThrowDice : %d"), DiceNumber);
+	UE_LOG(LogTemp, Warning, TEXT("ThrowDice : %d"), DiceNumber);
 	GetPlayerCharacter()->MoveToNextNode(DiceNumber);
 }
 
