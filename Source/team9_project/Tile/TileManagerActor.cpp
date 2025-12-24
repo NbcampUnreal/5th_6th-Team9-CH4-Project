@@ -4,6 +4,7 @@
 #include "Tile/TileManagerActor.h"
 #include "TileData.h"
 #include "Tile/Tile.h"
+#include "Player/PlayerCharacter.h"
 
 TWeakObjectPtr<ATileManagerActor> ATileManagerActor::SingletonInstance = nullptr;
 
@@ -26,13 +27,72 @@ ATile* ATileManagerActor::GetTile(int32 Index)
 	return Result;
 }
 
+void ATileManagerActor::PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerArrive(Tile, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::PlayerPassed(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerPassed(Tile, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::PlayerLeave(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerLeave(Tile, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::PlayerUseItem(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerUseItem(Tile, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
+void ATileManagerActor::PlayerRollDice(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	if (IsValid(Tile) && IsValid(PlayerCharacter)) {
+		NetMulticastRPC_PlayerRollDice(Tile, PlayerCharacter);
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Tile or PlayerCharacter is not Valid"));
+	}
+}
+
 // Called when the game starts or when spawned
 void ATileManagerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnTiles();
 	LinkTiles();
-	SingletonInstance = this;
+
+	if (IsValid(SingletonInstance.Get()) == false)
+	{
+		SingletonInstance = this;
+	}
 }
 
 void ATileManagerActor::SpawnTiles(){
@@ -119,4 +179,29 @@ TArray<TWeakObjectPtr<ATile>> ATileManagerActor::GetTilesByIndexes(TArray<int32>
 	}
 
 	return result;
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerRollDice_Implementation(ATile* Tile, APlayerCharacter* PlayerCharacter)
+{
+	Tile->PlayerRollDice(PlayerCharacter);
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerUseItem_Implementation(ATile* Tile, APlayerCharacter* PlayerCharacter)
+{
+	Tile->PlayerUseItem(PlayerCharacter);
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerLeave_Implementation(ATile* Tile, APlayerCharacter* PlayerCharacter)
+{
+	Tile->PlayerLeave(PlayerCharacter);
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerPassed_Implementation(ATile* Tile, APlayerCharacter* PlayerCharacter)
+{
+	Tile->PlayerPassed(PlayerCharacter);
+}
+
+void ATileManagerActor::NetMulticastRPC_PlayerArrive_Implementation(ATile* Tile, APlayerCharacter* PlayerCharacter)
+{
+	Tile->PlayerArrive(PlayerCharacter);
 }
