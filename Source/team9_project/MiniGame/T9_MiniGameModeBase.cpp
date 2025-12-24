@@ -41,7 +41,7 @@ void AT9_MiniGameModeBase::EndGame()
 		ComeBackHandle,
 		this,
 		&AT9_MiniGameModeBase::ComeBackMainGame,
-		3.0f,
+		5.0f,
 		false
 	);
 }
