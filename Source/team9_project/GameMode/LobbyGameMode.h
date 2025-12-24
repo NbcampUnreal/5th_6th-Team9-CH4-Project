@@ -31,7 +31,7 @@ private:
 	
 	//로비에 있는 플레이어 목록
 	UPROPERTY()
-	TSet<AController*> PlayersInLobby;
+	TMap<int32, AController*> PlayersInLobby;
 
 	//접속한 플레이어에게 부여할 번호
 	int32 PlayerNumber;
