@@ -25,6 +25,18 @@ struct FMiniGamePlayerResult
 	int32 Score = 0;
 };
 
+USTRUCT(BlueprintType)
+struct FMiniGamePlayerReady
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 PlayerId = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bReady = false;
+};
+
 UCLASS()
 class TEAM9_PROJECT_API AT9_MiniGameStateBase : public AGameStateBase
 {
@@ -33,6 +45,15 @@ class TEAM9_PROJECT_API AT9_MiniGameStateBase : public AGameStateBase
 public:
 	UFUNCTION()
 	void OnRep_Phase();
+
+	UFUNCTION()
+	void OnRep_PlayerReady();
+
+	UFUNCTION()
+	void InitializePlayerReadys();
+
+	UFUNCTION()
+	void SetPlayerReady(int32 PlayerNumber, bool bReady);
 
 	void AddPlayerResult(int32 PlayerId, int32 Score);
 
@@ -45,7 +66,10 @@ public:
 
 public:
 	UPROPERTY(Replicated)
-	TArray<FMiniGamePlayerResult> PlayerResults;
+	FMiniGamePlayerResult PlayerResults;
+
+	UPROPERTY(ReplicatedUsing = OnRep_PlayerReady)
+	TArray<FMiniGamePlayerReady> PlayerReadys;
 
 	bool bInGame = false;
 

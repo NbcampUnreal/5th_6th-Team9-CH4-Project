@@ -18,11 +18,9 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void EnableCharacterInput();
-
-	virtual void DisableCharacterInput();
+	virtual void SetAcceptInput(bool bEnable);
 
 protected:
-	bool bInputEnabled;
+	bool bAcceptInput = false;
 
 };

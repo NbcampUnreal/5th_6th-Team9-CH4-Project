@@ -5,8 +5,6 @@
 AT9_MiniGameCharacterBase::AT9_MiniGameCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	bInputEnabled = true;
 	bUseControllerRotationYaw = true;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
@@ -26,22 +24,7 @@ void AT9_MiniGameCharacterBase::SetupPlayerInputComponent(UInputComponent* Playe
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AT9_MiniGameCharacterBase::EnableCharacterInput()
+void AT9_MiniGameCharacterBase::SetAcceptInput(bool bEnable)
 {
-	bInputEnabled = true;
-
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
-	{
-		EnableInput(PC);
-	}
-}
-
-void AT9_MiniGameCharacterBase::DisableCharacterInput()
-{
-	bInputEnabled = false;
-
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
-	{
-		DisableInput(PC);
-	}
+	bAcceptInput = bEnable;
 }

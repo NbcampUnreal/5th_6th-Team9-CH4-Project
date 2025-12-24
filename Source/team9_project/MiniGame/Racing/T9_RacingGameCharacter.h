@@ -24,6 +24,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void SetAcceptInput(bool bEnable) override;
+
 public:
 	FORCEINLINE USpringArmComponent* GetSpringArm() const { return SpringArm; }
 
@@ -43,29 +45,26 @@ private:
 
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DXPlayerCharacter|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerCharacter|Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DXPlayerCharacter|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerCharacter|Input")
 	TObjectPtr<UInputAction> MoveAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DXPlayerCharacter|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerCharacter|Input")
 	TObjectPtr<UInputAction> LookAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DXPlayerCharacter|Input")
-	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditAnywhere, Category = "Racing")
 	float CurrentSpeed = 0.f;
 
 	UPROPERTY(EditAnywhere, Category = "Racing")
-	float MaxSpeed = 1200.f;
+	float MaxSpeed = 1000.f;
 
 	UPROPERTY(EditAnywhere, Category = "Racing")
-	float AccelPerInput = 100.f; 
+	float AccelPerInput = 50.f; 
 
 	UPROPERTY(EditAnywhere, Category = "Racing")
-	float DecelPerSecond = 60.f;  
+	float DecelPerSecond = 400.f;  
 
 	bool bAccelRequested = false;
 };

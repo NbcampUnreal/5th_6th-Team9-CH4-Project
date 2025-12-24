@@ -57,8 +57,10 @@ void AT9_RacingGameCharacter::BeginPlay()
 void AT9_RacingGameCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// 가속
+	if (!bAcceptInput)
+	{
+		return; 
+	}
 	if (bAccelRequested)
 	{
 		CurrentSpeed = FMath::Clamp(
@@ -67,7 +69,6 @@ void AT9_RacingGameCharacter::Tick(float DeltaTime)
 			MaxSpeed
 		);
 	}
-	// 감속
 	else
 	{
 		CurrentSpeed = FMath::Max(
@@ -78,13 +79,23 @@ void AT9_RacingGameCharacter::Tick(float DeltaTime)
 
 	bAccelRequested = false;
 
-	// 실제 이동
 	if (CurrentSpeed > 0.f && IsValid(Controller))
 	{
 		const FRotator ControlYaw(0.f, Controller->GetControlRotation().Yaw, 0.f);
 		const FVector Forward = FRotationMatrix(ControlYaw).GetUnitAxis(EAxis::X);
 
 		AddMovementInput(Forward, CurrentSpeed * DeltaTime);
+	}
+}
+
+void AT9_RacingGameCharacter::SetAcceptInput(bool bEnable)
+{
+	bAcceptInput = bEnable;
+	UE_LOG(LogTemp, Error, TEXT("override"));
+	if (!bAcceptInput)
+	{
+		CurrentSpeed = 0.f;
+		bAccelRequested = false;
 	}
 }
 
@@ -112,6 +123,10 @@ void AT9_RacingGameCharacter::HandleMoveInput(const FInputActionValue& InValue)
 
 void AT9_RacingGameCharacter::HandleLookInput(const FInputActionValue& InValue)
 {
+	if (!bAcceptInput)
+	{
+		return;
+	}
 	if (IsValid(Controller) == false)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Controller is invalid."));
