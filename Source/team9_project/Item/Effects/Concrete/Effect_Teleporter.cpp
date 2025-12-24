@@ -3,8 +3,9 @@
 
 #include "Effect_Teleporter.h"
 #include "Item/Data/ItemUseContext.h"
-// #include "Tile/Tile.h"  // TODO: 타일 시스템 연동 시 활성화
-// #include "Kismet/GameplayStatics.h"
+#include "Tile/Tile.h"
+#include "Tile/TileManagerActor.h"
+#include "Player/PlayerCharacter.h"
 
 void UEffect_Teleporter::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 {
@@ -16,54 +17,40 @@ void UEffect_Teleporter::ExecuteEffect(AActor* User, const FItemUseContext& Cont
 		return;
 	}
 
-	// TODO: 타일 시스템 연동
-	// int32 TargetIndex = Context.TargetTileIndex;
-	// if (TargetIndex < 0) { return; }
-	// ATile* TargetTile = GetTileByIndex(TargetIndex);
-	// if (!TargetTile) { return; }
-	// FVector TeleportLocation = TargetTile->GetActorLocation();
-	// TeleportLocation.Z += 100.0f;
-	// User->SetActorLocation(TeleportLocation);
-
-	UE_LOG(LogTemp, Log, TEXT("Effect_Teleporter: Effect triggered (teleport not implemented yet)"));
-}
-
-// TODO: 타일 시스템 연동 시 활성화
-/*
-TArray<ATile*> UEffect_Teleporter::GetAllTiles() const
-{
-	TArray<ATile*> FoundTiles;
-
-	if (!CurrentUser || !CurrentUser->GetWorld())
+	// 타일 매니저에서 타일 가져오기
+	ATileManagerActor* TileManager = ATileManagerActor::Get(User->GetWorld());
+	if (!TileManager)
 	{
-		return FoundTiles;
+		UE_LOG(LogTemp, Warning, TEXT("Effect_Teleporter: TileManager is null"));
+		return;
 	}
 
-	// 월드에서 모든 ATile 액터 찾기
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(CurrentUser->GetWorld(), ATile::StaticClass(), FoundActors);
-
-	// ATile*로 캐스팅
-	for (AActor* Actor : FoundActors)
+	int32 TargetIndex = Context.TargetTileIndex;
+	if (TargetIndex < 0)
 	{
-		if (ATile* Tile = Cast<ATile>(Actor))
-		{
-			FoundTiles.Add(Tile);
-		}
+		UE_LOG(LogTemp, Warning, TEXT("Effect_Teleporter: Invalid TargetTileIndex: %d"), TargetIndex);
+		return;
 	}
 
-	return FoundTiles;
-}
-
-ATile* UEffect_Teleporter::GetTileByIndex(int32 Index) const
-{
-	TArray<ATile*> AllTiles = GetAllTiles();
-
-	if (Index >= 0 && Index < AllTiles.Num())
+	ATile* TargetTile = TileManager->GetTile(TargetIndex);
+	if (!TargetTile)
 	{
-		return AllTiles[Index];
+		UE_LOG(LogTemp, Warning, TEXT("Effect_Teleporter: TargetTile is null for index: %d"), TargetIndex);
+		return;
 	}
 
-	return nullptr;
+	// 텔레포트 위치 계산
+	FVector TeleportLocation = TargetTile->GetActorLocation();
+	TeleportLocation.Z += 46.0f; // PlayerCharacter.cpp와 동일한 높이 오프셋
+
+	// 위치 이동
+	User->SetActorLocation(TeleportLocation);
+
+	// PlayerCharacter인 경우 CurrentTile 업데이트
+	if (APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(User))
+	{
+		PlayerChar->SetCurrentTile(TargetTile);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Effect_Teleporter: %s teleported to tile %d"), *User->GetName(), TargetIndex);
 }
-*/

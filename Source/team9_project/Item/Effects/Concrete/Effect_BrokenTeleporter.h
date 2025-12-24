@@ -6,6 +6,9 @@
 #include "Item/Effects/ItemEffectBase_Instant.h"
 #include "Effect_BrokenTeleporter.generated.h"
 
+class ATile;
+class APlayerCharacter;
+
 /**
  * 망가진 순간이동기 - 랜덤 타일로 즉시 이동
  * - 조작 타입: Instant (즉시 발동)
@@ -18,8 +21,4 @@ class TEAM9_PROJECT_API UEffect_BrokenTeleporter : public UItemEffectBase_Instan
 
 public:
 	virtual void ExecuteEffect(AActor* User, const FItemUseContext& Context) override;
-
-protected:
-	// TODO: 타일 시스템 연동 시 활성화
-	// TArray<class ATile*> GetAllTiles() const;
 };

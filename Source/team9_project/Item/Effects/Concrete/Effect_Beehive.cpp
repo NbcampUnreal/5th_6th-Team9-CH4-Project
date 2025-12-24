@@ -3,10 +3,10 @@
 
 #include "Effect_Beehive.h"
 #include "Item/Data/ItemUseContext.h"
-// #include "Tile/Tile.h"  // TODO: 타일 시스템 연동 시 활성화
-// #include "Player/PlayerCharacter.h"  // TODO: 플레이어 시스템 연동 시 활성화
-// #include "Kismet/GameplayStatics.h"
-// #include "DrawDebugHelpers.h"
+#include "Tile/Tile.h"
+#include "Tile/TileManagerActor.h"
+#include "Player/PlayerCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 void UEffect_Beehive::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 {
@@ -18,96 +18,54 @@ void UEffect_Beehive::ExecuteEffect(AActor* User, const FItemUseContext& Context
 		return;
 	}
 
-	// TODO: 타일/플레이어 시스템 연동
-	// int32 TargetIndex = Context.TargetTileIndex;
-	// if (TargetIndex < 0) { return; }
-	// ATile* TargetTile = GetTileByIndex(TargetIndex);
-	// if (!TargetTile) { return; }
-	// TArray<AActor*> PlayersOnTile = GetPlayersOnTile(TargetTile);
-	// for (AActor* Player : PlayersOnTile)
-	// {
-	//     if (!Player || Player == User) { continue; }
-	//     FDamageEvent DamageEvent;
-	//     Player->TakeDamage(Damage, DamageEvent, User->GetInstigatorController(), User);
-	// }
-
-	UE_LOG(LogTemp, Log, TEXT("Effect_Beehive: Effect triggered (damage not implemented yet)"));
-}
-
-// TODO: 타일/플레이어 시스템 연동 시 활성화
-/*
-TArray<ATile*> UEffect_Beehive::GetAllTiles() const
-{
-	TArray<ATile*> FoundTiles;
-
-	if (!CurrentUser || !CurrentUser->GetWorld())
+	// 타일 매니저에서 타일 가져오기
+	ATileManagerActor* TileManager = ATileManagerActor::Get(User->GetWorld());
+	if (!TileManager)
 	{
-		return FoundTiles;
+		UE_LOG(LogTemp, Warning, TEXT("Effect_Beehive: TileManager is null"));
+		return;
 	}
 
-	// 월드에서 모든 ATile 액터 찾기
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(CurrentUser->GetWorld(), ATile::StaticClass(), FoundActors);
-
-	// ATile*로 캐스팅
-	for (AActor* Actor : FoundActors)
+	int32 TargetIndex = Context.TargetTileIndex;
+	if (TargetIndex < 0)
 	{
-		if (ATile* Tile = Cast<ATile>(Actor))
+		UE_LOG(LogTemp, Warning, TEXT("Effect_Beehive: Invalid TargetTileIndex: %d"), TargetIndex);
+		return;
+	}
+
+	ATile* TargetTile = TileManager->GetTile(TargetIndex);
+	if (!TargetTile)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Effect_Beehive: TargetTile is null for index: %d"), TargetIndex);
+		return;
+	}
+
+	// 타일에 있는 모든 플레이어 가져오기
+	TArray<APlayerCharacter*> PlayersOnTile = TargetTile->GetInPlayers();
+
+	int32 HitCount = 0;
+	for (APlayerCharacter* Player : PlayersOnTile)
+	{
+		// 자기 자신은 제외
+		if (!Player || Player == User)
 		{
-			FoundTiles.Add(Tile);
+			continue;
 		}
+
+		// 데미지 적용
+		UGameplayStatics::ApplyDamage(
+			Player,
+			Damage,
+			User->GetInstigatorController(),
+			User,
+			nullptr
+		);
+
+		HitCount++;
+		UE_LOG(LogTemp, Log, TEXT("Effect_Beehive: %s dealt %.0f damage to %s"),
+			*User->GetName(), Damage, *Player->GetName());
 	}
 
-	return FoundTiles;
+	UE_LOG(LogTemp, Log, TEXT("Effect_Beehive: Effect triggered on tile %d, hit %d players"),
+		TargetIndex, HitCount);
 }
-
-ATile* UEffect_Beehive::GetTileByIndex(int32 Index) const
-{
-	TArray<ATile*> AllTiles = GetAllTiles();
-
-	if (Index >= 0 && Index < AllTiles.Num())
-	{
-		return AllTiles[Index];
-	}
-
-	return nullptr;
-}
-
-TArray<AActor*> UEffect_Beehive::GetPlayersOnTile(ATile* Tile) const
-{
-	TArray<AActor*> PlayersOnTile;
-
-	if (!Tile || !CurrentUser || !CurrentUser->GetWorld())
-	{
-		return PlayersOnTile;
-	}
-
-	FVector TileLocation = Tile->GetActorLocation();
-
-	// SphereOverlap으로 타일 범위 내 플레이어 찾기
-	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(Tile); // 타일 자체는 무시
-
-	bool bHasHit = CurrentUser->GetWorld()->OverlapMultiByChannel(
-		OverlapResults,
-		TileLocation,
-		FQuat::Identity,
-		ECC_Pawn, // Pawn 채널 사용
-		FCollisionShape::MakeSphere(TileRadius),
-		QueryParams
-	);
-
-	// 결과에서 PlayerCharacter만 필터링
-	for (const FOverlapResult& Result : OverlapResults)
-	{
-		AActor* Actor = Result.GetActor();
-		if (Actor && Actor->IsA(APlayerCharacter::StaticClass()))
-		{
-			PlayersOnTile.Add(Actor);
-		}
-	}
-
-	return PlayersOnTile;
-}
-*/

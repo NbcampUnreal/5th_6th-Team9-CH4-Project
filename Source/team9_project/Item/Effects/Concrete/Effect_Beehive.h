@@ -6,6 +6,10 @@
 #include "Item/Effects/ItemEffectBase_TileTarget.h"
 #include "Effect_Beehive.generated.h"
 
+class ATile;
+class ATileManagerActor;
+class APlayerCharacter;
+
 /**
  * 벌꿀집 - 선택한 타일에 있는 모든 플레이어에게 데미지
  * - 조작 타입: TileTarget (A/D로 타일 순환 → Space로 확정)
@@ -24,12 +28,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beehive")
 	float Damage = 30.0f;
 
-	// 타일 범위 (타일 중심에서의 반경)
+	// 타일 범위 (타일 중심에서의 반경) - Source에서 추가됨
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beehive")
 	float TileRadius = 150.0f;
-
-	// TODO: 타일/플레이어 시스템 연동 시 활성화
-	// TArray<class ATile*> GetAllTiles() const;
-	// class ATile* GetTileByIndex(int32 Index) const;
-	// TArray<AActor*> GetPlayersOnTile(class ATile* Tile) const;
 };

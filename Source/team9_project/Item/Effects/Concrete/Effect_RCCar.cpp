@@ -3,9 +3,12 @@
 
 #include "Effect_RCCar.h"
 #include "Item/Data/ItemUseContext.h"
-#include "Engine/World.h"  // SpawnActor에 필요
-// #include "DrawDebugHelpers.h"  // TODO: 데미지 시스템 연동 시 활성화
-// #include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/OverlapResult.h"
+#include "Player/CameraPawn.h"
+#include "Player/PlayerCharacter.h"
 
 AActor* UEffect_RCCar::SpawnControlledActor(AActor* User)
 {
@@ -22,9 +25,23 @@ AActor* UEffect_RCCar::SpawnControlledActor(AActor* User)
 		return nullptr;
 	}
 
-	// User 앞쪽에 RC카 스폰
-	FVector SpawnLocation = User->GetActorLocation() + User->GetActorForwardVector() * 100.0f;
-	FRotator SpawnRotation = User->GetActorRotation();
+	// CameraPawn에서 PlayerCharacter 위치 가져오기
+	FVector SpawnLocation;
+	FRotator SpawnRotation;
+
+	ACameraPawn* CameraPawn = Cast<ACameraPawn>(User);
+	if (CameraPawn && CameraPawn->GetPlayerCharacter())
+	{
+		APlayerCharacter* PlayerChar = CameraPawn->GetPlayerCharacter();
+		SpawnLocation = PlayerChar->GetActorLocation() + PlayerChar->GetActorForwardVector() * 100.0f;
+		SpawnRotation = PlayerChar->GetActorRotation();
+	}
+	else
+	{
+		// fallback: User 위치 사용
+		SpawnLocation = User->GetActorLocation() + User->GetActorForwardVector() * 100.0f;
+		SpawnRotation = User->GetActorRotation();
+	}
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -61,29 +78,25 @@ void UEffect_RCCar::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 		return;
 	}
 
-	if (!ControlledActor)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Effect_RCCar: No ControlledActor to explode"));
-		return;
-	}
-
 	FVector ExplosionLocation = ControlledActor->GetActorLocation();
 
-	// TODO: 데미지 시스템 연동
-	/*
+	// SphereOverlap으로 폭발 범위 내 액터 찾기
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(User);
 	QueryParams.AddIgnoredActor(ControlledActor);
-	bool bHasHit = User->GetWorld()->OverlapMultiByChannel(...);
-	for (const FOverlapResult& Result : OverlapResults)
-	{
-	    AActor* HitActor = Result.GetActor();
-	    FDamageEvent DamageEvent;
-	    HitActor->TakeDamage(ExplosionDamage, DamageEvent, User->GetInstigatorController(), User);
-	}
+
+	bool bHasHit = User->GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		ExplosionLocation,
+		FQuat::Identity,
+		ECC_Pawn,
+		FCollisionShape::MakeSphere(ExplosionRadius),
+		QueryParams
+	);
 
 	// 디버그 구체 그리기
+#if WITH_EDITOR
 	DrawDebugSphere(
 		User->GetWorld(),
 		ExplosionLocation,
@@ -95,11 +108,35 @@ void UEffect_RCCar::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 		0,
 		3.0f
 	);
-	*/
+#endif
+
+	// 폭발 범위 내 액터들에게 데미지 적용
+	int32 HitCount = 0;
+	for (const FOverlapResult& Result : OverlapResults)
+	{
+		AActor* HitActor = Result.GetActor();
+		if (!HitActor || HitActor == User)
+		{
+			continue;
+		}
+
+		// 데미지 적용
+		UGameplayStatics::ApplyDamage(
+			HitActor,
+			ExplosionDamage,
+			User->GetInstigatorController(),
+			User,
+			nullptr
+		);
+
+		HitCount++;
+		UE_LOG(LogTemp, Log, TEXT("Effect_RCCar: Explosion hit %s for %.0f damage"),
+			*HitActor->GetName(), ExplosionDamage);
+	}
 
 	// RC카 제거
 	DestroyControlledActor();
 
-	UE_LOG(LogTemp, Log, TEXT("Effect_RCCar: Explosion at %s (damage not implemented yet)"),
-		*ExplosionLocation.ToString());
+	UE_LOG(LogTemp, Log, TEXT("Effect_RCCar: Explosion at %s, hit %d targets"),
+		*ExplosionLocation.ToString(), HitCount);
 }

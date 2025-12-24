@@ -6,6 +6,10 @@
 #include "Item/Effects/ItemEffectBase_TileTarget.h"
 #include "Effect_Teleporter.generated.h"
 
+class ATile;
+class ATileManagerActor;
+class APlayerCharacter;
+
 /**
  * 순간이동기 - 선택한 타일로 즉시 이동
  * - 조작 타입: TileTarget (A/D로 타일 순환 → Space로 확정)
@@ -18,9 +22,4 @@ class TEAM9_PROJECT_API UEffect_Teleporter : public UItemEffectBase_TileTarget
 
 public:
 	virtual void ExecuteEffect(AActor* User, const FItemUseContext& Context) override;
-
-protected:
-	// TODO: 타일 시스템 연동 시 활성화
-	// TArray<class ATile*> GetAllTiles() const;
-	// class ATile* GetTileByIndex(int32 Index) const;
 };

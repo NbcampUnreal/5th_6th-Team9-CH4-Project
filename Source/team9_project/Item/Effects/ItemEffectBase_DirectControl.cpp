@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ItemEffectBase_DirectControl.h"
@@ -7,9 +7,9 @@
 void UItemEffectBase_DirectControl::StartUse(AActor* User)
 {
 	Super::StartUse(User);
-	
+
 	ControlledActor = SpawnControlledActor(User);
-	
+
 	if (ControlledActor)
 	{
 		CurrentLocation = ControlledActor->GetActorLocation();
@@ -17,7 +17,7 @@ void UItemEffectBase_DirectControl::StartUse(AActor* User)
 	else
 	{
 		CurrentLocation = User->GetActorLocation();
-		
+
 	}
 	MoveInput = FVector2D::ZeroVector;
 }
@@ -29,22 +29,22 @@ void UItemEffectBase_DirectControl::TickUse(float DeltaTime)
 	{
 		return;
 	}
-	
+
 	if (CheckTimeout())
 	{
 		CancelUse();
 		return;
 	}
-	
+
 	UpdateMovement(DeltaTime);
-	
+
 }
 
 void UItemEffectBase_DirectControl::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 {
 	Super::ExecuteEffect(User, Context);
-	
-	
+
+
 }
 
 void UItemEffectBase_DirectControl::CancelUse()
@@ -57,7 +57,7 @@ void UItemEffectBase_DirectControl::CancelUse()
 EItemUseType UItemEffectBase_DirectControl::GetUseType() const
 {
 	return EItemUseType::DirectControl;
-	
+
 }
 
 void UItemEffectBase_DirectControl::SetMoveInput(FVector2D Input)
@@ -69,6 +69,12 @@ void UItemEffectBase_DirectControl::SetMoveInput(FVector2D Input)
 AActor* UItemEffectBase_DirectControl::GetControlledActor() const
 {
 	return ControlledActor;
+}
+
+void UItemEffectBase_DirectControl::UpdateContext(FItemUseContext& Context)
+{
+	Super::UpdateContext(Context);
+	Context.FinalLocation = CurrentLocation;
 }
 
 AActor* UItemEffectBase_DirectControl::SpawnControlledActor(AActor* User)
