@@ -4,6 +4,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "MainGameMode.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundEnd);
+
 UCLASS()
 class TEAM9_PROJECT_API AMainGameMode : public AGameModeBase
 {
