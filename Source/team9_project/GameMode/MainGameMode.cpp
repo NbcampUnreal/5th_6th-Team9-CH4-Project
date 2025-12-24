@@ -94,6 +94,11 @@ int8 AMainGameMode::GetTurnPlayerNumber()
 void AMainGameMode::SetPlayerNumbersOrder()
 {
 	//TODO : 플레이어 순서 정하기
+	//임시로 TMap 기준 순서 따름
+	for (auto PlayerInfo : PlayersInGame)
+	{
+		OrderedPlayerNumbers.Add(PlayerInfo.Key);
+	}
 }
 
 void AMainGameMode::NextPlayerTurn()
