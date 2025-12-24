@@ -57,6 +57,7 @@ private:
 	TMap<int32, AController*> PlayersInGame;
 
 	//턴 진행 순서
+	UPROPERTY()
 	TArray<int32> OrderedPlayerNumbers;
 
 	//현재 턴 진행중인 플레이어 번호
