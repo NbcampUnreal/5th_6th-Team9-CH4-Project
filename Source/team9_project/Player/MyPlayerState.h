@@ -41,17 +41,35 @@ public:
 
 	void SetPlayerNumber(int32 PNumber);
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 private:
 	int CurrentHp;
 
 	int MaxHp;
 
-	int CurrentScore;
+	//int CurrentScore;
 
 	int TileIndex;
 
-	int32 PlayerNumber;
+	//int32 PlayerNumber;
 
+public:
+	    // UI용 표시 이름 (복제로 모든 클라이언트에 전달됨)
+    UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
+    FString DisplayName;
 
+    UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
+    bool bIsReady = false;
+
+    UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
+    int32 PlayerNumber = -1;
+
+    // 점수와 순위 변수 (복제 설정)
+    UPROPERTY(Replicated, BlueprintReadOnly, Category = "Result")
+    int32 CurrentScore = 0;
+	
+    UPROPERTY(Replicated, BlueprintReadOnly, Category = "Result")
+    int32 FinalRank = 0;
 
 };

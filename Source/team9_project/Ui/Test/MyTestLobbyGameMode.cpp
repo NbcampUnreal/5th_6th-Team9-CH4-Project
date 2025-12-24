@@ -1,13 +1,13 @@
 #include "MyTestLobbyGameMode.h"
-#include "MyTestPlayerController.h"
+#include "Player/MyPlayerController.h"
+#include "Player/MyPlayerState.h"
 #include "Ui/EGameUIState.h"
 #include "Kismet/GameplayStatics.h"
-#include "MyTestPlayerState.h"
 #include "MyTestGameInstance.h"
 
 AMyTestLobbyGameMode::AMyTestLobbyGameMode()
 {
-    PlayerStateClass = AMyTestPlayerState::StaticClass();
+    PlayerStateClass = AMyPlayerState::StaticClass();
 
     bUseSeamlessTravel = true;
 }
@@ -20,7 +20,7 @@ void AMyTestLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 
     if (NewPlayer->IsLocalController())  // 이 플레이어가 로컬 플레이어인지 체크 (클라이언트 측에서만 true)
     {
-        if (AMyTestPlayerState* TestPS = NewPlayer->GetPlayerState<AMyTestPlayerState>())
+        if (AMyPlayerState* TestPS = NewPlayer->GetPlayerState<AMyPlayerState>())
         {
             if (UMyTestGameInstance* GI = Cast<UMyTestGameInstance>(GetWorld()->GetGameInstance()))
             {
@@ -36,7 +36,7 @@ void AMyTestLobbyGameMode::PostLogin(APlayerController* NewPlayer)
     }
 
     // 기존 UI 설정 로직
-    if (AMyTestPlayerController* PC = Cast<AMyTestPlayerController>(NewPlayer))
+    if (AMyPlayerController* PC = Cast<AMyPlayerController>(NewPlayer))
     {
         FTimerHandle Handle;
         GetWorldTimerManager().SetTimer(Handle, [PC]()
@@ -59,7 +59,7 @@ FString AMyTestLobbyGameMode::InitNewPlayer(APlayerController* NewPlayerControll
         JoinedName = TEXT("Player");
     }
 
-    if (AMyTestPlayerState* TestPS = NewPlayerController->GetPlayerState<AMyTestPlayerState>())
+    if (AMyPlayerState* TestPS = NewPlayerController->GetPlayerState<AMyPlayerState>())
     {
         // 엔진 기본 이름 (옵션 없으면 랜덤 등)
         TestPS->SetPlayerName(JoinedName);

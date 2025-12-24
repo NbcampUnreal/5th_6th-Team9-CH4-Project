@@ -1,4 +1,5 @@
 #include "Player/MyPlayerState.h"
+#include "Net/UnrealNetwork.h"
 
 AMyPlayerState::AMyPlayerState()
 	: CurrentHp(100),
@@ -6,8 +7,11 @@ AMyPlayerState::AMyPlayerState()
 	CurrentScore(0),
 	TileIndex(0),
 	PlayerNumber(0)
-{
 
+{
+	DisplayName = TEXT("Player");
+	bIsReady = false;
+	PlayerNumber = -1;
 }
 
 void AMyPlayerState::CopyProperties(APlayerState* NewPlayerState)
@@ -81,4 +85,15 @@ int32 AMyPlayerState::GetPlayerNumber()
 void AMyPlayerState::SetPlayerNumber(int32 PNumber)
 {
 	PlayerNumber = PNumber;
+}
+
+void AMyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, DisplayName);
+	DOREPLIFETIME(ThisClass, bIsReady);
+	DOREPLIFETIME(ThisClass, PlayerNumber);
+	DOREPLIFETIME(ThisClass, CurrentScore);
+	DOREPLIFETIME(ThisClass, FinalRank);
 }

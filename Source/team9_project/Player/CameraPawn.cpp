@@ -49,6 +49,12 @@ void ACameraPawn::BeginPlay()
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Warning, TEXT("ACameraPawn::BeginPlay"));
 
+	StateMachine = NewObject<UPlayerStateMachine>(this);
+	if (IsValid(StateMachine))
+	{
+		StateMachine->Initialize(this, PlayerCharacter);
+	}
+
 	if (HasAuthority())
 	{
 		PlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>
@@ -58,6 +64,16 @@ void ACameraPawn::BeginPlay()
 		AMyPlayerState* PS = Cast<AMyPlayerState>(GetPlayerState());
 
 		PlayerCharacter->InitCharacter(this, PS);
+	}
+
+	APlayerState* PS = GetPlayerState();
+	if (IsValid(PS))
+	{
+		AMyPlayerState* TPS = Cast<AMyPlayerState>(PS);
+		if (IsValid(TPS))
+		{
+			PlayerCharacter->SetPlayerState(TPS);
+		}
 	}
 }
 
@@ -72,21 +88,7 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 		UE_LOG(LogTemp, Warning, TEXT("Owner set to %s"), *GetNameSafe(NewControlle));
 	}
 
-	StateMachine = NewObject<UPlayerStateMachine>(this);
-	if (IsValid(StateMachine))
-	{
-		StateMachine->Initialize(this, PlayerCharacter);
-	}
 
-	APlayerState* PS = GetPlayerState();
-	if (IsValid(PS))
-	{
-		AMyPlayerState* TPS = Cast<AMyPlayerState>(PS);
-		if (IsValid(TPS))
-		{
-			PlayerCharacter->SetPlayerState(TPS);
-		}
-	}
 }
 
 void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
