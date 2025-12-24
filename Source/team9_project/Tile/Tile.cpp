@@ -59,6 +59,33 @@ void ATile::PlayerRollDice(APlayerCharacter* PlayerCharacter)
 	OnPlayerRollDice.Broadcast(PlayerCharacter);
 }
 
+//void ATile::ServerRPC_PlayerLeave_Implementation(APlayerCharacter* PlayerCharacter)
+//{
+//	//OnPlayerLeave.Broadcast(PlayerCharacter);
+//	_InPlayers.Remove(PlayerCharacter);
+//}
+//
+//void ATile::ServerRPC_PlayerPassed_Implementation(APlayerCharacter* PlayerCharacter)
+//{
+//	OnPlayerPassed.Broadcast(PlayerCharacter);
+//}
+//
+//void ATile::ServerRPC_PlayerArrive_Implementation(APlayerCharacter* PlayerCharacter)
+//{
+//	_InPlayers.Add(PlayerCharacter);
+//	OnPlayerArrive.Broadcast(PlayerCharacter);
+//}
+//
+//void ATile::ServerRPC_PlayerUseItem_Implementation(APlayerCharacter* PlayerCharacter)
+//{
+//	OnPlayerUseItem.Broadcast(PlayerCharacter);
+//}
+//
+//void ATile::ServerRPC_PlayerRollDice_Implementation(APlayerCharacter* PlayerCharacter)
+//{
+//	OnPlayerRollDice.Broadcast(PlayerCharacter);
+//}
+
 TArray<APlayerCharacter*> ATile::GetInPlayers()
 {
 	TArray<APlayerCharacter*> Result;
@@ -108,14 +135,18 @@ TArray<ATile*> ATile::GetBeforeTiles()
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	/*OnPlayerArrive.AddUObject(this, &ATile::ServerRPC_PlayerArrive);
+	OnPlayerLeave.AddUObject(this, &ATile::ServerRPC_PlayerPassed);
+	OnPlayerUseItem.AddUObject(this, &ATile::ServerRPC_PlayerLeave);
+	OnPlayerRollDice.AddUObject(this, &ATile::ServerRPC_PlayerUseItem);
+	OnPlayerPassed.AddUObject(this, &ATile::ServerRPC_PlayerRollDice);*/
 }
 
 // Called every frame
 void ATile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ATile::AssignFromDataAsset(UTileDataAsset* asset)
@@ -139,5 +170,15 @@ void ATile::AssignFromDataAsset(UTileDataAsset* asset)
 		NewComp->RegisterComponent(); 
 		_TileComponents.Add(NewComp);
     }
+}
+
+bool ATile::IsServer()
+{
+	if (GetWorld() && GetWorld()->GetNetMode() == NM_DedicatedServer)
+	{
+		return true;
+	}
+
+	return false;
 }
 

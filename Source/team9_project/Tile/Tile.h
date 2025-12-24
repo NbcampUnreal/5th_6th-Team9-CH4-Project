@@ -52,7 +52,7 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Tile")
 	TArray<TObjectPtr<UTileComponent>> _TileComponents;
 
-	int32 _Index;	
+	int32 _Index;
 
 	TSet<TWeakObjectPtr<APlayerCharacter>> _InPlayers;
 
@@ -65,6 +65,21 @@ public:
 	void PlayerLeave(APlayerCharacter* PlayerCharacter);
 	void PlayerUseItem(APlayerCharacter* PlayerCharacter);
 	void PlayerRollDice(APlayerCharacter* PlayerCharacter);
+
+	//UFUNCTION(Server, Reliable)
+	//void ServerRPC_PlayerArrive(APlayerCharacter* PlayerCharacter);
+
+	//UFUNCTION(Server, Reliable)
+	//void ServerRPC_PlayerPassed(APlayerCharacter* PlayerCharacter);
+
+	//UFUNCTION(Server, Reliable)
+	//void ServerRPC_PlayerLeave(APlayerCharacter* PlayerCharacter);
+
+	//UFUNCTION(Server, Reliable)
+	//void ServerRPC_PlayerUseItem(APlayerCharacter* PlayerCharacter);
+
+	//UFUNCTION(Server, Reliable)
+	//void ServerRPC_PlayerRollDice(APlayerCharacter* PlayerCharacter);
 
 	TArray<APlayerCharacter*> GetInPlayers();
 
@@ -83,4 +98,6 @@ private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void AssignFromDataAsset(UTileDataAsset* asset);
+
+	bool IsServer();
 };
