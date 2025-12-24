@@ -3,9 +3,9 @@
 
 #include "Effect_Shotgun.h"
 #include "Item/Data/ItemUseContext.h"
-// #include "Engine/World.h"  // TODO: 데미지 시스템 연동 시 활성화
-// #include "DrawDebugHelpers.h"
-// #include "Kismet/KismetMathLibrary.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 void UEffect_Shotgun::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 {
@@ -17,8 +17,6 @@ void UEffect_Shotgun::ExecuteEffect(AActor* User, const FItemUseContext& Context
 		return;
 	}
 
-	// TODO: 데미지 시스템 연동
-	/*
 	// AimDirection 사용 (Context가 아닌 클래스 멤버 변수)
 	FVector BaseDirection = AimDirection.GetSafeNormal();
 
@@ -42,15 +40,10 @@ void UEffect_Shotgun::ExecuteEffect(AActor* User, const FItemUseContext& Context
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Effect_Shotgun: %s fired %d bullets"), *User->GetName(), BulletCount);
-	*/
-
-	UE_LOG(LogTemp, Log, TEXT("Effect_Shotgun: Effect triggered (damage not implemented yet)"));
 }
 
 void UEffect_Shotgun::FireBullet(AActor* User, const FVector& Direction)
 {
-	// TODO: 데미지 시스템 연동 시 구현
-	/*
 	if (!User || !User->GetWorld())
 	{
 		return;
@@ -73,10 +66,11 @@ void UEffect_Shotgun::FireBullet(AActor* User, const FVector& Direction)
 		HitResult,
 		Start,
 		End,
-		ECC_Visibility,
+		ECC_Pawn,
 		QueryParams
 	);
 
+#if WITH_EDITOR
 	// 디버그 라인 그리기
 	DrawDebugLine(
 		User->GetWorld(),
@@ -88,16 +82,21 @@ void UEffect_Shotgun::FireBullet(AActor* User, const FVector& Direction)
 		0,
 		2.0f
 	);
+#endif
 
 	// 적중 시 데미지 적용
 	if (bHit && HitResult.GetActor())
 	{
 		AActor* HitActor = HitResult.GetActor();
 
-		// FDamageEvent DamageEvent;
-		// HitActor->TakeDamage(DamagePerBullet, DamageEvent, User->GetInstigatorController(), User);
+		UGameplayStatics::ApplyDamage(
+			HitActor,
+			DamagePerBullet,
+			User->GetInstigatorController(),
+			User,
+			nullptr
+		);
 
-		UE_LOG(LogTemp, Log, TEXT("Effect_Shotgun: Hit %s (damage not applied yet)"), *HitActor->GetName());
+		UE_LOG(LogTemp, Log, TEXT("Effect_Shotgun: Hit %s for %.0f damage"), *HitActor->GetName(), DamagePerBullet);
 	}
-	*/
 }

@@ -114,6 +114,7 @@ void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
 
 	if (bIsMoving == false)
 	{
+		TileManager->PlayerLeave(CurrentIndex, this);
 		UE_LOG(LogTemp, Warning, TEXT("PlayerLeave"));
 	}
 
@@ -149,11 +150,13 @@ void APlayerCharacter::UpdateMove()
 		remainingMove--;
 		if (remainingMove > 0) // 지나가는중
 		{
+			TileManager->PlayerPassed(CurrentIndex, this);
 			UE_LOG(LogTemp, Warning, TEXT("PlayerPassed"));
 			MoveToNextNode(remainingMove);
 		}
 		else // 도착
 		{
+			TileManager->PlayerArrive(CurrentIndex, this);
 			// playerState Index 저장
 			MyPlayerState->SetTileIndex(CurrentIndex);
 			UE_LOG(LogTemp, Warning, TEXT("EndTileIndex : %d"), MyPlayerState->GetTileIndex());

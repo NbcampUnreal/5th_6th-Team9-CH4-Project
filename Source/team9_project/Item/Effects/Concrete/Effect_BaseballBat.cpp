@@ -3,8 +3,10 @@
 
 #include "Effect_BaseballBat.h"
 #include "Item/Data/ItemUseContext.h"
-// #include "Engine/World.h"  // TODO: 데미지 시스템 연동 시 활성화
-// #include "DrawDebugHelpers.h"
+#include "Engine/World.h"
+#include "Engine/OverlapResult.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 void UEffect_BaseballBat::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 {
@@ -25,8 +27,6 @@ void UEffect_BaseballBat::ExecuteEffect(AActor* User, const FItemUseContext& Con
 		return;
 	}
 
-	// TODO: 데미지 시스템 연동
-	/*
 	// 공격 중심 위치 계산 (User 위치 + 방향 * 거리)
 	FVector UserLocation = User->GetActorLocation();
 	FVector AttackCenter = UserLocation + Direction * AttackRange;
@@ -45,6 +45,7 @@ void UEffect_BaseballBat::ExecuteEffect(AActor* User, const FItemUseContext& Con
 		QueryParams
 	);
 
+#if WITH_EDITOR
 	// 디버그 구체 그리기
 	DrawDebugSphere(
 		User->GetWorld(),
@@ -57,6 +58,7 @@ void UEffect_BaseballBat::ExecuteEffect(AActor* User, const FItemUseContext& Con
 		0,
 		2.0f
 	);
+#endif
 
 	// 적중한 액터들에게 데미지 적용
 	int32 HitCount = 0;
@@ -68,15 +70,18 @@ void UEffect_BaseballBat::ExecuteEffect(AActor* User, const FItemUseContext& Con
 			continue;
 		}
 
-		// FDamageEvent DamageEvent;
-		// HitActor->TakeDamage(Damage, DamageEvent, User->GetInstigatorController(), User);
+		// 데미지 적용
+		UGameplayStatics::ApplyDamage(
+			HitActor,
+			Damage,
+			User->GetInstigatorController(),
+			User,
+			nullptr
+		);
 
 		HitCount++;
-		UE_LOG(LogTemp, Log, TEXT("Effect_BaseballBat: Hit %s (damage not applied yet)"), *HitActor->GetName());
+		UE_LOG(LogTemp, Log, TEXT("Effect_BaseballBat: Hit %s for %.0f damage"), *HitActor->GetName(), Damage);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Effect_BaseballBat: %s found %d targets"), *User->GetName(), HitCount);
-	*/
-
-	UE_LOG(LogTemp, Log, TEXT("Effect_BaseballBat: Effect triggered (damage not implemented yet)"));
+	UE_LOG(LogTemp, Log, TEXT("Effect_BaseballBat: %s hit %d targets"), *User->GetName(), HitCount);
 }

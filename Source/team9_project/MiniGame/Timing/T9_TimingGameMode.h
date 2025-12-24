@@ -18,6 +18,8 @@ public:
 
 	virtual void EndGame() override;
 
+	int32 Winner() ;
+
 	void OnTimeOver();
 
 public:
@@ -26,4 +28,6 @@ public:
 	float StartServerTime;
 
 	FTimerHandle TimeOverHandle;
+
+	int32 BestDeltaMs;
 };

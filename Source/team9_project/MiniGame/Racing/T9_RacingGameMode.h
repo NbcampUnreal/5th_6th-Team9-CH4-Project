@@ -19,4 +19,7 @@ public:
 	virtual void StartGame() override;
 
 	virtual void EndGame() override;
+
+public:
+	int32 Winner=0;
 };
