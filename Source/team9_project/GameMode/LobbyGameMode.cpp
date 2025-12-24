@@ -1,4 +1,6 @@
 #include "GameMode/LobbyGameMode.h"
+
+#include "Kismet/GameplayStatics.h"
 #include "Player/MyPlayerState.h"
 
 ALobbyGameMode::ALobbyGameMode()
@@ -17,19 +19,29 @@ void ALobbyGameMode::OnPostLogin(AController* NewPlayer)
 	Super::OnPostLogin(NewPlayer);
 
 	//번호 부여하기
+	int32 NewNumber = GivePlayerNumber();
 	if (AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>())
 	{
-		MyPlayerState->SetPlayerNumber(GivePlayerNumber());
+		MyPlayerState->SetPlayerNumber(NewNumber);
 	}
 
-	PlayersInLobby.Add(NewPlayer);
+	PlayersInLobby.Add(NewNumber, NewPlayer);
+
+	//4인 이상이면 게임 시작
+	if (PlayersInLobby.Num() >= 4)
+	{
+		MainGameStart();
+	}
 }
 
 void ALobbyGameMode::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
 
-	PlayersInLobby.Remove(Exiting);
+	if (AMyPlayerState* MyPlayerState = Exiting->GetPlayerState<AMyPlayerState>())
+	{
+		PlayersInLobby.Remove(MyPlayerState->GetPlayerNumber());
+	}
 }
 
 void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlayerName)
@@ -39,7 +51,7 @@ void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlaye
 
 void ALobbyGameMode::MainGameStart()
 {
-	//TODO : 게임 시작 구현
+	UGameplayStatics::OpenLevel(this, TEXT("Main"));
 }
 
 int32 ALobbyGameMode::GivePlayerNumber()

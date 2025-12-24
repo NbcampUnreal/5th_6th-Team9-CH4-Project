@@ -23,7 +23,7 @@ void AT9_TimingGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void AT9_TimingGameState::AddPlayerPress(int32 PlayerId, float PressServerTime)
 {
-    for (auto& R : Results)
+    for (const FTimingPlayerResult& R : Results)
     {
         if (R.PlayerId == PlayerId)
             return;

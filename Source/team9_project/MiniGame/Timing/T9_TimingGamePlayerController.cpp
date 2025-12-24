@@ -86,7 +86,7 @@ void AT9_TimingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 
 	case EMiniGamePhase::Playing:
 		ShowInGameUI();
-		SetInputEnabled(false);
+		SetInputEnabled(true);
 		break;
 
 	case EMiniGamePhase::Result:

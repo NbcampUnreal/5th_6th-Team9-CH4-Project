@@ -27,8 +27,8 @@ public:
 	void ComeBackMainGame();
 
 protected:
-
 	void SetPhase(EMiniGamePhase NewPhase);
 
+public:
 	FTimerHandle ComeBackHandle;
 };
