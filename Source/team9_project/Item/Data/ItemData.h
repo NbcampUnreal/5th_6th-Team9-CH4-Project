@@ -67,18 +67,37 @@ USTRUCT(BlueprintType)
 struct FActiveEffect
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName EffectID;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EEffectEndCondition EndCoudition;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 RemainingRounds =0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 RemainingCount = 0;
-	
-	
-	
+
+
+
+};
+
+// Cho_Sungmin - 맵 이동 시 유지되는 인벤토리 데이터
+USTRUCT(BlueprintType)
+struct FPlayerPersistentData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FInventorySlot> InventorySlots;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FActiveEffect> ActiveEffects;
+
+	void Clear()
+	{
+		InventorySlots.Empty();
+		ActiveEffects.Empty();
+	}
 };
