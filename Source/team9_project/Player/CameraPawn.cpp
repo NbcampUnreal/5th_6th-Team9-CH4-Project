@@ -11,6 +11,7 @@
 #include "State/StateBase.h"
 #include "Tile/Tile.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 ACameraPawn::ACameraPawn() :
 	ScreenSpeed(1500.f),
@@ -27,7 +28,7 @@ ACameraPawn::ACameraPawn() :
 	SpringArmComp->bDoCollisionTest = false;
 	SpringArmComp->TargetArmLength = 800.f;
 	SpringArmComp->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-
+   
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComp->SetupAttachment(SpringArmComp);
 
@@ -38,26 +39,33 @@ ACameraPawn::ACameraPawn() :
 	}
 }
 
+void ACameraPawn::BeginPlay()
+{
+	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("ACameraPawn::BeginPlay"));
+	
+	if (HasAuthority())
+	{
+		PlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>
+			(CharacterClass, GetActorLocation(), GetActorRotation());
+
+
+		AMyPlayerState* PS = Cast<AMyPlayerState>(GetPlayerState());
+
+		PlayerCharacter->InitCharacter(this, PS);
+	}
+}
+
 void ACameraPawn::PossessedBy(AController* NewControlle)
 {
 	Super::PossessedBy(NewControlle);
-
+	UE_LOG(LogTemp, Warning, TEXT("ACameraPawn::PossessedBy"));
+	
 	if (HasAuthority())
 	{
 		SetOwner(NewControlle);
 		UE_LOG(LogTemp, Warning, TEXT("Owner set to %s"), *GetNameSafe(NewControlle));
 	}
-
-	MyPlayerController = Cast<AMyPlayerController>(GetController());
-}
-
-void ACameraPawn::BeginPlay()
-{
-	Super::BeginPlay();
-
-	PlayerCharacter = GetWorld()->SpawnActor<APlayerCharacter>
-		(CharacterClass, GetActorLocation(), GetActorRotation());
-	PlayerCharacter->InitCharacter(this);
 
 	StateMachine = NewObject<UPlayerStateMachine>(this);
 	if (IsValid(StateMachine))
@@ -85,10 +93,11 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		UE_LOG(LogTemp, Warning, TEXT("SetupPlayerInputComponent Failed"))
 		return;
 	}
-
+	
 	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (IsValid(EIC))
 	{
+		MyPlayerController = Cast<AMyPlayerController>(GetController());
 		UE_LOG(LogTemp, Warning, TEXT("UEnhancedInputComponent"))
 		if (IsValid(MyPlayerController))
 		{
@@ -125,6 +134,11 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 				&ACameraPawn::CameraReturnHandle);
 		}
 	}
+}
+
+void ACameraPawn::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(ACameraPawn, PlayerCharacter);
 }
 
 void ACameraPawn::Tick(float DeltaTime)
@@ -246,12 +260,14 @@ void ACameraPawn::CameraWheelHandle(const FInputActionValue& Value)
 
 void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 {
-	if (IsLocallyControlled() == false)
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraReturnHandle"));
+
+	if (PlayerCharacter == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CLIENT: PlayerCharacter not"));
 		return;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraReturnHandle"));
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT: PlayerCharacter"));
 	SetActorLocation(PlayerCharacter->GetActorLocation());
 }
 
@@ -261,7 +277,7 @@ void ACameraPawn::ServerRPCLeftClick_Implementation()
 	UE_LOG(LogTemp, Warning, TEXT("Sever : LeftClick"));
 	
 	StateMachine->GetCurrentState()->Move();
-}
+} 
 
 // 공격받기 테스트
 void ACameraPawn::ServerRPCRightClick_Implementation()
