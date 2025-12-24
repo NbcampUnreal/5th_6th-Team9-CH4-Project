@@ -8,15 +8,15 @@
 void UItemEffectBase_MouseAim::StartUse(AActor* User)
 {
 	Super::StartUse(User);
-	
+
 	AimDirection = FVector::ForwardVector;
-	
+
 }
 
 void UItemEffectBase_MouseAim::TickUse(float DeltaTime)
 {
 	Super::TickUse(DeltaTime);
-	
+
 	if (!bIsOperating)
 	{
 		return;
@@ -26,7 +26,7 @@ void UItemEffectBase_MouseAim::TickUse(float DeltaTime)
 		CancelUse();
 		return;
 	}
-	
+
 	UpdateAimDirection();
 }
 
@@ -36,20 +36,20 @@ void UItemEffectBase_MouseAim::UpdateAimDirection()
 	{
 		return;
 	}
-	
+
 	APawn* Pawn = Cast<APawn>(CurrentUser);
-	
+
 	if (!Pawn)
 	{
 		return;
 	}
-	
+
 	APlayerController* PlayerController = Cast<APlayerController>(Pawn->GetController());
 	if (!PlayerController)
 	{
 		return;
 	}
-	
+
 	FVector WorldLocation , WorldDirection;
 	if (PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
 	{
@@ -61,9 +61,9 @@ void UItemEffectBase_MouseAim::UpdateAimDirection()
 void UItemEffectBase_MouseAim::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 {
 	Super::ExecuteEffect(User, Context);
-	
-	
-	
+
+
+
 }
 
 void UItemEffectBase_MouseAim::CancelUse()
@@ -83,19 +83,13 @@ FVector UItemEffectBase_MouseAim::GetAimDirection() const
 	return AimDirection;
 }
 
-bool UItemEffectBase_MouseAim::ChackTimeout()
+void UItemEffectBase_MouseAim::UpdateContext(FItemUseContext& Context)
+{
+	Super::UpdateContext(Context);
+	Context.Aimdirection = AimDirection;
+}
 
+bool UItemEffectBase_MouseAim::ChackTimeout()
 {
 	return ElapsedTime >= TimeLimt;
 }
-
-
-
-
-
-
-
-
-
-
-
