@@ -55,7 +55,7 @@ void ATile::PlayerUseItem(APlayerCharacter* PlayerCharacter)
 }
 
 void ATile::PlayerRollDice(APlayerCharacter* PlayerCharacter)
-{
+{ 
 	OnPlayerRollDice.Broadcast(PlayerCharacter);
 }
 
