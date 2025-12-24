@@ -76,6 +76,15 @@ void APlayerCharacter::MoveToNextNode(int DiceValue)
 
 }
 
+void APlayerCharacter::SetCharacterPosition()
+{
+	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+	CurrentIndex = MyPlayerState->GetTileIndex();
+	ATile* Tile = TileManager->GetTile(CurrentIndex);
+
+	SetActorLocation(Tile->GetActorLocation());
+}
+
 void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
 {
 	remainingMove = DiceValue;
@@ -105,8 +114,6 @@ void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
 
 	if (bIsMoving == false)
 	{
-		//타일 델리게이트 호출
-		NextTiles[0]->PlayerLeave(this);
 		UE_LOG(LogTemp, Warning, TEXT("PlayerLeave"));
 	}
 
@@ -131,7 +138,7 @@ void APlayerCharacter::UpdateMove()
 	SetActorLocation(FVector(NewLocation.X, NewLocation.Y, NewLocation.Z + 46));
 
 	if (Alpha >= 1.f)
-	{
+	{  
 		ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
 		TArray<ATile*> NextTiles = TileManager->GetTile(CurrentIndex)->GetNextTiles();
 
@@ -142,8 +149,6 @@ void APlayerCharacter::UpdateMove()
 		remainingMove--;
 		if (remainingMove > 0) // 지나가는중
 		{
-			//타일 델리게이트 호출
-			NextTiles[0]->PlayerPassed(this);
 			UE_LOG(LogTemp, Warning, TEXT("PlayerPassed"));
 			MoveToNextNode(remainingMove);
 		}
@@ -152,10 +157,10 @@ void APlayerCharacter::UpdateMove()
 			// playerState Index 저장
 			MyPlayerState->SetTileIndex(CurrentIndex);
 			UE_LOG(LogTemp, Warning, TEXT("EndTileIndex : %d"), MyPlayerState->GetTileIndex());
+			SetCurrentTile(NextTiles[0]);
 
 			bIsMoving = false;
-			//타일 델리게이트 호출
-			NextTiles[0]->PlayerArrive(this);
+
 			UE_LOG(LogTemp, Warning, TEXT("PlayerArrive"));
 		}
 	}
@@ -168,7 +173,7 @@ bool APlayerCharacter::OnDie()
 		return true;
 	}
 	return false;
-}
+} 
 
 void APlayerCharacter::SetPlayerState(AMyPlayerState* InPlayerState)
 {

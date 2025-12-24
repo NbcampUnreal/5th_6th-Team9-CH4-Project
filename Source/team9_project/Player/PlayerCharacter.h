@@ -37,6 +37,8 @@ public:
 
 	void MoveToNextNode(int DiceValue);
 
+	void SetCharacterPosition();
+
 	void SetPlayerState(AMyPlayerState* InPlayerState);
 
 	AMyPlayerState* GetPlayerState();
