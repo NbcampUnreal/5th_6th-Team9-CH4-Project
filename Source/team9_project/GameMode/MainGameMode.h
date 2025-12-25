@@ -43,9 +43,15 @@ public:
 private:
 	//플레이어 순서 정하기
 	void SetPlayerNumbersOrder();
+
+	//게임 처음 시작시 각 플레이어의 준비를 기다린다.
+	void WaitForReady();
 	
 	//다음 플레이어 턴 시작
-	void NextPlayerTurn();
+	void NextPlayerTurn(bool bRoundStart);
+
+	//미니게임 맵으로 이동
+	void MoveToMiniGameMap();
 
 public:
 	//라운드 종료시 실행할 델리게이트
@@ -68,4 +74,15 @@ private:
 
 	//현재 라운드
 	int16 CurrentRound;
+
+	//라운드 종료후 미니게임 시작시까지 지연 시간
+	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
+	float MiniGameWaitTime;
+
+	//최대 라운드
+	UPROPERTY(EditDefaultsOnly, category = "Game Rule", meta = (allowPrivateAccess = true))
+	int16 MaxRound;
+
+	//미니게임 맵 목록
+	const TArray<FString> MiniGameMapNames = { "RapidInputRacingMinigame", "TimingGame" };
 };

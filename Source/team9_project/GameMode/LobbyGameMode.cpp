@@ -1,7 +1,9 @@
 #include "GameMode/LobbyGameMode.h"
-
+#include "Team9GameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/MyPlayerState.h"
+
+class UTeam9GameInstance;
 
 ALobbyGameMode::ALobbyGameMode()
 {
@@ -51,6 +53,10 @@ void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlaye
 
 void ALobbyGameMode::MainGameStart()
 {
+	if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
+	{
+		GameInstance->PropertyInit();
+	}
 	UGameplayStatics::OpenLevel(this, TEXT("Main"));
 }
 
