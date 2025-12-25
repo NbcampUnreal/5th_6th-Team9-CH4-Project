@@ -20,6 +20,7 @@ class TEAM9_PROJECT_API UEffect_RCCar : public UItemEffectBase_DirectControl
 public:
 	virtual AActor* SpawnControlledActor(AActor* User) override;
 	virtual void ExecuteEffect(AActor* User, const FItemUseContext& Context) override;
+	virtual void CancelUse() override;
 
 protected:
 	// RC카 클래스 (블루프린트에서 설정)

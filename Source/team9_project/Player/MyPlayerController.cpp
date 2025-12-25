@@ -64,6 +64,15 @@ void AMyPlayerController::BeginPlay()
 			MinimapCamera->CaptureComp->TextureTarget = MinimapCamera->MinimapRT;
 		}
 	}
+	// Cho_Sungmin - 인벤토리 위젯 생성
+	if (InventoryWidgetClass)
+	{
+		InventoryWidget = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
+		if (InventoryWidget)
+		{
+			InventoryWidget->AddToViewport();
+		}
+	}
 }
 // 모든 RPC는 뒤에 _Implementation을 붙여서 본체를 만듭니다.
 
