@@ -57,20 +57,26 @@ void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlaye
 void ALobbyGameMode::MainGameStart()
 {
 	//준비 완료된 4명의 플레이어를 찾는다.
-	TArray<AController*> LobbyControllers;
+	TArray<AMyPlayerState*> LobbyPlayerStates;
 	for (auto PlayerInfo : PlayersInLobby)
 	{
-		if (AMyPlayerState* MyPlayerState = PlayerInfo.Value->GetPlayerState<AMyPlayerState>(); MyPlayerState->bIsReady)
+		AMyPlayerState* MyPlayerState = PlayerInfo.Value->GetPlayerState<AMyPlayerState>();
+		if (!IsValid(MyPlayerState))
 		{
-			LobbyControllers.Add(PlayerInfo.Value);
-			if (LobbyControllers.Num() >= 4)
+			continue;
+		}
+		
+		if (MyPlayerState->bIsReady)
+		{
+			LobbyPlayerStates.Add(MyPlayerState);
+			if (LobbyPlayerStates.Num() >= 4)
 			{
 				break;
 			}
 		}
 	}
 
-	if (LobbyControllers.Num() < 4)
+	if (LobbyPlayerStates.Num() < 4)
 	{
 		return;
 	}
@@ -80,6 +86,7 @@ void ALobbyGameMode::MainGameStart()
 	{
 		GameInstance->PropertyInit();
 	}
+	
 	UGameplayStatics::OpenLevel(this, MAIN_GAME_MAP_NAME);
 }
 
