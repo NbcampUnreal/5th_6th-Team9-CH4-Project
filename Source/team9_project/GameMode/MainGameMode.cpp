@@ -9,6 +9,7 @@ AMainGameMode::AMainGameMode()
 	TurnPlayerNumber = 0;
 	TurnIndex = 0;
 	CurrentRound = 0;
+	FirstReadyCheckTime = 1.0f;
 	MiniGameWaitTime = 1.0f;
 	MaxRound = 5;
 }
@@ -30,10 +31,11 @@ void AMainGameMode::BeginPlay()
 		return;
 	}
 
-	//1라운드(처음 시작)인 경우 진행 순서 정하기
+	//1라운드(처음 시작)인 경우 진행 순서 정하고 준비를 기다린다.
 	if (CurrentRound == 1)
 	{
 		SetPlayerNumbersOrder();
+		WaitForReady();
 		return;
 	}
 
@@ -111,17 +113,73 @@ int8 AMainGameMode::GetTurnPlayerNumber()
 
 void AMainGameMode::SetPlayerNumbersOrder()
 {
-	//TODO : 플레이어 순서 정하기
-	//임시로 TMap 기준 순서 따름
+	//1 ~ 6의 숫자를 무작위로 섞기
+	TArray DiceNums = { 1, 2, 3, 4, 5, 6 };
+	for (int32 iNum = 5; iNum > 0 ; --iNum)
+	{
+		if (int32 RandomIndex = FMath::RandRange(0, iNum); iNum != RandomIndex)
+		{
+			DiceNums.Swap(iNum, RandomIndex);
+		}
+	}
+
+	//앞에서 부터 각 플레이어에게 배정
+	int8 ArrayIndex = -1;
+	TMap<int32, int32> OrderByDiceNum;
 	for (auto PlayerInfo : PlayersInGame)
 	{
-		OrderedPlayerNumbers.Add(PlayerInfo.Key);
+		OrderByDiceNum.Add(DiceNums[++ArrayIndex], PlayerInfo.Key);
+
+		//TODO : 당첨 숫자를 플레이어에게 전달
+	}
+
+	//배정받은 수 기준 내림차순으로 순서가 정해진다.
+	for (int32 iNum = 6; iNum >= 1; --iNum)
+	{
+		if (OrderByDiceNum.Contains(iNum))
+		{
+			OrderedPlayerNumbers.Add(OrderByDiceNum[iNum]);
+		}
 	}
 }
 
 void AMainGameMode::WaitForReady()
 {
-	//TODO : 각 플레이어의 준비 기다림
+	//모든 플레이어의 준비를 해제
+	TArray<AMyPlayerState*> PlayerStates;//플레이어 스테이트 따로 빼기
+	for (auto PlayerInfo : PlayersInGame)
+	{
+		AMyPlayerState* MyPlayerState = PlayerInfo.Value->GetPlayerState<AMyPlayerState>();
+		if (!IsValid(MyPlayerState))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Find error while wait for ready."));
+			return;
+		}
+
+		MyPlayerState->bIsReady = false;
+		PlayerStates.Add(MyPlayerState);
+	}
+	
+	//모두의 준비 완료까지 계속 확인한다.
+	GetWorld()->GetTimerManager().SetTimer(FirstReadyHandle, FTimerDelegate::CreateLambda([&]()
+	{
+		bool bGameReady = true;
+		for (AMyPlayerState* MyPlayerState : PlayerStates)
+		{
+			if (!MyPlayerState->bIsReady)
+			{
+				bGameReady = false;
+				break;
+			}
+		}
+
+		//모두의 준비 완료시 게임 시작
+		if (bGameReady)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(FirstReadyHandle);
+			NextPlayerTurn(true);
+		}
+	}), FirstReadyCheckTime, true);
 }
 
 void AMainGameMode::NextPlayerTurn(bool bRoundStart)
@@ -153,6 +211,14 @@ void AMainGameMode::MoveToMiniGameMap()
 		 GameInstance->SetCurrentRound(CurrentRound);
 	}
 
-	//TODO : 잠시후 미니게임 시작
+	//잠시후 미니게임 시작
+	GetWorld()->GetTimerManager().SetTimer(WaitForMiniGameHandle, FTimerDelegate::CreateLambda([&]()
+	{
+		//TODO : 미니게임 시작 알림
 	
+		//무작위 미니게임맵 하나 사용
+		int32 RandomIndex = FMath::RandRange(0, MiniGameMapNames.Num() - 1);
+		UGameplayStatics::OpenLevel(this, MiniGameMapNames[RandomIndex]);
+		
+	}), MiniGameWaitTime, false);
 }

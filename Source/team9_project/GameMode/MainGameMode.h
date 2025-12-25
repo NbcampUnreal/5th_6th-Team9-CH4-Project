@@ -66,6 +66,12 @@ private:
 	UPROPERTY()
 	TArray<int32> OrderedPlayerNumbers;
 
+	//제일 처음 준비를 기다릴 때 사용하는 타이머 핸들
+	FTimerHandle FirstReadyHandle;
+
+	//라운드 종료후 미니게임으로 넘어갈 때 사용하는 타이머 핸들
+	FTimerHandle WaitForMiniGameHandle;
+
 	//현재 턴 진행중인 플레이어 번호
 	int32 TurnPlayerNumber;
 
@@ -74,6 +80,10 @@ private:
 
 	//현재 라운드
 	int16 CurrentRound;
+
+	//제일 처음 플레이어의 준비시 확인 간격
+	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
+	float FirstReadyCheckTime;
 
 	//라운드 종료후 미니게임 시작시까지 지연 시간
 	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
@@ -84,5 +94,5 @@ private:
 	int16 MaxRound;
 
 	//미니게임 맵 목록
-	const TArray<FString> MiniGameMapNames = { "RapidInputRacingMinigame", "TimingGame" };
+	const TArray<FName> MiniGameMapNames = { TEXT("RapidInputRacingMinigame"), TEXT("TimingGame") };
 };
