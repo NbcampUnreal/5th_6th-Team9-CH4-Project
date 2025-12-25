@@ -13,5 +13,7 @@ UCLASS()
 class TEAM9_PROJECT_API UServerTileAction : public UTileAction
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void Active(APlayerCharacter* PlayerCharacter);
 };
