@@ -6,7 +6,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Kismet/GameplayStatics.h"
 #include "MinimapCameraActor.h"
-#include "Ui/Test/MyTestPlayerState.h"
+#include "Player/MyPlayerState.h"
 #include "Engine/TextureRenderTarget2D.h"
 
 void UGameHUDWidget::NativeConstruct()
@@ -99,7 +99,7 @@ void UGameHUDWidget::UpdatePlayerMarkers()
         APlayerController* PC = It->Get();
         if (!PC || !PC->GetPawn()) continue;
 
-        if (AMyTestPlayerState* PS = PC->GetPlayerState<AMyTestPlayerState>())
+        if (AMyPlayerState* PS = PC->GetPlayerState<AMyPlayerState>())
         {
             int32 Idx = PS->PlayerNumber - 1;
             if (MarkerWidgets.IsValidIndex(Idx) && MarkerWidgets[Idx])

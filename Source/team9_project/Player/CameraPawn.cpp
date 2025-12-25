@@ -59,6 +59,7 @@ void ACameraPawn::BeginPlay()
 
 		PlayerCharacter->InitCharacter(this, PS);
 	}
+
 }
 
 void ACameraPawn::PossessedBy(AController* NewControlle)

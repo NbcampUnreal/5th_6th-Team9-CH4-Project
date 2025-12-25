@@ -9,7 +9,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "Blueprint/WidgetTree.h"
-#include "Ui/Test/MyTestPlayerState.h"
+#include "Player/MyPlayerState.h"
 
 void ULobbyWidget::NativeConstruct()
 {
@@ -61,7 +61,7 @@ void ULobbyWidget::UpdatePlayerList()
 
                 if (Players.IsValidIndex(i) && Players[i])
                 {
-                    if (AMyTestPlayerState* TestPS = Cast<AMyTestPlayerState>(Players[i]))
+                    if (AMyPlayerState* TestPS = Cast<AMyPlayerState>(Players[i]))
                     {
                         NameToDisplay = TestPS->DisplayName.IsEmpty() ? TestPS->GetPlayerName() : TestPS->DisplayName;
                     }
@@ -137,7 +137,7 @@ void ULobbyWidget::OnActionClicked()
         // 현재 플레이어 이름 가져오기 (예: PlayerState에서)
         if (APlayerState* PS = GetOwningPlayerState())
         {
-            if (AMyTestPlayerState* TestPS = Cast<AMyTestPlayerState>(PS))
+            if (AMyPlayerState* TestPS = Cast<AMyPlayerState>(PS))
             {
                 PlayerName = TestPS->DisplayName;  // 또는 GetPlayerName()
             }

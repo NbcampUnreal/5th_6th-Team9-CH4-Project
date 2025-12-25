@@ -1,5 +1,5 @@
 #include "Ui/ResultWidget.h"
-#include "Test/MyTestPlayerState.h"
+#include "Player/MyPlayerState.h"
 #include "GameFramework/GameStateBase.h"
 #include "Components/Border.h"
 #include "Components/TextBlock.h"
@@ -25,21 +25,21 @@ void UResultWidget::SetupResults()
     AGameStateBase* GS = GetWorld()->GetGameState();
     if (!GS) return;
 
-    TArray<AMyTestPlayerState*> PlayerStates;
+    TArray<AMyPlayerState*> PlayerStates;
     for (APlayerState* PS : GS->PlayerArray)
     {
-        if (AMyTestPlayerState* TestPS = Cast<AMyTestPlayerState>(PS))
+        if (AMyPlayerState* TestPS = Cast<AMyPlayerState>(PS))
         {
             PlayerStates.Add(TestPS);
         }
     }
 
-    PlayerStates.Sort([](const AMyTestPlayerState& A, const AMyTestPlayerState& B)
+    PlayerStates.Sort([](const AMyPlayerState& A, const AMyPlayerState& B)
         {
             return A.FinalRank < B.FinalRank;
         });
 
-    for (AMyTestPlayerState* TargetPS : PlayerStates)
+    for (AMyPlayerState* TargetPS : PlayerStates)
     {
         UBorder* RowBorder = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
         UTextBlock* ResultText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
@@ -51,7 +51,7 @@ void UResultWidget::SetupResults()
             RowBorder->SetPadding(FMargin(20.f, 10.f));
 
             FString PName = TargetPS->DisplayName.IsEmpty() ? TargetPS->GetPlayerName() : TargetPS->DisplayName;
-            FString Info = FString::Printf(TEXT("%d위: %s (점수: %d)"), TargetPS->FinalRank, *PName, TargetPS->FinalScore);
+            FString Info = FString::Printf(TEXT("%d위: %s (점수: %d)"), TargetPS->FinalRank, *PName, TargetPS->CurrentScore);
             ResultText->SetText(FText::FromString(Info));
 
             FSlateFontInfo FontInfo = ResultText->GetFont();

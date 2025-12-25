@@ -4,6 +4,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "MyTestGameMode.generated.h"
 
+class AMyPlayerController;
+
 UCLASS()
 class TEAM9_PROJECT_API AMyTestGameMode : public AGameModeBase
 {
@@ -14,7 +16,7 @@ public:
     virtual void PostLogin(APlayerController* NewPlayer) override;
 
     // 주사위 로직 (서버 실행)
-    void ProcessDiceThrow(class AMyTestPlayerController* Requester);
+    void ProcessDiceThrow(AMyPlayerController* Requester);
 
     UFUNCTION(BlueprintCallable, Category = "GameFlow")
     void EndMatch();

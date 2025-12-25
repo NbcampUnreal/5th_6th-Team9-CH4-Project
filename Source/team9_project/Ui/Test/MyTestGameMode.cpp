@@ -1,22 +1,22 @@
 #include "MyTestGameMode.h"
-#include "MyTestPlayerController.h"
-#include "Ui/Test/MyTestPlayerState.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "Ui/EGameUIState.h"
+#include "Player/MyPlayerState.h"
+#include "Player/MyPlayerController.h"
 
 void AMyTestGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
     // 인게임 접속 시 HUD 위젯으로 교체 명령
-    if (AMyTestPlayerController* PC = Cast<AMyTestPlayerController>(NewPlayer))
+    if (AMyPlayerController* PC = Cast<AMyPlayerController>(NewPlayer))
     {
         PC->Client_SetUIState(EGameUIState::InGame);
     }
 }
 
-void AMyTestGameMode::ProcessDiceThrow(AMyTestPlayerController* Requester)
+void AMyTestGameMode::ProcessDiceThrow(AMyPlayerController* Requester)
 {
     if (!Requester) return;
 
@@ -35,7 +35,7 @@ void AMyTestGameMode::EndMatch()
     // 2. 모든 플레이어 컨트롤러를 순회하며 결과창 표시 RPC 호출
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
-        if (AMyTestPlayerController* PC = Cast<AMyTestPlayerController>(It->Get()))
+        if (AMyPlayerController* PC = Cast<AMyPlayerController>(It->Get()))
         {
             // 모든 클라이언트가 결과창을 띄우도록 멀티캐스트 호출
             PC->Multicast_ShowResult();
@@ -48,10 +48,10 @@ void AMyTestGameMode::CalculateFinalResults()
     AGameStateBase* GS = GetWorld()->GetGameState();
     if (!GS) return;
 
-    TArray<AMyTestPlayerState*> PlayerStates;
+    TArray<AMyPlayerState*> PlayerStates;
     for (APlayerState* PS : GS->PlayerArray)
     {
-        if (AMyTestPlayerState* TestPS = Cast<AMyTestPlayerState>(PS))
+        if (AMyPlayerState* TestPS = Cast<AMyPlayerState>(PS))
         {
             PlayerStates.Add(TestPS);
         }
@@ -60,9 +60,9 @@ void AMyTestGameMode::CalculateFinalResults()
     if (PlayerStates.Num() == 0) return;
 
     // 점수 높은 순으로 정렬 (내림차순)
-    PlayerStates.Sort([](const AMyTestPlayerState& A, const AMyTestPlayerState& B)
+    PlayerStates.Sort([](const AMyPlayerState& A, const AMyPlayerState& B)
         {
-            return A.FinalScore > B.FinalScore;  // 높은 점수가 1위
+            return A.CurrentScore > B.CurrentScore;  // 높은 점수가 1위
         });
 
     // 순위 부여
@@ -70,6 +70,6 @@ void AMyTestGameMode::CalculateFinalResults()
     {
         PlayerStates[i]->FinalRank = i + 1;
 
-        //UE_LOG(LogTemp, Warning, TEXT("[GameMode] %d: %s (Scor: %d)"), PlayerStates[i]->FinalRank, *PlayerStates[i]->DisplayName.IsEmpty() ? PlayerStates[i]->GetPlayerName() : PlayerStates[i]->DisplayName, PlayerStates[i]->FinalScore);
+        //UE_LOG(LogTemp, Warning, TEXT("[GameMode] %d: %s (Scor: %d)"), PlayerStates[i]->FinalRank, *PlayerStates[i]->DisplayName.IsEmpty() ? PlayerStates[i]->GetPlayerName() : PlayerStates[i]->DisplayName, PlayerStates[i]->CurrentScore);
     }
 }
