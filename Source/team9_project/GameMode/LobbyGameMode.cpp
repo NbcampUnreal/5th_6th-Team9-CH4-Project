@@ -8,12 +8,15 @@ class UTeam9GameInstance;
 ALobbyGameMode::ALobbyGameMode()
 {
 	PlayerNumber = 0;
+	StartGameDelay = 10.0f;
 }
 
 void ALobbyGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	PlayerNumber = 0;
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleForStart, this, &ALobbyGameMode::MainGameStart, StartGameDelay, true);
 }
 
 void ALobbyGameMode::OnPostLogin(AController* NewPlayer)
@@ -53,11 +56,31 @@ void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlaye
 
 void ALobbyGameMode::MainGameStart()
 {
+	//준비 완료된 4명의 플레이어를 찾는다.
+	TArray<AController*> LobbyControllers;
+	for (auto PlayerInfo : PlayersInLobby)
+	{
+		if (AMyPlayerState* MyPlayerState = PlayerInfo.Value->GetPlayerState<AMyPlayerState>(); MyPlayerState->bIsReady)
+		{
+			LobbyControllers.Add(PlayerInfo.Value);
+			if (LobbyControllers.Num() >= 4)
+			{
+				break;
+			}
+		}
+	}
+
+	if (LobbyControllers.Num() < 4)
+	{
+		return;
+	}
+
+	//메인 게임 맵으로 이동
 	if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
 	{
 		GameInstance->PropertyInit();
 	}
-	UGameplayStatics::OpenLevel(this, TEXT("Main"));
+	UGameplayStatics::OpenLevel(this, MAIN_GAME_MAP_NAME);
 }
 
 int32 ALobbyGameMode::GivePlayerNumber()
