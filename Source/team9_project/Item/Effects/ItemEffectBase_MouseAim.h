@@ -26,6 +26,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FVector GetAimDirection() const;
 
+	UFUNCTION(BlueprintCallable)
+	void SetAimDirection(FVector Direction);
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	FVector AimDirection = FVector::ForwardVector;

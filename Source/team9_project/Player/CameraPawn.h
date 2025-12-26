@@ -76,6 +76,25 @@ public:
 	// Cho_Sungmin - PlayerCharacter 접근
 	UFUNCTION(BlueprintCallable, Category = "Character")
 	APlayerCharacter* GetPlayerCharacter() const;
+	
+	// Cho_Sungmin - 아이템 조작 입력용 Server RPC
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetItemControlInput(FVector2D Input);
+
+	// Cho_Sungmin - 카메라 추적 타겟 위치 가져오기
+	FVector GetItemCameraTargetLocation() const;
+	
+	// Cho_Sungmin - 마우스 에임 업데이트
+	void UpdateMouseAim();
+	
+	// Server RPC로 조준 방향 전달
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetMouseAimDirection(FVector Direction);
+
+	// Server RPC로 아이템 확정
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_ConfirmItemUse();
+	
 
 protected:
 	UPROPERTY()

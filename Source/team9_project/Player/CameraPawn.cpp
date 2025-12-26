@@ -14,6 +14,7 @@
 #include "Net/UnrealNetwork.h"
 // Cho_Sungmin
 #include "Inventory/InventoryComponent.h"
+#include "Item/Effects/ItemEffectBase_DirectControl.h"
 
 ACameraPawn::ACameraPawn() :
 	ScreenSpeed(1500.f),
@@ -67,18 +68,20 @@ void ACameraPawn::BeginPlay()
 void ACameraPawn::PossessedBy(AController* NewControlle)
 {
 	Super::PossessedBy(NewControlle);
-	UE_LOG(LogTemp, Warning, TEXT("ACameraPawn::PossessedBy"));
+	UE_LOG(LogTemp, Warning, TEXT("=== PossessedBy === Pawn: %s, Controller: %s"), 
+		*GetName(), *GetNameSafe(NewControlle));
 
 	if (HasAuthority())
 	{
 		SetOwner(NewControlle);
-		UE_LOG(LogTemp, Warning, TEXT("Owner set to %s"), *GetNameSafe(NewControlle));
-		//Cho_Sungmin테스트용 아이템 부여
-		// 테스트용 아이템 추가
+        
 		if (InventoryComponent)
 		{
 			InventoryComponent->AddItem(FName("RCCar"));
-			UE_LOG(LogTemp, Warning, TEXT("ADDITEM RCCar - Server"));
+			InventoryComponent->AddItem(FName("BaseballBat"));
+			InventoryComponent->AddItem(FName("Shotgun"));
+			InventoryComponent->AddItem(FName("RCCar"));
+			UE_LOG(LogTemp, Warning, TEXT("ADDITEM for %s"), *GetName());
 		}
 	}
 
@@ -174,6 +177,23 @@ void ACameraPawn::Tick(float DeltaTime)
 		return;
 	}
 
+	// 아이템 사용 중이면 타겟 따라가기
+	if (InventoryComponent && InventoryComponent->IsUsingItem())
+	{
+		UpdateMouseAim();
+		FVector TargetLocation = GetItemCameraTargetLocation();
+		FVector CurrentLocation = GetActorLocation();
+		
+		FVector NewLocation = FMath::VInterpTo(
+			CurrentLocation, 
+			FVector(TargetLocation.X, TargetLocation.Y, CurrentLocation.Z),
+			DeltaTime, 
+			5.0f  // 추적 속도
+		);
+		SetActorLocation(NewLocation);
+		return;  // 마우스 엣지 이동 스킵
+	}
+	
 	if (IsValid(MyPlayerController))
 	{
 		if (ViewX == 0 || ViewY == 0)
@@ -214,6 +234,12 @@ void ACameraPawn::Tick(float DeltaTime)
 void ACameraPawn::LeftClickHandle(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: LeftClick"));
+	// 아이템 사용 중이면 확정
+	if (InventoryComponent && InventoryComponent->IsUsingItem())
+	{
+		ServerRPC_ConfirmItemUse();
+		return;
+	}
 
 	ServerRPCLeftClick();
 }
@@ -299,7 +325,7 @@ APlayerCharacter* ACameraPawn::GetPlayerCharacter() const
 
 void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraKeyMoveHandle"));
+	
 
 	if (IsLocallyControlled() == false)
 	{
@@ -307,7 +333,16 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 	}
 
 	const FVector2D ArrowInput = Value.Get<FVector2D>();
+	
 
+	// Cho_Sungmin 아이템 사용 중이면 서버로 입력 전달
+	if (InventoryComponent && InventoryComponent->IsUsingItem())
+	{
+		UE_LOG(LogTemp, Warning, TEXT(">>> Sending to ServerRPC! Input: %s"), *ArrowInput.ToString());
+		ServerRPC_SetItemControlInput(ArrowInput);
+		return;
+	}
+	
 	if (ArrowInput.IsNearlyZero())
 	{
 		return;
@@ -320,6 +355,86 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 	float DeltaTime = GetWorld()->GetDeltaSeconds();
 	FVector MoveDirection = Forward * ArrowInput.X + Right * ArrowInput.Y;
 	AddActorWorldOffset(MoveDirection * ScreenSpeed * DeltaTime, true);
+}
+
+// Cho_Sungmin Server RPC 구현
+void ACameraPawn::ServerRPC_SetItemControlInput_Implementation(FVector2D Input)
+{
+	
+    
+	if (InventoryComponent)
+	{
+		InventoryComponent->SetDirectControlInput(Input);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent is NULL!"));
+	}
+}
+// Cho_Sungmin 카메라 추적 타겟 위치
+FVector ACameraPawn::GetItemCameraTargetLocation() const
+{
+	if (!InventoryComponent || !InventoryComponent->IsUsingItem())
+	{
+		return GetActorLocation();
+	}
+
+	// Replicated된 ControlledActor 사용
+	AActor* ControlledActor = InventoryComponent->CurrentControlledActor;
+	if (ControlledActor)
+	{
+		return ControlledActor->GetActorLocation();
+	}
+
+	return GetActorLocation();
+}
+
+void ACameraPawn::UpdateMouseAim()
+{
+	if (!MyPlayerController) return;
+    
+	FHitResult HitResult;
+	bool bHit = MyPlayerController->GetHitResultUnderCursor(
+		ECC_Visibility,
+		false,
+		HitResult
+	);
+    
+	
+    
+	if (bHit && PlayerCharacter)
+	{
+		FVector CharacterLocation = PlayerCharacter->GetActorLocation();
+		FVector MouseWorldLocation = HitResult.Location;
+        
+		
+        
+		FVector Direction = MouseWorldLocation - CharacterLocation;
+		Direction.Z = 0;
+		Direction.Normalize();
+		
+        
+		if (!Direction.IsNearlyZero())
+		{
+			ServerRPC_SetMouseAimDirection(Direction);
+		}
+	}
+}
+
+void ACameraPawn::ServerRPC_SetMouseAimDirection_Implementation(FVector Direction)
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->SetMouseAimDirection(Direction);
+	}
+}
+
+void ACameraPawn::ServerRPC_ConfirmItemUse_Implementation()
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->ConfirmItemUse();
+	}
 }
 
 void ACameraPawn::CameraWheelHandle(const FInputActionValue& Value)

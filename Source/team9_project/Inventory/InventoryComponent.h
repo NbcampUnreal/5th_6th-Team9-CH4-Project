@@ -10,6 +10,7 @@
 
 class UItemSubsystem;
 class UItemEffectBase;
+class AAimIndicatorActor;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, int32, SlotIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemUseStarted);
@@ -38,7 +39,12 @@ public:
 	//아이템 사용 여부
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	bool bHasUsedItemThisTurn = false;
-
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bIsCurrentlyOperating = false;
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	AActor* CurrentControlledActor = nullptr;
 	//델리게이트
 	UPROPERTY(BlueprintAssignable)
 	FOnInventoryUpdated OnInventoryUpdated;
@@ -54,7 +60,20 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUseCancelled OnItemUseCancelled;
+	
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void SetMouseAimDirection(FVector Direction);
 
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	FVector CurrentAimDirection = FVector::ZeroVector;
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	AAimIndicatorActor* CurrentAimIndicator = nullptr;
+
+	// AimIndicator 클래스 (BP 설정용)
+	UPROPERTY(EditDefaultsOnly, Category = "Item")
+	TSubclassOf<AAimIndicatorActor> AimIndicatorClass;
 	//========== 네트워크 RPC ==========
 
 	// 클라이언트 → 서버: 아이템 사용 요청
@@ -65,6 +84,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnItemUsed(FName ItemID, bool bSuccess);
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_DrawDebugAttack(FVector Center, float Radius, FVector Start, FVector End);
+	
 	//아이템 관리
 	UFUNCTION(BlueprintCallable)
 	bool AddItem(FName ItemID);
@@ -136,7 +158,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Persistence")
 	void LoadFromGameInstance(int32 PlayerID);
 
-
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void SetDirectControlInput(FVector2D Input);
+	
+	
 protected:
 
 	virtual void BeginPlay() override;
@@ -171,5 +196,8 @@ private:
 
 	// Effect가 자체적으로 취소되었을 때 처리 (타임아웃 등)
 	void HandleEffectCancelled();
+	
+	void SpawnAimIndicator();
+	void DestroyAimIndicator();
 
 };
