@@ -3,6 +3,8 @@
 
 AMinimapCameraActor::AMinimapCameraActor()
 {
+    // 0. 서버 복제 방지
+    bReplicates = false;
     // 1. 컴포넌트 생성 및 루트 설정
     CaptureComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("CaptureComp"));
     RootComponent = CaptureComp;

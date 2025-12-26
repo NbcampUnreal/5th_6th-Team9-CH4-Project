@@ -126,8 +126,7 @@ void UUIManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     Super::Initialize(Collection);
 
     // === 임시 테스트용 Result 위젯 직접 등록 ===
-    TSubclassOf<UUserWidget> ResultWidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/All/Game/KJH/WBP_ResultWidget"));
-    if (ResultWidgetClass)
+    TSubclassOf<UUserWidget> ResultWidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/KJH/WBP_ResultWidget.WBP_ResultWidget_C"));    if (ResultWidgetClass)
     {
         RegisterUIWidget(EGameUIState::Result, ResultWidgetClass);
         UE_LOG(LogTemp, Log, TEXT("[UIManager] ResultWidget Success!"));

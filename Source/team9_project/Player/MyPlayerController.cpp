@@ -7,6 +7,7 @@
 #include "PlayerCharacter.h"
 #include "Player/MyPlayerState.h"
 #include "Ui/ResultWidget.h"
+#include <Kismet/GameplayStatics.h>
 
 
 AMyPlayerController::AMyPlayerController()
@@ -29,7 +30,13 @@ void AMyPlayerController::OnPossess(APawn* InPawn)
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
+    //Dedicated Server에서는 미니맵 카메라 관련 로직 스킵
+    ENetMode NetMode = GetWorld()->GetNetMode();
+    if (NetMode == NM_DedicatedServer)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[MyPlayerController] Dedicated Server detected - Skipping MinimapCamera spawn and input setup"));
+        return;
+    }
 	// 내 클라에서만 실행?
 	if (!IsLocalController())
 	{
@@ -39,6 +46,51 @@ void AMyPlayerController::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("APlayerController::BeginPlay"));
 
 	ULocalPlayer* LocalPlayer = GetLocalPlayer();
+    if (LocalPlayer)
+    {
+        UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+        if (Subsystem && BoardIMC)
+        {
+            Subsystem->AddMappingContext(BoardIMC, 0);
+            CurrentIMC = BoardIMC;
+        }
+    }
+    // 미니맵 카메라 스폰 (클라이언트에서만)
+    TArray<AActor*> FoundCameras;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMinimapCameraActor::StaticClass(), FoundCameras);
+    if (FoundCameras.Num() > 0)
+    {
+        MinimapCamera = Cast<AMinimapCameraActor>(FoundCameras[0]);
+        UE_LOG(LogTemp, Log, TEXT("[MyPlayerController] Found existing MinimapCamera"));
+    }
+    else
+    {
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        MinimapCamera = GetWorld()->SpawnActor<AMinimapCameraActor>(
+            AMinimapCameraActor::StaticClass(),
+            FVector(0, 0, 10000),
+            FRotator(-90, 0, 0),
+            SpawnParams
+        );
+
+        if (MinimapCamera)
+        {
+            MinimapCamera->CaptureComp->OrthoWidth = 12000.0f;
+
+            if (MinimapCamera->MinimapRT)
+            {
+                MinimapCamera->CaptureComp->TextureTarget = MinimapCamera->MinimapRT;
+                UE_LOG(LogTemp, Log, TEXT("[MyPlayerController] MinimapCamera spawned and configured"));
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("[MyPlayerController] MinimapRT is null!"));
+            }
+        }
+    }
 	UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem
 		= LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
 	EnhancedInputLocalPlayerSubsystem->AddMappingContext(BoardIMC, 0);
