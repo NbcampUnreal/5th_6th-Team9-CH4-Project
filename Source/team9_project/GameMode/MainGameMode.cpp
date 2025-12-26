@@ -92,6 +92,9 @@ int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 	{
 		PlayerInfo.Value->Client_ReceiveDiceResult(MyPlayerNumber, DiceNum);
 	}
+
+	//임시 : 주사위 눈 만큼 점수 획득
+	PlayersInGame[MyPlayerNumber]->GetPlayerState<AMyPlayerState>()->AddScore(DiceNum);
 	
 	return DiceNum;
 }
