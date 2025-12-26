@@ -97,10 +97,10 @@ void AMyPlayerController::Client_SetUIState_Implementation(EGameUIState NewState
     }
 }
 
-void AMyPlayerController::Client_ReceiveDiceResult_Implementation(int32 Result)
+void AMyPlayerController::Client_ReceiveDiceResult_Implementation(int32 PlayerNumber, int32 DiceNum)
 {
     // UI나 블루프린트에서 들을 수 있도록 델리게이트 브로드캐스트
-    OnDiceResultReceived.Broadcast(Result);
+    OnDiceResultReceived.Broadcast(PlayerNumber, DiceNum);
 }
 
 void AMyPlayerController::Multicast_ShowResult_Implementation()

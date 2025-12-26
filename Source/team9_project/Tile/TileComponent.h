@@ -56,4 +56,5 @@ private:
 	void SetOnPlayerLeaveTileActions();
 	void SetOnPlayerUseItemTileActions();
 	void SetOnPlayerPassedTileActions();
+	bool IsServer();
 };
