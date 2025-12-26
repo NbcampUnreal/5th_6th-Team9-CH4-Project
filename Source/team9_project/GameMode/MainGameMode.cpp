@@ -90,7 +90,7 @@ int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 	//주사위 결과를 각 플레이어 컨트롤러에게 전달
 	for (auto PlayerInfo : PlayersInGame)
 	{
-		PlayerInfo.Value->Client_ReceiveDiceResult(PlayerInfo.Key, DiceNum);
+		PlayerInfo.Value->Client_ReceiveDiceResult(MyPlayerNumber, DiceNum);
 	}
 	
 	return DiceNum;
