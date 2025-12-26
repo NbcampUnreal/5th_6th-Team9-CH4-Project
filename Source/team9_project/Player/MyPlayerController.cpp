@@ -138,6 +138,16 @@ void AMyPlayerController::SetupInputComponent()
     }
 }
 
+void AMyPlayerController::Client_ReceiveFirstOrder_Implementation(TArray<int32> PlayerNumbers, TArray<int32> DiceNums)
+{
+	OnFirstReady.Broadcast(PlayerNumbers, DiceNums);
+}
+
+void AMyPlayerController::Client_ReceiveTurnEndInfo_Implementation(TArray<int32> PlayerNumbers, TArray<int32> Scores)
+{
+	TurnEndInfo.Broadcast(PlayerNumbers, Scores);
+}
+
 void AMyPlayerController::TestShowResult()
 {
     UE_LOG(LogTemp, Warning, TEXT("[Test] R Key Press - Result Widget Coll"));
