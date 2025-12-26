@@ -33,10 +33,11 @@ void AMainGameMode::BeginPlay()
 	}
 
 	//1라운드(처음 시작)인 경우 진행 순서 정하고 준비를 기다린다.
-	if (CurrentRound == 1)
+	if (CurrentRound <= 1)
 	{
-		SetPlayerNumbersOrder();
 		WaitForReady();
+		SetPlayerNumbersOrder();
+		
 		return;
 	}
 
@@ -141,11 +142,19 @@ void AMainGameMode::SetPlayerNumbersOrder()
 	//앞에서 부터 각 플레이어에게 배정
 	int8 ArrayIndex = -1;
 	TMap<int32, int32> OrderByDiceNum;
+	TArray<int32> SendPlayerNumbers;
+	TArray<int32> SendDiceNums;
 	for (auto PlayerInfo : PlayersInGame)
 	{
 		OrderByDiceNum.Add(DiceNums[++ArrayIndex], PlayerInfo.Key);
+		SendPlayerNumbers.Add(PlayerInfo.Key);
+		SendDiceNums.Add(DiceNums[ArrayIndex]);
+	}
 
-		//TODO : 당첨 숫자를 플레이어에게 전달
+	//순서 정보를 각 플레이어에게 전달
+	for (auto PlayerInfo : PlayersInGame)
+	{
+		PlayerInfo.Value->Client_ReceiveFirstOrder(SendPlayerNumbers, SendDiceNums);
 	}
 
 	//배정받은 수 기준 내림차순으로 순서가 정해진다.
