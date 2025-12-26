@@ -7,6 +7,7 @@
 #include "MyPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDiceResultReceived, int32, PlayerNumber, int32, DiceNum);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnFirstReady, TArray<int32>, PlayerNumbers, TArray<int32>, DiceNums);
 
 class UInputMappingContext;
 class UInputAction;
@@ -56,6 +57,9 @@ public:
 
     UPROPERTY(BlueprintAssignable, Category = "Dice")
     FOnDiceResultReceived OnDiceResultReceived;
+
+	UPROPERTY(BlueprintAssignable, Category = "Dice")
+	FOnFirstReady OnOnFirstReady;
 
 	UPROPERTY()
 	UInputMappingContext* CurrentIMC;
