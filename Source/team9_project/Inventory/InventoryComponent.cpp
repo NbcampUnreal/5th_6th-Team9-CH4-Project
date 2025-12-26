@@ -53,7 +53,7 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UInventoryComponent, Slots);
+	DOREPLIFETIME_CONDITION_NOTIFY(UInventoryComponent, Slots, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME(UInventoryComponent, ActiveEffects);
 	DOREPLIFETIME(UInventoryComponent, bHasUsedItemThisTurn);
 }
@@ -67,6 +67,7 @@ void UInventoryComponent::OnRep_ActiveEffects()
 
 void UInventoryComponent::OnRep_Slots()
 {
+	UE_LOG(LogTemp, Warning, TEXT("OnRep_Slots called on client! Broadcasting OnInventoryUpdated"));
 	OnInventoryUpdated.Broadcast(-1);
 }
 
@@ -257,16 +258,11 @@ void UInventoryComponent::HandleEffectCancelled()
 		return;
 	}
 
-	// 취소된 아이템 반환
+	// 타임아웃 시 아이템 소멸 (반환 안 함)
 	FName CancelledItemID = CurrentItemID;
-	if (CancelledItemID != NAME_None)
-	{
-		AddItem(CancelledItemID);
-		UE_LOG(LogTemp, Log, TEXT("HandleEffectCancelled: Returned item %s to inventory"), *CancelledItemID.ToString());
-	}
+	UE_LOG(LogTemp, Log, TEXT("HandleEffectCancelled: Item %s consumed (timeout)"), *CancelledItemID.ToString());
 
-	// 아이템 사용권 복구
-	bHasUsedItemThisTurn = false;
+	// 타임아웃은 아이템 사용으로 간주 (사용권 복구 안 함)
 
 	// 취소 브로드캐스트
 	OnItemUseCancelled.Broadcast();

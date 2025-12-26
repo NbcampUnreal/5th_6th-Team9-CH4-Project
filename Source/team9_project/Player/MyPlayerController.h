@@ -10,7 +10,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDiceResultReceived, int32, Result
 
 class UInputMappingContext;
 class UInputAction;
-
+//Cho_sungmin
+class UUserWidget;
 UCLASS()
 class TEAM9_PROJECT_API AMyPlayerController : public APlayerController
 {
@@ -27,14 +28,14 @@ public:
 
 	//void IMCChange(Mode mode);
 
-    // ╪╜╧Ж аж╩Гю╖ ©Дц╩ RPC
+    // О©╫О©╫О©╫О©╫ О©╫ж╩О©╫О©╫О©╫ О©╫О©╫ц╩ RPC
     UFUNCTION(Server, Reliable)
     void Server_RequestThrowDice();
 
-    // UI ╩Себ ╨╞╟Ф Client RPC
+    // UI О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ Client RPC
     UFUNCTION(Client, Reliable)
     void Client_SetUIState(EGameUIState NewState);
-    // аж╩Гю╖ ╟А╟З ╪Ж╫е Client RPC
+    // О©╫ж╩О©╫О©╫О©╫ О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ Client RPC
 
     UFUNCTION(Client, Reliable)
     void Client_ReceiveDiceResult(int32 Result);
@@ -78,6 +79,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* CameraWheelAction;
+	
+	// Cho_Sungmin - Л²╦К╡╓М├═К╕╛ Л°└Л═╞
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> InventoryWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* InventoryWidget;
 };
 
 //#pragma once
@@ -102,15 +110,15 @@ public:
 //    UPROPERTY()
 //    AMinimapCameraActor* MinimapCamera;
 //
-//    // ╪╜╧Ж аж╩Гю╖ ©Дц╩ RPC
+//    // О©╫О©╫О©╫О©╫ О©╫ж╩О©╫О©╫О©╫ О©╫О©╫ц╩ RPC
 //    UFUNCTION(Server, Reliable)
 //    void Server_RequestThrowDice();
 //
-//    // UI ╩Себ ╨╞╟Ф Client RPC
+//    // UI О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ Client RPC
 //    UFUNCTION(Client, Reliable)
 //    void Client_SetUIState(EGameUIState NewState);
 //
-//    // аж╩Гю╖ ╟А╟З ╪Ж╫е Client RPC
+//    // О©╫ж╩О©╫О©╫О©╫ О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ Client RPC
 //    UFUNCTION(Client, Reliable)
 //    void Client_ReceiveDiceResult(int32 Result);
 //

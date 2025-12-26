@@ -110,7 +110,7 @@ void UEffect_RCCar::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 	);
 #endif
 
-	// 폭발 범위 내 액터들에게 데미지 적용
+	// 폭발 범위 내 PlayerCharacter에게만 데미지 적용
 	int32 HitCount = 0;
 	for (const FOverlapResult& Result : OverlapResults)
 	{
@@ -120,18 +120,26 @@ void UEffect_RCCar::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 			continue;
 		}
 
+		// PlayerCharacter만 타겟
+		APlayerCharacter* TargetPlayer = Cast<APlayerCharacter>(HitActor);
+		if (!TargetPlayer)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Effect_RCCar: Skipping non-player actor %s"), *HitActor->GetName());
+			continue;
+		}
+
 		// 데미지 적용
 		UGameplayStatics::ApplyDamage(
-			HitActor,
-			ExplosionDamage,
-			User->GetInstigatorController(),
-			User,
-			nullptr
+				TargetPlayer,
+				ExplosionDamage,
+				User->GetInstigatorController(),
+				User,
+				nullptr
 		);
 
 		HitCount++;
-		UE_LOG(LogTemp, Log, TEXT("Effect_RCCar: Explosion hit %s for %.0f damage"),
-			*HitActor->GetName(), ExplosionDamage);
+		UE_LOG(LogTemp, Log, TEXT("Effect_RCCar: Explosion hit player %s for %.0f damage"),
+				*TargetPlayer->GetName(), ExplosionDamage);
 	}
 
 	// RC카 제거
@@ -139,4 +147,20 @@ void UEffect_RCCar::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 
 	UE_LOG(LogTemp, Log, TEXT("Effect_RCCar: Explosion at %s, hit %d targets"),
 		*ExplosionLocation.ToString(), HitCount);
+}
+
+void UEffect_RCCar::CancelUse()
+{
+	// 타임아웃 시 폭발 처리
+	if (ControlledActor && CurrentUser)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Effect_RCCar: Timeout - Exploding!"));
+
+		
+		FItemUseContext DummyContext;
+		ExecuteEffect(CurrentUser, DummyContext);
+	}
+
+	// 부모 클래스 CancelUse 호출
+	Super::CancelUse();
 }

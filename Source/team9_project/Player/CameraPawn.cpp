@@ -59,7 +59,9 @@ void ACameraPawn::BeginPlay()
 
 		PlayerCharacter->InitCharacter(this, PS);
 	}
-
+	
+	
+	
 }
 
 void ACameraPawn::PossessedBy(AController* NewControlle)
@@ -71,6 +73,13 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 	{
 		SetOwner(NewControlle);
 		UE_LOG(LogTemp, Warning, TEXT("Owner set to %s"), *GetNameSafe(NewControlle));
+		//Cho_Sungmin테스트용 아이템 부여
+		// 테스트용 아이템 추가
+		if (InventoryComponent)
+		{
+			InventoryComponent->AddItem(FName("RCCar"));
+			UE_LOG(LogTemp, Warning, TEXT("ADDITEM RCCar - Server"));
+		}
 	}
 
 	StateMachine = NewObject<UPlayerStateMachine>(this);
@@ -88,6 +97,8 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 			PlayerCharacter->SetPlayerState(TPS);
 		}
 	}
+	
+	
 }
 
 void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
