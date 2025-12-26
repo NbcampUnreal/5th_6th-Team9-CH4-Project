@@ -116,6 +116,15 @@ void AMyPlayerController::BeginPlay()
 			MinimapCamera->CaptureComp->TextureTarget = MinimapCamera->MinimapRT;
 		}
 	}
+	// Cho_Sungmin - 인벤토리 위젯 생성
+	if (InventoryWidgetClass)
+	{
+		InventoryWidget = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
+		if (InventoryWidget)
+		{
+			InventoryWidget->AddToViewport();
+		}
+	}
 }
 // 모든 RPC는 뒤에 _Implementation을 붙여서 본체를 만듭니다.
 
@@ -140,10 +149,10 @@ void AMyPlayerController::Client_SetUIState_Implementation(EGameUIState NewState
     }
 }
 
-void AMyPlayerController::Client_ReceiveDiceResult_Implementation(int32 Result)
+void AMyPlayerController::Client_ReceiveDiceResult_Implementation(int32 PlayerNumber, int32 DiceNum)
 {
     // UI나 블루프린트에서 들을 수 있도록 델리게이트 브로드캐스트
-    OnDiceResultReceived.Broadcast(Result);
+    OnDiceResultReceived.Broadcast(PlayerNumber, DiceNum);
 }
 
 void AMyPlayerController::Multicast_ShowResult_Implementation()

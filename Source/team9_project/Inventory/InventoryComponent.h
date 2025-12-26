@@ -58,7 +58,7 @@ public:
 	//========== 네트워크 RPC ==========
 
 	// 클라이언트 → 서버: 아이템 사용 요청
-	UFUNCTION(Server, Reliable, WithValidation)
+	UFUNCTION(Server, Reliable, WithValidation,BlueprintCallable)
 	void Server_RequestUseItem(int32 SlotIndex, FItemUseContext Context);
 
 	// 서버 → 모든 클라이언트: 아이템 사용 결과 브로드캐스트

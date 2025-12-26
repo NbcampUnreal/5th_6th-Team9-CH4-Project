@@ -6,11 +6,12 @@
 #include "Ui/MinimapCameraActor.h"
 #include "MyPlayerController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDiceResultReceived, int32, Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDiceResultReceived, int32, PlayerNumber, int32, DiceNum);
 
 class UInputMappingContext;
 class UInputAction;
-
+//Cho_sungmin
+class UUserWidget;
 UCLASS()
 class TEAM9_PROJECT_API AMyPlayerController : public APlayerController
 {
@@ -27,22 +28,20 @@ public:
 
 	//void IMCChange(Mode mode);
 
-    // ¼­¹ö ÁÖ»çÀ§ ¿äÃ» RPC
+	// ì„œë²„ ì£¼ì‚¬ìœ„ ìš”ì²­ RPC
     UFUNCTION(Server, Reliable)
     void Server_RequestThrowDice();
 
-    // UI »óÅÂ º¯°æ Client RPC
+	// UI ìƒíƒœ ë³€ê²½ Client RPC
     UFUNCTION(Client, Reliable)
     void Client_SetUIState(EGameUIState NewState);
-    // ÁÖ»çÀ§ °á°ú ¼ö½Å Client RPC
-
+	
+	// ì£¼ì‚¬ìœ„ ê²°ê³¼ ìˆ˜ì‹  Client RPC
     UFUNCTION(Client, Reliable)
-    void Client_ReceiveDiceResult(int32 Result);
+    void Client_ReceiveDiceResult(int32 PlayerNumber, int32 DiceNum);
 
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_ShowResult();
-
-    void Multicast_ShowResult_Implementation();
 
 protected:
     void TestShowResult();

@@ -99,5 +99,6 @@ struct FPlayerPersistentData
 	{
 		InventorySlots.Empty();
 		ActiveEffects.Empty();
+		
 	}
 };

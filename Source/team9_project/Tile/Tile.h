@@ -66,21 +66,6 @@ public:
 	void PlayerUseItem(APlayerCharacter* PlayerCharacter);
 	void PlayerRollDice(APlayerCharacter* PlayerCharacter);
 
-	//UFUNCTION(Server, Reliable)
-	//void ServerRPC_PlayerArrive(APlayerCharacter* PlayerCharacter);
-
-	//UFUNCTION(Server, Reliable)
-	//void ServerRPC_PlayerPassed(APlayerCharacter* PlayerCharacter);
-
-	//UFUNCTION(Server, Reliable)
-	//void ServerRPC_PlayerLeave(APlayerCharacter* PlayerCharacter);
-
-	//UFUNCTION(Server, Reliable)
-	//void ServerRPC_PlayerUseItem(APlayerCharacter* PlayerCharacter);
-
-	//UFUNCTION(Server, Reliable)
-	//void ServerRPC_PlayerRollDice(APlayerCharacter* PlayerCharacter);
-
 	TArray<APlayerCharacter*> GetInPlayers();
 
 	TArray<ATile*> GetNextTiles();
