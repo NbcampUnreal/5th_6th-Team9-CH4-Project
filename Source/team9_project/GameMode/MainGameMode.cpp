@@ -105,6 +105,18 @@ int32 AMainGameMode::ThrowDice()
 	return DiceNum;
 }
 
+void AMainGameMode::RequestTurnEnd(const int32 RequestPlayerNum)
+{
+	//현재 턴 플레이어가 아니면 턴 종료를 요청할 수 없다.
+	if (!CheckPlayerTurn(RequestPlayerNum))
+	{
+		return;
+	}
+
+	//다음 턴
+	NextPlayerTurn(false);
+}
+
 bool AMainGameMode::CheckPlayerTurn(const int32 MyPlayerNumber)
 {	
 	return TurnPlayerNumber == MyPlayerNumber;
@@ -125,7 +137,7 @@ bool AMainGameMode::UsingItem(const int32 MyPlayerNumber, const int32 InventoryI
 	return true;
 }
 
-int8 AMainGameMode::GetTurnPlayerNumber()
+int32 AMainGameMode::GetTurnPlayerNumber()
 {
 	return TurnPlayerNumber;
 }
@@ -165,7 +177,8 @@ void AMainGameMode::SetPlayerNumbersOrder()
 	{
 		if (OrderByDiceNum.Contains(iNum))
 		{
-			OrderedPlayerNumbers.Add(OrderByDiceNum[iNum]);
+			TurnOrderedPlayerNums.Add(OrderByDiceNum[iNum]);
+			RankOrderedPlayerNums.Add(OrderByDiceNum[iNum]);//시작시 순위는 턴 진행 순서를 따른다.
 		}
 	}
 }
@@ -209,8 +222,39 @@ void AMainGameMode::WaitForReady()
 	}), FirstReadyCheckTime, true);
 }
 
+void AMainGameMode::CheckAndSendPlayerRank()
+{
+	//점수 기준으로 정렬
+	RankOrderedPlayerNums.Sort([this](const int32& NumA, const  int32& NumB)
+	{
+		int32 ScoreA = PlayersInGame[NumA]->GetPlayerState<AMyPlayerState>()->GetScore();
+		int32 ScoreB = PlayersInGame[NumB]->GetPlayerState<AMyPlayerState>()->GetScore();
+
+		return ScoreA > ScoreB;
+	});
+
+	//정렬된 순서대로 점수 목록 생성
+	TArray<int32> SendScores;
+	for (int32& PlayerNum : RankOrderedPlayerNums)
+	{
+		SendScores.Add(PlayersInGame[PlayerNum]->GetPlayerState<AMyPlayerState>()->GetScore());
+	}
+
+	//각 클라이언트에게 전달
+	for (auto PlayerInfo : PlayersInGame)
+	{
+		PlayerInfo.Value->Client_ReceiveTurnEndInfo(RankOrderedPlayerNums, SendScores);
+	}
+}
+
 void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 {
+	//라운드 시작시가 아니면 이 함수 실행시 순위 정보를 클라이언트에게 전달
+	if (!bRoundStart)
+	{
+		CheckAndSendPlayerRank();
+	}
+	
 	//라운드 시작시 첫 번째 플레이어를 지정
 	if (bRoundStart)
 	{
@@ -227,7 +271,7 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 	}
 
 	//아직 라운드 종료가 아니라면 다음 플레이어의 차례 진행
-	TurnPlayerNumber = OrderedPlayerNumbers[TurnIndex];
+	TurnPlayerNumber = TurnOrderedPlayerNums[TurnIndex];
 }
 
 void AMainGameMode::MoveToMiniGameMap()
