@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "Tile/TileAction/DecreaseHPTileAction.h"
+#include "Tile/TileAction/ServerTileAction/DecreaseHPTileAction.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/MyPlayerState.h"
 

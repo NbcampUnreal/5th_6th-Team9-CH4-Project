@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Tile/TileAction.h"
+#include "Tile/TileAction/TileAction.h"
 #include "ServerTileAction.generated.h"
 
 /**

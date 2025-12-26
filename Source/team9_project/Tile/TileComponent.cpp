@@ -2,8 +2,8 @@
 
 
 #include "Tile/TileComponent.h"
-#include "Tile/ClientTileAction.h"
-#include "Tile/ServerTileAction.h"
+#include "Tile/TileAction/ClientTileAction/ClientTileAction.h"
+#include "Tile/TileAction/ServerTileAction/ServerTileAction.h"
 #include "Tile/Tile.h"
 
 // Sets default values for this component's properties

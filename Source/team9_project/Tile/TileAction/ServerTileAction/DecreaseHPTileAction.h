@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Tile/ServerTileAction.h"
+#include "Tile/TileAction/ServerTileAction/ServerTileAction.h"
 #include "DecreaseHPTileAction.generated.h"
 
 /**
@@ -15,7 +15,7 @@ class TEAM9_PROJECT_API UDecreaseHPTileAction : public UServerTileAction
 	GENERATED_BODY()
 
 public:
-	virtual void Active(APlayerCharacter* PlayerCharacter);
+	virtual void Active(APlayerCharacter* PlayerCharacter) override;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tile", meta = (AllowPrivateAccess = "true"))
