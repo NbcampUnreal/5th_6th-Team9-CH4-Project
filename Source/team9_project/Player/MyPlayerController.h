@@ -59,7 +59,7 @@ public:
     FOnDiceResultReceived OnDiceResultReceived;
 
 	UPROPERTY(BlueprintAssignable, Category = "Dice")
-	FOnFirstReady OnOnFirstReady;
+	FOnFirstReady OnFirstReady;
 
 	UPROPERTY()
 	UInputMappingContext* CurrentIMC;
