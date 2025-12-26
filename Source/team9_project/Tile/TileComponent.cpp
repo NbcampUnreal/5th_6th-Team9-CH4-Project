@@ -2,7 +2,8 @@
 
 
 #include "Tile/TileComponent.h"
-#include "Tile/TileAction.h"
+#include "Tile/TileAction/ClientTileAction/ClientTileAction.h"
+#include "Tile/TileAction/ServerTileAction/ServerTileAction.h"
 #include "Tile/Tile.h"
 
 // Sets default values for this component's properties
@@ -52,14 +53,35 @@ void UTileComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
 void UTileComponent::SetOnPlayerArriveTileActions()
 {
 	ATile* Tile = Cast<ATile>(GetOwner());
+	const bool bIsServer = IsServer();
 	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerArriveTileActions)
 	{
 		if (!SubTileAction) continue;
-		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
-		if (IsValid(Inst))
+		UClass* Cls = SubTileAction.Get();
+		if (!Cls) continue;
+
+		if (bIsServer)
 		{
-			_TileActionInstance.Add(Inst);
-			Tile->OnPlayerArrive.AddUObject(Inst, &UTileAction::Active);
+			if (Cls->IsChildOf(UServerTileAction::StaticClass()))
+			{
+				UServerTileAction* Inst = NewObject<UServerTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerArrive.AddUObject(Inst, &UServerTileAction::Active);
+				}
+			}
+		}
+		else {
+			if (Cls->IsChildOf(UClientTileAction::StaticClass()))
+			{
+				UClientTileAction* Inst = NewObject<UClientTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerArrive.AddUObject(Inst, &UClientTileAction::Active);
+				}
+			}
 		}
 	}
 }
@@ -67,14 +89,35 @@ void UTileComponent::SetOnPlayerArriveTileActions()
 void UTileComponent::SetOnPlayerRollDiceTileActions()
 {
 	ATile* Tile = Cast<ATile>(GetOwner());
+	const bool bIsServer = IsServer();
 	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerRollDiceTileActions)
 	{
 		if (!SubTileAction) continue;
-		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
-		if (IsValid(Inst))
+		UClass* Cls = SubTileAction.Get();
+		if (!Cls) continue;
+
+		if (bIsServer)
 		{
-			_TileActionInstance.Add(Inst);
-			Tile->OnPlayerRollDice.AddUObject(Inst, &UTileAction::Active);
+			if (Cls->IsChildOf(UServerTileAction::StaticClass()))
+			{
+				UServerTileAction* Inst = NewObject<UServerTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerRollDice.AddUObject(Inst, &UServerTileAction::Active);
+				}
+			}
+		}
+		else {
+			if (Cls->IsChildOf(UClientTileAction::StaticClass()))
+			{
+				UClientTileAction* Inst = NewObject<UClientTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerRollDice.AddUObject(Inst, &UClientTileAction::Active);
+				}
+			}
 		}
 	}
 }
@@ -82,14 +125,35 @@ void UTileComponent::SetOnPlayerRollDiceTileActions()
 void UTileComponent::SetOnPlayerLeaveTileActions()
 {
 	ATile* Tile = Cast<ATile>(GetOwner());
+	const bool bIsServer = IsServer();
 	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerLeaveTileActions)
 	{
 		if (!SubTileAction) continue;
-		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
-		if (IsValid(Inst))
+		UClass* Cls = SubTileAction.Get();
+		if (!Cls) continue;
+
+		if (bIsServer)
 		{
-			_TileActionInstance.Add(Inst);
-			Tile->OnPlayerLeave.AddUObject(Inst, &UTileAction::Active);
+			if (Cls->IsChildOf(UServerTileAction::StaticClass()))
+			{
+				UServerTileAction* Inst = NewObject<UServerTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerLeave.AddUObject(Inst, &UServerTileAction::Active);
+				}
+			}
+		}
+		else {
+			if (Cls->IsChildOf(UClientTileAction::StaticClass()))
+			{
+				UClientTileAction* Inst = NewObject<UClientTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerLeave.AddUObject(Inst, &UClientTileAction::Active);
+				}
+			}
 		}
 	}
 }
@@ -97,14 +161,35 @@ void UTileComponent::SetOnPlayerLeaveTileActions()
 void UTileComponent::SetOnPlayerUseItemTileActions()
 {
 	ATile* Tile = Cast<ATile>(GetOwner());
+	const bool bIsServer = IsServer();
 	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerUseItemTileActions)
 	{
 		if (!SubTileAction) continue;
-		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
-		if (IsValid(Inst))
+		UClass* Cls = SubTileAction.Get();
+		if (!Cls) continue;
+
+		if (bIsServer)
 		{
-			_TileActionInstance.Add(Inst);
-			Tile->OnPlayerUseItem.AddUObject(Inst, &UTileAction::Active);
+			if (Cls->IsChildOf(UServerTileAction::StaticClass()))
+			{
+				UServerTileAction* Inst = NewObject<UServerTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerUseItem.AddUObject(Inst, &UServerTileAction::Active);
+				}
+			}
+		}
+		else {
+			if (Cls->IsChildOf(UClientTileAction::StaticClass()))
+			{
+				UClientTileAction* Inst = NewObject<UClientTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerUseItem.AddUObject(Inst, &UClientTileAction::Active);
+				}
+			}
 		}
 	}
 }
@@ -112,14 +197,35 @@ void UTileComponent::SetOnPlayerUseItemTileActions()
 void UTileComponent::SetOnPlayerPassedTileActions()
 {
 	ATile* Tile = Cast<ATile>(GetOwner());
+	const bool bIsServer = IsServer();
 	for (TSubclassOf<UTileAction>& SubTileAction : _OnPlayerPassedTileActions)
-	{ 
+	{
 		if (!SubTileAction) continue;
-		UTileAction* Inst = NewObject<UTileAction>(Tile, SubTileAction);
-		if (IsValid(Inst))
+		UClass* Cls = SubTileAction.Get();
+		if (!Cls) continue;
+
+		if (bIsServer)
 		{
-			_TileActionInstance.Add(Inst);
-			Tile->OnPlayerPassed.AddUObject(Inst, &UTileAction::Active);
+			if (Cls->IsChildOf(UServerTileAction::StaticClass()))
+			{
+				UServerTileAction* Inst = NewObject<UServerTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerPassed.AddUObject(Inst, &UServerTileAction::Active);
+				}
+			}
+		}
+		else {
+			if (Cls->IsChildOf(UClientTileAction::StaticClass()))
+			{
+				UClientTileAction* Inst = NewObject<UClientTileAction>(Tile, Cls);
+				if (IsValid(Inst))
+				{
+					_TileActionInstance.Add(Inst);
+					Tile->OnPlayerPassed.AddUObject(Inst, &UClientTileAction::Active);
+				}
+			}
 		}
 	}
 }
@@ -133,3 +239,11 @@ void UTileComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
+bool UTileComponent::IsServer() {
+	if (GetWorld() && GetWorld()->GetNetMode() == NM_DedicatedServer)
+	{
+		return true;
+	}
+
+	return false;
+}
