@@ -43,12 +43,12 @@ public:
     void Client_ReceiveDiceResult(int32 PlayerNumber, int32 DiceNum);
 
 	// 처음 정해진 순서 수신용 RPC
-	UFUNCTION(Client, Reliable)
-	void Client_ReceiveFirstOrder(TArray<int32> PlayerNumbers, TArray<int32> DiceNums);
+	//UFUNCTION(Client, Reliable)
+	//void Client_ReceiveFirstOrder(const TArray<int32> PlayerNumbers, const TArray<int32> DiceNums) const;
 	
 	// 턴 종료시마다 순위 확인용 RPC
-	UFUNCTION(Client, Reliable)
-	void Client_ReceiveTurnEndInfo(TArray<int32> PlayerNumbers, TArray<int32> Scores);
+	//UFUNCTION(Client, Reliable)
+	//void Client_ReceiveTurnEndInfo(const TArray<int32> PlayerNumbers, const TArray<int32> Scores) const;
 
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_ShowResult();
