@@ -6,7 +6,8 @@
 #include "Ui/MinimapCameraActor.h"
 #include "MyPlayerController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDiceResultReceived, int32, Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDiceResultReceived, int32, PlayerNumber, int32, DiceNum);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnFirstReady, TArray<int32>, PlayerNumbers, TArray<int32>, DiceNums);
 
 class UInputMappingContext;
 class UInputAction;
@@ -28,22 +29,20 @@ public:
 
 	//void IMCChange(Mode mode);
 
-    // ���� �ֻ��� ��û RPC
+	// 서버 주사위 요청 RPC
     UFUNCTION(Server, Reliable)
     void Server_RequestThrowDice();
 
-    // UI ���� ���� Client RPC
+	// UI 상태 변경 Client RPC
     UFUNCTION(Client, Reliable)
     void Client_SetUIState(EGameUIState NewState);
-    // �ֻ��� ��� ���� Client RPC
-
+	
+	// 주사위 결과 수신 Client RPC
     UFUNCTION(Client, Reliable)
-    void Client_ReceiveDiceResult(int32 Result);
+    void Client_ReceiveDiceResult(int32 PlayerNumber, int32 DiceNum);
 
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_ShowResult();
-
-    void Multicast_ShowResult_Implementation();
 
 protected:
     void TestShowResult();
@@ -58,6 +57,9 @@ public:
 
     UPROPERTY(BlueprintAssignable, Category = "Dice")
     FOnDiceResultReceived OnDiceResultReceived;
+
+	UPROPERTY(BlueprintAssignable, Category = "Dice")
+	FOnFirstReady OnFirstReady;
 
 	UPROPERTY()
 	UInputMappingContext* CurrentIMC;
