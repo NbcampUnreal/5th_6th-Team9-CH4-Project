@@ -111,8 +111,7 @@ protected:
 	float MouseX;
 	float MouseY;
 
-	// 아이템 사용중 체크
-	bool bisUsingItem;
+	
 
 	// Cho_Sungmin
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")

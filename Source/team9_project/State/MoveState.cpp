@@ -7,6 +7,9 @@
 void UMoveState::OnEnter()
 {
 	UE_LOG(LogTemp, Warning, TEXT("MoveState OnEnter"));
+	GetPlayerCharacter()->bIsMoving = true;
+	UE_LOG(LogTemp, Warning, TEXT("bIsMoving : true"));
+
 	AMainGameMode* GM = GetWorld()->GetAuthGameMode<AMainGameMode>();
 	if (IsValid(GM) == false)
 	{
@@ -37,6 +40,8 @@ void UMoveState::OnUpdate(float DeltaTime)
 void UMoveState::OnExit()
 {
 	UE_LOG(LogTemp, Warning, TEXT("MoveState OnExit"));
+	GetPlayerCharacter()->bIsMoving = false;
+	UE_LOG(LogTemp, Warning, TEXT("bIsMoving : false"));
 }
 
 bool UMoveState::CanTakeDamage()
