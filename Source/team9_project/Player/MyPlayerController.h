@@ -28,15 +28,15 @@ public:
 
 	//void IMCChange(Mode mode);
 
-    // ���� �ֻ��� ��û RPC
+	// 서버 주사위 요청 RPC
     UFUNCTION(Server, Reliable)
     void Server_RequestThrowDice();
 
-    // UI ���� ���� Client RPC
+	// UI 상태 변경 Client RPC
     UFUNCTION(Client, Reliable)
     void Client_SetUIState(EGameUIState NewState);
-    // �ֻ��� ��� ���� Client RPC
-
+	
+	// 주사위 결과 수신 Client RPC
     UFUNCTION(Client, Reliable)
     void Client_ReceiveDiceResult(int32 Result);
 
