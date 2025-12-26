@@ -6,7 +6,7 @@
 #include "Ui/MinimapCameraActor.h"
 #include "MyPlayerController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDiceResultReceived, int32, Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDiceResultReceived, int32, PlayerNumber, int32, DiceNum);
 
 class UInputMappingContext;
 class UInputAction;
@@ -38,12 +38,10 @@ public:
 	
 	// 주사위 결과 수신 Client RPC
     UFUNCTION(Client, Reliable)
-    void Client_ReceiveDiceResult(int32 Result);
+    void Client_ReceiveDiceResult(int32 PlayerNumber, int32 DiceNum);
 
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_ShowResult();
-
-    void Multicast_ShowResult_Implementation();
 
 protected:
     void TestShowResult();

@@ -2,6 +2,7 @@
 #include "Team9GameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/MyPlayerState.h"
+#include "Player/MyPlayerController.h"
 
 AMainGameMode::AMainGameMode()
 {
@@ -47,9 +48,16 @@ void AMainGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
 
-	if (AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>())
+	AMyPlayerController* MyPlayerController = Cast<AMyPlayerController>(NewPlayer);
+	if (!IsValid(MyPlayerController))
 	{
-		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), NewPlayer);
+		return;
+	}
+	
+	AMyPlayerState* MyPlayerState = MyPlayerController->GetPlayerState<AMyPlayerState>();
+	if (IsValid(MyPlayerState))
+	{
+		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), MyPlayerController);
 	}
 }
 
@@ -75,8 +83,15 @@ int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 	{
 		return 0;
 	}
-	
+
 	const int32 DiceNum = FMath::RandRange(1, 6);
+
+	//주사위 결과를 각 플레이어 컨트롤러에게 전달
+	for (auto PlayerInfo : PlayersInGame)
+	{
+		PlayerInfo.Value->Client_ReceiveDiceResult(PlayerInfo.Key, DiceNum);
+	}
+	
 	return DiceNum;
 }
 

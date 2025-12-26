@@ -4,6 +4,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "MainGameMode.generated.h"
 
+class AMyPlayerController;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundEnd);
 
 UCLASS()
@@ -25,10 +27,10 @@ public:
 	UFUNCTION(meta = (DeprecatedFunction, DeprecationMessage = "Use ThrowDice(int8) instead."))
 	int32 ThrowDice(AController* Controller);
 
-	//주사위 굴리기 (턴 플레이어 체크)
+	//주사위 굴리기 (턴 플레이어 체크, 모든 플레이어가 알 수 있음)
 	int32 ThrowDice(const int32 MyPlayerNumber);
 
-	//주사위 굴리기 (무조건 굴림)
+	//주사위 굴리기 (무조건 굴림, 반환값만 존재)
 	int32 ThrowDice();
 
 	//지정한 플레이어의 턴인가
@@ -60,7 +62,7 @@ public:
 private:
 	//게임중인 플레이어 목록
 	UPROPERTY()
-	TMap<int32, AController*> PlayersInGame;
+	TMap<int32, AMyPlayerController*> PlayersInGame;
 
 	//턴 진행 순서
 	UPROPERTY()
