@@ -72,11 +72,6 @@ void AMainGameMode::Logout(AController* Exiting)
 	}
 }
 
-int32 AMainGameMode::ThrowDice(AController* Controller)
-{
-	return 1;
-}
-
 int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 {
 	//차례가 아닌 플레이어는 주사위 못던진다.

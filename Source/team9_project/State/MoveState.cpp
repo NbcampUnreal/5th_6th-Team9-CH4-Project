@@ -1,6 +1,7 @@
 #include "State/MoveState.h"
 
 #include "GameMode/MainGameMode.h"
+#include "Player/MyPlayerState.h"
 #include "Player/PlayerCharacter.h"
 #include "State/PlayerStateMachine.h"
 
@@ -17,14 +18,7 @@ void UMoveState::OnEnter()
 		return;
 	}
 
-	AController* MPC = GetCameraPawn()->GetController();
-	if (IsValid(MPC) == false)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Controller not found"));
-		return;
-	}
-
-	const int32 DiceNumber = GM->ThrowDice(MPC);
+	const int32 DiceNumber = GM->ThrowDice(GetPlayerCharacter()->GetPlayerState()->GetPlayerNumber());
 	UE_LOG(LogTemp, Warning, TEXT("ThrowDice : %d"), DiceNumber);
 	GetPlayerCharacter()->MoveToNextNode(DiceNumber);
 }
