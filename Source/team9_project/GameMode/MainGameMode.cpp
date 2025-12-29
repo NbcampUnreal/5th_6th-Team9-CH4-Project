@@ -75,7 +75,7 @@ void AMainGameMode::GameStart()
 	}
 
 	//라운드 시작
-	//NextPlayerTurn(true);
+	NextPlayerTurn(true);
 }
 
 int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
@@ -262,7 +262,7 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 		OnRoundEnd.Broadcast();
 
 		MoveToMiniGameMap();
-		CheckAndSendPlayerRank(CurrentRound >= MaxRound ? EEndType::GameEnd : EEndType::RoundEnd);
+		CheckAndSendPlayerRank(CurrentRound > MaxRound ? EEndType::GameEnd : EEndType::RoundEnd);
 		return;
 	}
 
