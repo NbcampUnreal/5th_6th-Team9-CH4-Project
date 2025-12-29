@@ -13,10 +13,10 @@ struct FTimingPlayerResult
     int32 PlayerId;
 
     UPROPERTY(BlueprintReadOnly)
-    int32 PressTimeMs;
+    float PressTimeMs;
 
     UPROPERTY(BlueprintReadOnly)
-    int32 DeltaMs;
+    float DeltaMs;
 };
 
 UCLASS()
@@ -36,7 +36,7 @@ public:
 
 public:
     UPROPERTY(Replicated, BlueprintReadOnly)
-    int32 TargetTime;
+    float TargetTime;
 
     UPROPERTY(Replicated, BlueprintReadOnly)
     float GameStartTime;

@@ -23,11 +23,11 @@ public:
 	void OnTimeOver();
 
 public:
-	int32 TimerTime;
+	float TimerTime;
 
 	float StartServerTime;
 
 	FTimerHandle TimeOverHandle;
 
-	int32 BestDeltaMs;
+	float BestDeltaMs;
 };
