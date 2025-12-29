@@ -12,6 +12,7 @@ AMainGameMode::AMainGameMode()
 	CurrentRound = 0;
 	FirstReadyCheckTime = 1.0f;
 	MiniGameWaitTime = 1.0f;
+	NeedPlayers = 4;
 	MaxRound = 5;
 }
 
@@ -31,8 +32,8 @@ void AMainGameMode::OnPostLogin(AController* NewPlayer)
 		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), MyPlayerController);
 	}
 
-	//4명이 들어오면 시작한다.
-	if (PlayersInGame.Num() < 4)
+	//지정한 인원이 들어오면 시작한다.
+	if (PlayersInGame.Num() < NeedPlayers)
 	{
 		return;
 	}

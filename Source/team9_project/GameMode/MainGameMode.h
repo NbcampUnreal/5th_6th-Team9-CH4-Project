@@ -99,6 +99,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
 	float MiniGameWaitTime;
 
+	//게임 시작에 필요한 인원
+	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
+	int32 NeedPlayers;
+
 	//최대 라운드
 	UPROPERTY(EditDefaultsOnly, category = "Game Rule", meta = (allowPrivateAccess = true))
 	int16 MaxRound;
