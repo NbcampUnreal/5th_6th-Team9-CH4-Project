@@ -4,9 +4,17 @@
 #include "Blueprint/UserWidget.h"
 #include "T9_MiniGameResultWidget.generated.h"
 
+class UTextBlock;
+
 UCLASS()
 class TEAM9_PROJECT_API UT9_MiniGameResultWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	void SetResultText(const FText& NewText);
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> Result;
 };

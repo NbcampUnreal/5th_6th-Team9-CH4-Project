@@ -34,6 +34,8 @@ public:
 
     void AddPlayerPress(int32 PlayerId, float PressServerTime);
 
+    virtual FText GetGameName() override;
+
 public:
     UPROPERTY(Replicated, BlueprintReadOnly)
     float TargetTime;
@@ -43,4 +45,6 @@ public:
 
     UPROPERTY(ReplicatedUsing = OnRep_Results, BlueprintReadOnly)
     TArray<FTimingPlayerResult> Results;
+
+    FText GameName = FText::FromString(TEXT("TimingGame"));
 };

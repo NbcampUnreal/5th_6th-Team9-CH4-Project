@@ -6,7 +6,7 @@
 #include "T9_RacingGameState.generated.h"
 
 USTRUCT()
-struct FRacingPlayerDistance : public FFastArraySerializerItem
+struct FRacingRanking
 {
     GENERATED_BODY()
 
@@ -15,35 +15,6 @@ struct FRacingPlayerDistance : public FFastArraySerializerItem
 
     UPROPERTY()
     int32 Distance;
-
-    void PostReplicatedAdd(const struct FRacingPlayerDistanceArray& InArray);
-
-    void PostReplicatedChange(const struct FRacingPlayerDistanceArray& InArray);
-
-    void PreReplicatedRemove(const struct FRacingPlayerDistanceArray& InArray);
-};
-
-USTRUCT()
-struct FRacingPlayerDistanceArray : public FFastArraySerializer
-{
-    GENERATED_BODY()
-
-    UPROPERTY()
-    TArray<FRacingPlayerDistance> Items;
-
-    bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
-    {
-        return FFastArraySerializer::FastArrayDeltaSerialize<
-            FRacingPlayerDistance,
-            FRacingPlayerDistanceArray>(Items, DeltaParams, *this);
-    }
-};
-
-template<>
-struct TStructOpsTypeTraits<FRacingPlayerDistanceArray>
-    : public TStructOpsTypeTraitsBase2<FRacingPlayerDistanceArray>
-{
-    enum { WithNetDeltaSerializer = true };
 };
 
 UCLASS()
@@ -54,11 +25,10 @@ class TEAM9_PROJECT_API AT9_RacingGameState : public AT9_MiniGameStateBase
 public:
 	virtual void OnPhaseChanged(EMiniGamePhase NewPhase) override;
 
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-    void UpdatePlayerDistance(int32 PlayerId, int32 Distance);
+    virtual FText GetGameName() override;
 
 public:
-    UPROPERTY(Replicated)
-    FRacingPlayerDistanceArray PlayerDistances;
+    TArray<FRacingRanking> Ranking;
+
+    FText GameName = FText::FromString(TEXT("RacingGame"));
 };

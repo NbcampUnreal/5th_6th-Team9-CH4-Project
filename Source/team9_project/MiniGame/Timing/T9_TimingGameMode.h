@@ -18,7 +18,7 @@ public:
 
 	virtual void EndGame() override;
 
-	int32 Winner() ;
+	void Winner();
 
 	void OnTimeOver();
 

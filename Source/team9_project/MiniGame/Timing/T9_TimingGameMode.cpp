@@ -37,7 +37,8 @@ void AT9_TimingGameMode::EndGame()
 	Super::EndGame();
 	UE_LOG(LogTemp, Error, TEXT("TimingEndGame"));
 	GetWorld()->GetTimerManager().ClearTimer(TimeOverHandle);
-	UE_LOG(LogTemp, Error, TEXT("Winner3 %d"), Winner());
+	Winner();
+	UE_LOG(LogTemp, Error, TEXT("Winner3"));
 	//ResultWidget업데이트
 }
 
@@ -46,7 +47,7 @@ void AT9_TimingGameMode::OnTimeOver()
 	EndGame();
 }
 
-int32 AT9_TimingGameMode::Winner()
+void AT9_TimingGameMode::Winner()
 {
 	AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
 	int32 WinnerPlayer = 0;
@@ -66,5 +67,6 @@ int32 AT9_TimingGameMode::Winner()
 			UE_LOG(LogTemp, Error, TEXT("Winner"));
 		}
 	}
-	return WinnerPlayer;
+	GS->WinnerPlayer = WinnerPlayer;
+	return;
 }

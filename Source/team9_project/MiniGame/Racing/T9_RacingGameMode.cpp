@@ -1,5 +1,5 @@
 #include "MiniGame/Racing/T9_RacingGameMode.h"
-
+#include "MiniGame/Racing/T9_RacingGameState.h"
 
 AT9_RacingGameMode::AT9_RacingGameMode()
 {

@@ -29,7 +29,7 @@ void AT9_TimingGameState::AddPlayerPress(int32 PlayerId, float PressServerTime)
             return;
     }
 
-    float PressMs = float((PressServerTime - GameStartTime) * 1000.f);
+    float PressMs = float((PressServerTime - GameStartTime));
     float Delta = FMath::Abs(PressMs - TargetTime);
 
     Results.Add({ PlayerId, PressMs, Delta });
@@ -41,6 +41,11 @@ void AT9_TimingGameState::AddPlayerPress(int32 PlayerId, float PressServerTime)
         TargetTime,
         Delta,
         Results.Num());
+}
+
+FText AT9_TimingGameState::GetGameName()
+{
+    return GameName;
 }
 
 void AT9_TimingGameState::OnRep_Results()
