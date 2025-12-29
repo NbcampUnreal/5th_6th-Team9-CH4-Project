@@ -48,6 +48,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_CancelItemUse();
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_CycleTileTarget(bool bNext);
+	
 	// 내화면에만 움직이면 됌
 	void CameraKeyMoveHandle(const FInputActionValue&);
 	void CameraWheelHandle(const FInputActionValue&);

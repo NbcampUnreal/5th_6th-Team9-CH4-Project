@@ -11,7 +11,9 @@
 #include "Item/AimIndicatorActor.h"
 #include "Player/CameraPawn.h"
 #include "Player/PlayerCharacter.h"
-
+#include "Item/Effects/ItemEffectBase_TileTarget.h"
+#include "Tile/TileManagerActor.h"
+#include "Tile/Tile.h"
 
 UInventoryComponent::UInventoryComponent()
 {
@@ -70,6 +72,8 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 	DOREPLIFETIME(UInventoryComponent, CurrentControlledActor);
 	DOREPLIFETIME(UInventoryComponent, CurrentAimDirection);
 	DOREPLIFETIME(UInventoryComponent, CurrentAimIndicator);
+	DOREPLIFETIME(UInventoryComponent, CurrentUseType);
+	DOREPLIFETIME(UInventoryComponent, SelectedTileIndex);
 }
 
 void UInventoryComponent::SetMouseAimDirection(FVector Direction)
@@ -238,6 +242,7 @@ bool UInventoryComponent::UseItem(int32 SlotIndex)
 	CurrentItemID = ItemID;
 	CurrentUseContext.OwnerActor = GetOwner();
 	CurrentUseContext.OwnerInventory = this;
+	
 
 	// Effect 타입에 따라 분기
 	EItemUseType UseType = Effect->GetUseType();
@@ -256,6 +261,7 @@ bool UInventoryComponent::UseItem(int32 SlotIndex)
 		CurrentEffect = Effect;
 		CurrentEffect->StartUse(GetOwner());
 		bIsCurrentlyOperating = true;
+		CurrentUseType = UseType;
 
 		// DirectControl이면 ControlledActor 저장
 		UItemEffectBase_DirectControl* DirectControl = 
@@ -266,11 +272,19 @@ bool UInventoryComponent::UseItem(int32 SlotIndex)
 		}
 
 		// MouseAim이면 AimIndicator 스폰
-		UItemEffectBase_MouseAim* MouseAim = 
+		UItemEffectBase_MouseAim* MouseAim =
 			Cast<UItemEffectBase_MouseAim>(CurrentEffect);
 		if (MouseAim && AimIndicatorClass)
 		{
 			SpawnAimIndicator();
+		}
+
+		// Cho_SungMin - TileTarget이면 초기 SelectedTileIndex 설정
+		UItemEffectBase_TileTarget* TileTarget =
+			Cast<UItemEffectBase_TileTarget>(CurrentEffect);
+		if (TileTarget)
+		{
+			SelectedTileIndex = TileTarget->GetSelectedTileIndex();
 		}
 
 		OnItemUseStarted.Broadcast();
@@ -664,8 +678,10 @@ void UInventoryComponent::ClearCurrentEffect()
 	CurrentItemID = NAME_None;
 	CurrentUseContext = FItemUseContext();
 	bIsCurrentlyOperating = false;
-	CurrentControlledActor = nullptr; 
-	
+	CurrentControlledActor = nullptr;
+	CurrentUseType = EItemUseType::Instant;
+	SelectedTileIndex = 0;  // Cho_SungMin - 타일 선택 인덱스 리셋
+
 	DestroyAimIndicator();
 }
 // 직접 입력
@@ -696,4 +712,58 @@ void UInventoryComponent::Multicast_DrawDebugAttack_Implementation(FVector Cente
 		DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, 3.0f, 0, 2.0f);
 	}
 #endif
+}
+
+void UInventoryComponent::CycleTileTarget(bool bNext)
+{
+	if (!CurrentEffect) return;
+
+	UItemEffectBase_TileTarget* TileTargetEffect =
+		Cast<UItemEffectBase_TileTarget>(CurrentEffect);
+
+	if (TileTargetEffect)
+	{
+		if (bNext)
+		{
+			TileTargetEffect->CycleNextTile();
+		}
+		else
+		{
+			TileTargetEffect->CyclePrevTile();
+		}
+
+		// Cho_SungMin - Replicated 변수 업데이트 (클라이언트 카메라 추적용)
+		SelectedTileIndex = TileTargetEffect->GetSelectedTileIndex();
+	}
+}
+
+// Cho_SungMin - 타일 셀렉터 위치 반환 (카메라 추적용)
+// Replicated된 SelectedTileIndex를 사용하여 클라이언트에서도 동작
+FVector UInventoryComponent::GetTileSelectorLocation() const
+{
+	if (!bIsCurrentlyOperating || CurrentUseType != EItemUseType::TileTarget)
+	{
+		return FVector::ZeroVector;
+	}
+
+	// TileManager를 통해 타일 위치 계산 (클라이언트에서도 동작)
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return FVector::ZeroVector;
+	}
+
+	ATileManagerActor* TileManager = ATileManagerActor::Get(World);
+	if (!TileManager)
+	{
+		return FVector::ZeroVector;
+	}
+
+	ATile* SelectedTile = TileManager->GetTile(SelectedTileIndex);
+	if (SelectedTile)
+	{
+		return SelectedTile->GetActorLocation();
+	}
+
+	return FVector::ZeroVector;
 }

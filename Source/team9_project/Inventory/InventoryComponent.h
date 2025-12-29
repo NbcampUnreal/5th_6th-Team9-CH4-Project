@@ -74,6 +74,23 @@ public:
 	// AimIndicator 클래스 (BP 설정용)
 	UPROPERTY(EditDefaultsOnly, Category = "Item")
 	TSubclassOf<AAimIndicatorActor> AimIndicatorClass;
+	
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void CycleTileTarget(bool bNext);
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	EItemUseType CurrentUseType = EItemUseType::Instant;
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	EItemUseType GetCurrentUseType() const { return CurrentUseType; }
+
+	// Cho_SungMin - 선택된 타일 인덱스 (Replicated - 카메라 추적용)
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	int32 SelectedTileIndex = 0;
+
+	// Cho_SungMin - 타일 셀렉터 위치 반환 (카메라 추적용)
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	FVector GetTileSelectorLocation() const;
 	//========== 네트워크 RPC ==========
 
 	// 클라이언트 → 서버: 아이템 사용 요청

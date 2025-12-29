@@ -205,3 +205,40 @@ ATile* APlayerCharacter::GetCurrentTile()
 {
 	return CurrentTile;
 }
+
+// Cho_SungMin - 텔레포트 NetMulticast 구현
+void APlayerCharacter::MultiRPC_Teleport_Implementation(int32 TargetTileIndex)
+{
+	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+	if (!TileManager)
+	{
+		return;
+	}
+
+	ATile* TargetTile = TileManager->GetTile(TargetTileIndex);
+	if (!TargetTile)
+	{
+		return;
+	}
+
+	FVector TeleportLocation = TargetTile->GetActorLocation();
+	TeleportLocation.Z += 140.0f;
+
+	SetActorLocation(TeleportLocation);
+
+	// Cho_SungMin - 카메라도 텔레포트 위치로 이동
+	if (CameraPawn)
+	{
+		CameraPawn->SetActorLocation(FVector(TeleportLocation.X, TeleportLocation.Y, CameraPawn->GetActorLocation().Z));
+	}
+
+	if (HasAuthority())
+	{
+		CurrentTile = TargetTile;
+
+		if (MyPlayerState)
+		{
+			MyPlayerState->SetTileIndex(TargetTileIndex);
+		}
+	}
+}
