@@ -18,8 +18,7 @@
 
 ACameraPawn::ACameraPawn() :
 	ScreenSpeed(1500.f),
-	EdgeSize(50.f),
-	bisUsingItem(false)
+	EdgeSize(10.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -259,14 +258,14 @@ void ACameraPawn::RightClickHandle(const FInputActionValue& Value)
 
 void ACameraPawn::ItemUseStart()
 {
-	bisUsingItem = true;
+	GetPlayerCharacter()->bIsUsingItem = true;
 	// Cho_Sungmin
 	StateMachine->GetCurrentState()->ItemUse();
 }
 
 void ACameraPawn::ItemUseEnd()
 {
-	bisUsingItem = false;
+	GetPlayerCharacter()->bIsUsingItem = false;
 }
 
 bool ACameraPawn::GetIsUsingItem()
@@ -276,7 +275,7 @@ bool ACameraPawn::GetIsUsingItem()
 	{
 		return InventoryComponent->IsUsingItem();
 	}
-	return bisUsingItem;
+	return GetPlayerCharacter()->bIsUsingItem;
 }
 
 // Cho_Sungmin - InventoryComponent Getter
@@ -353,7 +352,7 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 	{
 		return;
 	}
-
+   
 	const FRotator YawRotation(0.f, GetActorRotation().Yaw, 0.f);
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);

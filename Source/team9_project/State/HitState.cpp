@@ -9,6 +9,9 @@ void UHitState::OnEnter()
 	UE_LOG(LogTemp, Warning, TEXT("HitState OnEnter"));
 	ElapsedTime = 0.f;
 	HitDuration = 2.f;
+
+	GetPlayerCharacter()->bIsHit = true;
+	UE_LOG(LogTemp, Warning, TEXT("bIsHit : true"));
 }
 
 void UHitState::OnUpdate(float DeltaTime)
@@ -29,6 +32,8 @@ void UHitState::OnUpdate(float DeltaTime)
 void UHitState::OnExit()
 {
 	UE_LOG(LogTemp, Warning, TEXT("HitState OnEnter"));
+	GetPlayerCharacter()->bIsHit = false;
+	UE_LOG(LogTemp, Warning, TEXT("bIsHit : false"));
 }
 
 bool UHitState::CanTakeDamage()
