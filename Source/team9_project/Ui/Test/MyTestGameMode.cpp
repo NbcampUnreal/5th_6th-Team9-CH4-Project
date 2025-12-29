@@ -9,7 +9,7 @@ void AMyTestGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
-    // ÀÎ°ÔÀÓ Á¢¼Ó ½Ã HUD À§Á¬À¸·Î ±³Ã¼ ¸í·É
+    // ï¿½Î°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ HUD ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½
     if (AMyPlayerController* PC = Cast<AMyPlayerController>(NewPlayer))
     {
         PC->Client_SetUIState(EGameUIState::InGame);
@@ -20,24 +20,24 @@ void AMyTestGameMode::ProcessDiceThrow(AMyPlayerController* Requester)
 {
     if (!Requester) return;
 
-    // ¼­¹ö ³­¼ö »ý¼º
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     int32 DiceResult = FMath::RandRange(1, 6);
 
-    // Å¬¶óÀÌ¾ðÆ®¿¡°Ô °á°ú Àü¼Û
-    Requester->Client_ReceiveDiceResult(DiceResult);
+    // Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    Requester->Client_ReceiveDiceResult(1, DiceResult);
 }
 
 void AMyTestGameMode::EndMatch()
 {
-    // 1. ¼­¹ö¿¡¼­ ¸ðµç ÇÃ·¹ÀÌ¾îÀÇ Á¡¼ö¸¦ ±â¹ÝÀ¸·Î ¼øÀ§ °è»ê
+    // 1. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     CalculateFinalResults();
 
-    // 2. ¸ðµç ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯¸¦ ¼øÈ¸ÇÏ¸ç °á°úÃ¢ Ç¥½Ã RPC È£Ãâ
+    // 2. ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ï¿½ï¿½ ï¿½ï¿½È¸ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½Ã¢ Ç¥ï¿½ï¿½ RPC È£ï¿½ï¿½
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AMyPlayerController* PC = Cast<AMyPlayerController>(It->Get()))
         {
-            // ¸ðµç Å¬¶óÀÌ¾ðÆ®°¡ °á°úÃ¢À» ¶ç¿ìµµ·Ï ¸ÖÆ¼Ä³½ºÆ® È£Ãâ
+            // ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½Ã¢ï¿½ï¿½ ï¿½ï¿½ìµµï¿½ï¿½ ï¿½ï¿½Æ¼Ä³ï¿½ï¿½Æ® È£ï¿½ï¿½
             PC->Multicast_ShowResult();
         }
     }
@@ -59,13 +59,13 @@ void AMyTestGameMode::CalculateFinalResults()
 
     if (PlayerStates.Num() == 0) return;
 
-    // Á¡¼ö ³ôÀº ¼øÀ¸·Î Á¤·Ä (³»¸²Â÷¼ø)
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
     PlayerStates.Sort([](const AMyPlayerState& A, const AMyPlayerState& B)
         {
-            return A.CurrentScore > B.CurrentScore;  // ³ôÀº Á¡¼ö°¡ 1À§
+            return A.CurrentScore > B.CurrentScore;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 1ï¿½ï¿½
         });
 
-    // ¼øÀ§ ºÎ¿©
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½
     for (int32 i = 0; i < PlayerStates.Num(); ++i)
     {
         PlayerStates[i]->FinalRank = i + 1;

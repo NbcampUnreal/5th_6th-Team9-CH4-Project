@@ -6,6 +6,11 @@
 #include "GameMode/Team9GameInstance.h"
 #include "Item/ItemSubsystem.h"
 #include "Item/Effects/ItemEffectBase.h"
+#include "Item/Effects/ItemEffectBase_DirectControl.h"
+#include "Item/Effects/ItemEffectBase_MouseAim.h"
+#include "Item/AimIndicatorActor.h"
+#include "Player/CameraPawn.h"
+#include "Player/PlayerCharacter.h"
 
 
 UInventoryComponent::UInventoryComponent()
@@ -18,7 +23,11 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializeSlots();
+	// 서버에서만 초기화 (클라이언트는 복제받음)
+	if (GetOwner() && GetOwner()->HasAuthority())
+	{
+		InitializeSlots();
+	}
 }
 
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -28,12 +37,13 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// 현재 사용 중인 Effect가 있으면 TickUse 호출
 	if (CurrentEffect)
 	{
+		
 		CurrentEffect->TickUse(DeltaTime);
 
 		// Effect가 타임아웃 등으로 스스로 종료되었는지 확인
 		if (!CurrentEffect->IsOperating())
 		{
-			UE_LOG(LogTemp, Log, TEXT("TickComponent: Effect stopped operating, cancelling"));
+			
 			HandleEffectCancelled();
 		}
 	}
@@ -56,9 +66,31 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 	DOREPLIFETIME_CONDITION_NOTIFY(UInventoryComponent, Slots, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME(UInventoryComponent, ActiveEffects);
 	DOREPLIFETIME(UInventoryComponent, bHasUsedItemThisTurn);
+	DOREPLIFETIME(UInventoryComponent, bIsCurrentlyOperating);
+	DOREPLIFETIME(UInventoryComponent, CurrentControlledActor);
+	DOREPLIFETIME(UInventoryComponent, CurrentAimDirection);
+	DOREPLIFETIME(UInventoryComponent, CurrentAimIndicator);
 }
 
+void UInventoryComponent::SetMouseAimDirection(FVector Direction)
+{
+	if (!CurrentEffect) return;
+    
+	UItemEffectBase_MouseAim* MouseAimEffect = 
+		Cast<UItemEffectBase_MouseAim>(CurrentEffect);
+    
+	if (MouseAimEffect)
+	{
+		MouseAimEffect->SetAimDirection(Direction);
+		CurrentAimDirection = Direction;
 
+		// AimIndicator 회전 업데이트
+		if (CurrentAimIndicator)
+		{
+			CurrentAimIndicator->SetAimDirection(Direction);
+		}
+	}
+}
 
 void UInventoryComponent::OnRep_ActiveEffects()
 {
@@ -67,7 +99,35 @@ void UInventoryComponent::OnRep_ActiveEffects()
 
 void UInventoryComponent::OnRep_Slots()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnRep_Slots called on client! Broadcasting OnInventoryUpdated"));
+	AActor* Owner = GetOwner();
+	UE_LOG(LogTemp, Warning, TEXT("OnRep_Slots - Owner: %s"), Owner ? *Owner->GetName() : TEXT("NULL"));
+    
+	if (!Owner) return;
+    
+	APawn* OwnerPawn = Cast<APawn>(Owner);
+	if (!OwnerPawn) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnRep_Slots - Not a Pawn"));
+		return;
+	}
+    
+	bool bIsLocal = OwnerPawn->IsLocallyControlled();
+	UE_LOG(LogTemp, Warning, TEXT("OnRep_Slots - Pawn: %s, IsLocallyControlled: %s"), 
+		*OwnerPawn->GetName(), bIsLocal ? TEXT("TRUE") : TEXT("FALSE"));
+    
+	if (!bIsLocal)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnRep_Slots - Skipping non-local"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("=== OnRep_Slots (Local Client) ==="));
+	for (int32 i = 0; i < Slots.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Slot[%d]: %s (Empty: %s)"), 
+			i, *Slots[i].ItemID.ToString(), Slots[i].IsEmpty() ? TEXT("Y") : TEXT("N"));
+	}
+    
 	OnInventoryUpdated.Broadcast(-1);
 }
 
@@ -155,9 +215,22 @@ bool UInventoryComponent::UseItem(int32 SlotIndex)
 		UE_LOG(LogTemp, Warning, TEXT("UseItem: Failed to create effect for %s"), *ItemID.ToString());
 		return false;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("=== UseItem Before Clear ==="));
+	for (int32 i = 0; i < Slots.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Slot[%d]: %s (Empty: %s)"), 
+			i, *Slots[i].ItemID.ToString(), Slots[i].IsEmpty() ? TEXT("Y") : TEXT("N"));
+	}
 
 	// 슬롯에서 아이템 제거
 	Slots[SlotIndex].Clear();
+
+	UE_LOG(LogTemp, Warning, TEXT("=== UseItem After Clear (SlotIndex: %d) ==="), SlotIndex);
+	for (int32 i = 0; i < Slots.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Slot[%d]: %s (Empty: %s)"), 
+			i, *Slots[i].ItemID.ToString(), Slots[i].IsEmpty() ? TEXT("Y") : TEXT("N"));
+	}
 	OnInventoryUpdated.Broadcast(SlotIndex);
 
 	// 아이템 사용 상태 설정
@@ -180,11 +253,27 @@ bool UInventoryComponent::UseItem(int32 SlotIndex)
 	}
 	else
 	{
-		// 조작형: StartUse 호출 후 대기
 		CurrentEffect = Effect;
 		CurrentEffect->StartUse(GetOwner());
+		bIsCurrentlyOperating = true;
+
+		// DirectControl이면 ControlledActor 저장
+		UItemEffectBase_DirectControl* DirectControl = 
+			Cast<UItemEffectBase_DirectControl>(CurrentEffect);
+		if (DirectControl)
+		{
+			CurrentControlledActor = DirectControl->GetControlledActor();
+		}
+
+		// MouseAim이면 AimIndicator 스폰
+		UItemEffectBase_MouseAim* MouseAim = 
+			Cast<UItemEffectBase_MouseAim>(CurrentEffect);
+		if (MouseAim && AimIndicatorClass)
+		{
+			SpawnAimIndicator();
+		}
+
 		OnItemUseStarted.Broadcast();
-		UE_LOG(LogTemp, Log, TEXT("UseItem: Started using %s (Type: %d)"), *ItemID.ToString(), (int32)UseType);
 	}
 
 	return true;
@@ -272,9 +361,45 @@ void UInventoryComponent::HandleEffectCancelled()
 	ClearCurrentEffect();
 }
 
+void UInventoryComponent::SpawnAimIndicator()
+{
+	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+	if (!AimIndicatorClass) return;
+
+	ACameraPawn* CameraPawn = Cast<ACameraPawn>(GetOwner());
+	AActor* FollowTarget = nullptr;
+	FVector SpawnLocation = GetOwner()->GetActorLocation();
+
+	if (CameraPawn && CameraPawn->GetPlayerCharacter())
+	{
+		FollowTarget = CameraPawn->GetPlayerCharacter();  
+		SpawnLocation = FollowTarget->GetActorLocation();
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = GetOwner();
+
+	CurrentAimIndicator = GetWorld()->SpawnActor<AAimIndicatorActor>(
+		AimIndicatorClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+
+	if (CurrentAimIndicator && FollowTarget)
+	{
+		CurrentAimIndicator->SetFollowTarget(FollowTarget);
+	}
+}
+
+void UInventoryComponent::DestroyAimIndicator()
+{
+	if (CurrentAimIndicator)
+	{
+		CurrentAimIndicator->Destroy();
+		CurrentAimIndicator = nullptr;
+	}
+}
+
 bool UInventoryComponent::IsUsingItem() const
 {
-	return CurrentEffect != nullptr;
+	return bIsCurrentlyOperating;
 }
 
 UItemEffectBase* UInventoryComponent::GetCurrentEffect() const
@@ -537,5 +662,37 @@ void UInventoryComponent::ClearCurrentEffect()
 	CurrentEffect = nullptr;
 	CurrentItemID = NAME_None;
 	CurrentUseContext = FItemUseContext();
+	bIsCurrentlyOperating = false;
+	CurrentControlledActor = nullptr; 
+	
+	DestroyAimIndicator();
+}
+// 직접 입력
+void UInventoryComponent::SetDirectControlInput(FVector2D Input)
+{
+	
+    
+	if (!CurrentEffect) return;
+    
+	UItemEffectBase_DirectControl* DirectControlEffect = 
+		Cast<UItemEffectBase_DirectControl>(CurrentEffect);
+    
+	
+    
+	if (DirectControlEffect)
+	{
+		DirectControlEffect->SetMoveInput(Input);
+		
+	}
 }
 
+void UInventoryComponent::Multicast_DrawDebugAttack_Implementation(FVector Center, float Radius, FVector Start, FVector End)
+{
+#if WITH_EDITOR
+	if (GetWorld())
+	{
+		DrawDebugSphere(GetWorld(), Center, Radius, 16, FColor::Red, false, 3.0f, 0, 2.0f);
+		DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, 3.0f, 0, 2.0f);
+	}
+#endif
+}

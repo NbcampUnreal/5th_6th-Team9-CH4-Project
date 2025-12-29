@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Tile/TileAction.h"
-#include "ServerTileAction.generated.h"
+#include "Tile/TileAction/TileAction.h"
+#include "ClientTileAction.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TEAM9_PROJECT_API UServerTileAction : public UTileAction
+class TEAM9_PROJECT_API UClientTileAction : public UTileAction
 {
 	GENERATED_BODY()
 	

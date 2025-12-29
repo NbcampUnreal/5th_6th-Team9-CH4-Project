@@ -97,10 +97,10 @@ void AMyPlayerController::Client_SetUIState_Implementation(EGameUIState NewState
     }
 }
 
-void AMyPlayerController::Client_ReceiveDiceResult_Implementation(int32 Result)
+void AMyPlayerController::Client_ReceiveDiceResult_Implementation(int32 PlayerNumber, int32 DiceNum)
 {
     // UI나 블루프린트에서 들을 수 있도록 델리게이트 브로드캐스트
-    OnDiceResultReceived.Broadcast(Result);
+    OnDiceResultReceived.Broadcast(PlayerNumber, DiceNum);
 }
 
 void AMyPlayerController::Multicast_ShowResult_Implementation()
@@ -136,6 +136,16 @@ void AMyPlayerController::SetupInputComponent()
         // R 키 눌렀을 때 결과 화면 강제 표시 (테스트용)
         InputComponent->BindKey(EKeys::R, IE_Pressed, this, &AMyPlayerController::TestShowResult);
     }
+}
+
+void AMyPlayerController::Client_ReceiveFirstOrder_Implementation(const TArray<int32>& PlayerNumbers, const TArray<int32>& DiceNums)
+{
+	OnFirstReady.Broadcast(PlayerNumbers, DiceNums);
+}
+
+void AMyPlayerController::Client_ReceiveTurnEndInfo_Implementation(const TArray<int32>& PlayerNumbers, const TArray<int32>& Scores)
+{
+	TurnEndInfo.Broadcast(PlayerNumbers, Scores);
 }
 
 void AMyPlayerController::TestShowResult()

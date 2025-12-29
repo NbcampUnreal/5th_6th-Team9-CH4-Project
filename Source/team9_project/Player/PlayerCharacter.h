@@ -55,14 +55,26 @@ public:
 private:
 	void UpdateMove();
 
-	
-
 public:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* MeshComp;
 
 	
 	int remainingMove;
+
+	// 애니메이션 상태용
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Anim")
+	bool bIsMoving;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Anim")
+	bool bIsUsingItem;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Anim")
+	bool bIsDie;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Anim")
+	bool bIsHit;
+
 
 private:
 	UPROPERTY(Replicated)
@@ -91,5 +103,5 @@ private:
 	// 타일 인덱스
 	int32 CurrentIndex;
 
-	bool bIsMoving;
+	bool bPlayerLeave;
 };

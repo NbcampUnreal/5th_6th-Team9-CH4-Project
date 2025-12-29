@@ -7,7 +7,9 @@
 void UItemEffectBase_DirectControl::StartUse(AActor* User)
 {
 	Super::StartUse(User);
-
+	bIsOperating = true; 
+	CurrentUser = User;   
+	ElapsedTime = 0.0f; 
 	ControlledActor = SpawnControlledActor(User);
 
 	if (ControlledActor)
@@ -25,6 +27,9 @@ void UItemEffectBase_DirectControl::StartUse(AActor* User)
 void UItemEffectBase_DirectControl::TickUse(float DeltaTime)
 {
 	Super::TickUse(DeltaTime);
+	 
+	   
+    
 	if (!bIsOperating)
 	{
 		return;
@@ -37,7 +42,6 @@ void UItemEffectBase_DirectControl::TickUse(float DeltaTime)
 	}
 
 	UpdateMovement(DeltaTime);
-
 }
 
 void UItemEffectBase_DirectControl::ExecuteEffect(AActor* User, const FItemUseContext& Context)
@@ -64,6 +68,7 @@ void UItemEffectBase_DirectControl::SetMoveInput(FVector2D Input)
 {
 	MoveInput.X = FMath::Clamp(Input.X, -1.0f, 1.0f);
 	MoveInput.Y = FMath::Clamp(Input.Y, -1.0f, 1.0f);
+	
 }
 
 AActor* UItemEffectBase_DirectControl::GetControlledActor() const
@@ -100,14 +105,20 @@ void UItemEffectBase_DirectControl::UpdateMovement(float DeltaTime)
 		return;
 	}
 
-	// MoveInput을 3D 벡터로 변환 (X=Forward, Y=Right)
+	// 이동 방향 계산
 	FVector MoveDelta = FVector(MoveInput.X, MoveInput.Y, 0.0f) * MoveSpeed * DeltaTime;
 
 	// 현재 위치 업데이트
 	CurrentLocation += MoveDelta;
-
-	// 액터 위치 업데이트
 	ControlledActor->SetActorLocation(CurrentLocation);
+
+	// 이동 방향으로 회전
+	FVector MoveDirection = FVector(MoveInput.X, MoveInput.Y, 0.0f).GetSafeNormal();
+	if (!MoveDirection.IsNearlyZero())
+	{
+		FRotator TargetRotation = MoveDirection.Rotation();
+		ControlledActor->SetActorRotation(TargetRotation);
+	}
 }
 
 bool UItemEffectBase_DirectControl::CheckTimeout()
