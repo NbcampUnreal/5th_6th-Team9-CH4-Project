@@ -68,14 +68,14 @@ void AMainGameMode::GameStart()
 	//1라운드(처음 시작)인 경우 진행 순서 정하고 준비를 기다린다.
 	if (CurrentRound <= 1)
 	{
-		WaitForReady();
+		//WaitForReady();
 		SetPlayerNumbersOrder();
 		
 		return;
 	}
 
 	//라운드 시작
-	NextPlayerTurn(true);
+	//NextPlayerTurn(true);
 }
 
 int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)

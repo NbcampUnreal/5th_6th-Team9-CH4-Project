@@ -106,6 +106,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UInputAction* CameraWheelAction;
 	
+	UPROPERTY(EditAnywhere)
+	UInputAction* CancelAction;     // Cho_SungMin ESC 취소
+	
 	// Cho_Sungmin - 인벤토리 위젯
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> InventoryWidgetClass;

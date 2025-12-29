@@ -27,6 +27,10 @@ public:
 
 	ATile* GetTile(int32 Index);
 
+	// Cho_SungMin - 전체 타일 수 반환
+	UFUNCTION(BlueprintCallable, Category = "Tile")
+	int32 GetTileCount() const;
+
 protected:
 
 

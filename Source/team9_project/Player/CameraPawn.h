@@ -44,7 +44,13 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPCRightClick();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_CancelItemUse();
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_CycleTileTarget(bool bNext);
+	
 	// 내화면에만 움직이면 됌
 	void CameraKeyMoveHandle(const FInputActionValue&);
 	void CameraWheelHandle(const FInputActionValue&);
@@ -53,9 +59,11 @@ public:
 	void LeftClickHandle(const FInputActionValue&);
 	void RightClickHandle(const FInputActionValue&);
 
-
-	void ItemUseStart();
-	void ItemUseEnd();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPCItemUseStart();
+	UFUNCTION(Server, Reliable)
+	void ServerRPCItemUseEnd();
 
 	// Cho_Sungmin - InventoryComponent 접근
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
@@ -95,7 +103,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_ConfirmItemUse();
 	
-
+	void CancelHandle(const FInputActionValue& Value);
 protected:
 	UPROPERTY()
 	USceneComponent* Root;

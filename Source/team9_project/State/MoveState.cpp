@@ -20,7 +20,7 @@ void UMoveState::OnEnter()
 
 	const int32 DiceNumber = GM->ThrowDice(GetPlayerCharacter()->GetPlayerState()->GetPlayerNumber());
 	UE_LOG(LogTemp, Warning, TEXT("ThrowDice : %d"), DiceNumber);
-	GetPlayerCharacter()->MoveToNextNode(DiceNumber);
+	GetPlayerCharacter()->MultiRPCMove(DiceNumber);
 }
 
 void UMoveState::OnUpdate(float DeltaTime)
