@@ -19,6 +19,7 @@ public:
 	UFUNCTION()
 	void OnReadyButtonClicked();
 
+	void SetGameNameText(const FText& NewText);
 
 public:
 	UPROPERTY(meta = (BindWidget))

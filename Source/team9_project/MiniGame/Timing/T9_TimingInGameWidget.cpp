@@ -4,6 +4,16 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 
+void UT9_TimingInGameWidget::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    if (StopButton)
+    {
+        StopButton->OnClicked.AddDynamic(this, &UT9_TimingInGameWidget::OnStopClicked);
+    }
+}
+
 void UT9_TimingInGameWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
@@ -22,7 +32,7 @@ void UT9_TimingInGameWidget::NativeTick(const FGeometry& MyGeometry, float InDel
 void UT9_TimingInGameWidget::OnStopClicked()
 {
     StopButton->SetIsEnabled(false);
-
+    UE_LOG(LogTemp, Log, TEXT("Click"));
     AT9_TimingGamePlayerController* PC = Cast<AT9_TimingGamePlayerController>(GetOwningPlayer());
 
     if (PC)

@@ -26,5 +26,4 @@ struct FItemUseContext
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector FinalLocation = FVector::ZeroVector;
-
 };
