@@ -7,8 +7,8 @@
 void UItemUseState::OnEnter()
 {
 	UE_LOG(LogTemp, Warning, TEXT("ItemUseState OnEnter"));
+
 	GetPlayerCharacter()->bIsUsingItem = true;
-	UE_LOG(LogTemp, Warning, TEXT("bIsUsingItem : true"));
 }
 
 void UItemUseState::OnUpdate(float DeltaTime)
@@ -22,9 +22,9 @@ void UItemUseState::OnUpdate(float DeltaTime)
 
 void UItemUseState::OnExit()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemUseState OnEnter"));
+	UE_LOG(LogTemp, Warning, TEXT("ItemUseState OnExit"));
+
 	GetPlayerCharacter()->bIsUsingItem = false;
-	UE_LOG(LogTemp, Warning, TEXT("bIsUsingItem : false"));
 }
 
 void UItemUseState::Move()

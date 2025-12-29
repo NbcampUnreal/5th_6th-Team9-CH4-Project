@@ -61,7 +61,8 @@ void ACameraPawn::BeginPlay()
 	}
 	
 	
-	
+	GetInventoryComponent()->OnItemUseStarted.AddDynamic(this, &ACameraPawn::ServerRPCItemUseStart);
+	GetInventoryComponent()->OnItemUseCancelled.AddDynamic(this, &ACameraPawn::ServerRPCItemUseEnd);
 }
 
 void ACameraPawn::PossessedBy(AController* NewControlle)
@@ -250,15 +251,15 @@ void ACameraPawn::RightClickHandle(const FInputActionValue& Value)
 	ServerRPCRightClick();
 }
 
-void ACameraPawn::ItemUseStart()
+void ACameraPawn::ServerRPCItemUseStart_Implementation()
 {
-	GetPlayerCharacter()->bIsUsingItem = true;
-	// Cho_Sungmin
+	UE_LOG(LogTemp, Warning, TEXT("ItemUseStart1111111111111111111111111111111"));
 	StateMachine->GetCurrentState()->ItemUse();
 }
 
-void ACameraPawn::ItemUseEnd()
+void ACameraPawn::ServerRPCItemUseEnd_Implementation()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ItemUseEnd222222222222222222222222222222"));
 	GetPlayerCharacter()->bIsUsingItem = false;
 }
 
@@ -292,6 +293,7 @@ bool ACameraPawn::UseItem(int32 SlotIndex)
 		// 조작형 아이템인 경우 ItemUseState로 전환
 		if (InventoryComponent->IsUsingItem())
 		{
+			UE_LOG(LogTemp, Warning, TEXT("ItemUseStart33333333333333333333333333"));
 			StateMachine->GetCurrentState()->ItemUse();
 		}
 	}

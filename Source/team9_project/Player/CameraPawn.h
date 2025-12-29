@@ -53,9 +53,11 @@ public:
 	void LeftClickHandle(const FInputActionValue&);
 	void RightClickHandle(const FInputActionValue&);
 
-
-	void ItemUseStart();
-	void ItemUseEnd();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPCItemUseStart();
+	UFUNCTION(Server, Reliable)
+	void ServerRPCItemUseEnd();
 
 	// Cho_Sungmin - InventoryComponent 접근
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
