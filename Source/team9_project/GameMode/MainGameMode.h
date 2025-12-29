@@ -17,12 +17,16 @@ public:
 	AMainGameMode();
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	
 public:
 	virtual void Logout(AController* Exiting) override;
 
+private:
+	//게임 시작
+	void GameStart();
+	
+public:
 	//주사위 굴리기 (턴 플레이어 체크, 모든 플레이어가 알 수 있음)
 	int32 ThrowDice(const int32 MyPlayerNumber);
 

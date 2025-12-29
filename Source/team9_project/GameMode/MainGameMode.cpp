@@ -15,10 +15,42 @@ AMainGameMode::AMainGameMode()
 	MaxRound = 5;
 }
 
-void AMainGameMode::BeginPlay()
+void AMainGameMode::OnPostLogin(AController* NewPlayer)
 {
-	Super::BeginPlay();
+	Super::OnPostLogin(NewPlayer);
+
+	AMyPlayerController* MyPlayerController = Cast<AMyPlayerController>(NewPlayer);
+	if (!IsValid(MyPlayerController))
+	{
+		return;
+	}
 	
+	AMyPlayerState* MyPlayerState = MyPlayerController->GetPlayerState<AMyPlayerState>();
+	if (IsValid(MyPlayerState))
+	{
+		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), MyPlayerController);
+	}
+
+	//4명이 들어오면 시작한다.
+	if (PlayersInGame.Num() < 4)
+	{
+		return;
+	}
+	GameStart();
+}
+
+void AMainGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	if (AMyPlayerState* MyPlayerState = Exiting->GetPlayerState<AMyPlayerState>())
+	{
+		PlayersInGame.Remove(MyPlayerState->GetPlayerNumber());
+	}
+}
+
+void AMainGameMode::GameStart()
+{	
 	if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
 	{
 		CurrentRound = GameInstance->GetCurrentRound();
@@ -43,33 +75,6 @@ void AMainGameMode::BeginPlay()
 
 	//라운드 시작
 	NextPlayerTurn(true);
-}
-
-void AMainGameMode::OnPostLogin(AController* NewPlayer)
-{
-	Super::OnPostLogin(NewPlayer);
-
-	AMyPlayerController* MyPlayerController = Cast<AMyPlayerController>(NewPlayer);
-	if (!IsValid(MyPlayerController))
-	{
-		return;
-	}
-	
-	AMyPlayerState* MyPlayerState = MyPlayerController->GetPlayerState<AMyPlayerState>();
-	if (IsValid(MyPlayerState))
-	{
-		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), MyPlayerController);
-	}
-}
-
-void AMainGameMode::Logout(AController* Exiting)
-{
-	Super::Logout(Exiting);
-
-	if (AMyPlayerState* MyPlayerState = Exiting->GetPlayerState<AMyPlayerState>())
-	{
-		PlayersInGame.Remove(MyPlayerState->GetPlayerNumber());
-	}
 }
 
 int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
