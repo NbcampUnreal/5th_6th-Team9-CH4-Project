@@ -37,7 +37,8 @@ void AT9_TimingGameMode::EndGame()
 	Super::EndGame();
 	UE_LOG(LogTemp, Error, TEXT("TimingEndGame"));
 	GetWorld()->GetTimerManager().ClearTimer(TimeOverHandle);
-	UE_LOG(LogTemp, Error, TEXT("Winner %d"), Winner());
+	Winner();
+	UE_LOG(LogTemp, Error, TEXT("Winner3"));
 	//ResultWidget업데이트
 }
 
@@ -46,21 +47,26 @@ void AT9_TimingGameMode::OnTimeOver()
 	EndGame();
 }
 
-int32 AT9_TimingGameMode::Winner()
+void AT9_TimingGameMode::Winner()
 {
 	AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
 	int32 WinnerPlayer = 0;
+	UE_LOG(LogTemp, Error, TEXT("Winner1 %d"), WinnerPlayer);
 	for (const FTimingPlayerResult& R : GS->Results)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Record %f"), R.DeltaMs);
 		if (R.DeltaMs < BestDeltaMs)
 		{
 			BestDeltaMs = R.DeltaMs;
 			WinnerPlayer = R.PlayerId;
+			UE_LOG(LogTemp, Error, TEXT("Winner2 %d"), WinnerPlayer);
 		}
 		else if (R.DeltaMs == BestDeltaMs)//동등한기록
 		{
 			//고민중
+			UE_LOG(LogTemp, Error, TEXT("Winner"));
 		}
 	}
-	return WinnerPlayer;
+	GS->WinnerPlayer = WinnerPlayer;
+	return;
 }

@@ -4,14 +4,17 @@
 #include "MiniGame/Timing/T9_TimingGameState.h"
 #include "MiniGame/Timing/T9_TimingGameMode.h"
 #include "MiniGame/Timing/T9_TimingInGameWidget.h"
+#include "Player/MyPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
 void AT9_TimingGamePlayerController::ServerRPC_StopTimer_Implementation()
 {
 	AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
 	if (!GS) return;
-
-	GS->AddPlayerPress(1, GetWorld()->GetTimeSeconds());//PlayerId Change
+	UE_LOG(LogTemp, Log,TEXT("StopTimer"));
+	AMyPlayerState* PS =GetPlayerState<AMyPlayerState>();
+	if (!PS) return;
+	GS->AddPlayerPress(PS->GetPlayerNumber(), GetWorld()->GetTimeSeconds());
 }
 
 void AT9_TimingGamePlayerController::BeginPlay()

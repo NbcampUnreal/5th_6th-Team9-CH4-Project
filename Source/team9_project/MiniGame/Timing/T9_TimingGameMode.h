@@ -18,16 +18,16 @@ public:
 
 	virtual void EndGame() override;
 
-	int32 Winner() ;
+	void Winner();
 
 	void OnTimeOver();
 
 public:
-	int32 TimerTime;
+	float TimerTime;
 
 	float StartServerTime;
 
 	FTimerHandle TimeOverHandle;
 
-	int32 BestDeltaMs;
+	float BestDeltaMs;
 };

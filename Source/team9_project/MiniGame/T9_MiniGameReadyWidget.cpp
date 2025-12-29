@@ -1,6 +1,8 @@
 #include "MiniGame/T9_MiniGameReadyWidget.h"
 #include "MiniGame/T9_MiniGamePlayerControllerBase.h"
+#include "MiniGame/T9_MiniGameStateBase.h"
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 
 void UT9_MiniGameReadyWidget::NativeConstruct()
 {
@@ -11,6 +13,11 @@ void UT9_MiniGameReadyWidget::NativeConstruct()
         ReadyButton->OnClicked.AddDynamic(this, &UT9_MiniGameReadyWidget::OnReadyButtonClicked);
         ReadyButton->SetIsEnabled(true);
     }
+
+    if (AT9_MiniGameStateBase* GS = GetWorld()->GetGameState<AT9_MiniGameStateBase>())
+    {
+        SetGameNameText(GS->GetGameName());
+    }
 }
 
 void UT9_MiniGameReadyWidget::OnReadyButtonClicked()
@@ -20,5 +27,13 @@ void UT9_MiniGameReadyWidget::OnReadyButtonClicked()
     {
         UE_LOG(LogTemp, Error, TEXT("ButtonClick"));
         PC->ServerRPCUpdatePlayerReady();
+    }
+}
+
+void UT9_MiniGameReadyWidget::SetGameNameText(const FText& NewText)
+{
+    if (GameName)
+    {
+        GameName->SetText(NewText);
     }
 }

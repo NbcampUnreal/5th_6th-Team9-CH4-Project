@@ -13,10 +13,10 @@ struct FTimingPlayerResult
     int32 PlayerId;
 
     UPROPERTY(BlueprintReadOnly)
-    int32 PressTimeMs;
+    float PressTimeMs;
 
     UPROPERTY(BlueprintReadOnly)
-    int32 DeltaMs;
+    float DeltaMs;
 };
 
 UCLASS()
@@ -34,13 +34,17 @@ public:
 
     void AddPlayerPress(int32 PlayerId, float PressServerTime);
 
+    virtual FText GetGameName() override;
+
 public:
     UPROPERTY(Replicated, BlueprintReadOnly)
-    int32 TargetTime;
+    float TargetTime;
 
     UPROPERTY(Replicated, BlueprintReadOnly)
     float GameStartTime;
 
     UPROPERTY(ReplicatedUsing = OnRep_Results, BlueprintReadOnly)
     TArray<FTimingPlayerResult> Results;
+
+    FText GameName = FText::FromString(TEXT("TimingGame"));
 };

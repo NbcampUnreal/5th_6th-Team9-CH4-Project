@@ -3,12 +3,13 @@
 #include "Tile/TileAction/ServerTileAction/DecreaseHPTileAction.h"
 #include "Player/PlayerCharacter.h"
 #include "Player/MyPlayerState.h"
+#include "Tile/Tile.h"
+#include "Kismet/GameplayStatics.h"
 
 void UDecreaseHPTileAction::Active(APlayerCharacter* PlayerCharacter) {
 	Super::Active(PlayerCharacter);
 
 	AMyPlayerState* PlayerState = Cast<AMyPlayerState>(PlayerCharacter->GetPlayerState());
-	UE_LOG(LogTemp, Warning, TEXT("Before HP : %d"), PlayerState->GetHP());
-	PlayerState->SetHP(PlayerState->GetHP() - Damage);
-	UE_LOG(LogTemp, Warning, TEXT("After HP : %d"), PlayerState->GetHP());
+	ATile* Tile = GetTypedOuter<ATile>();
+	UGameplayStatics::ApplyDamage(PlayerCharacter, Damage, nullptr, Tile, UDamageType::StaticClass());
 }
