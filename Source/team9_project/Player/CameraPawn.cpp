@@ -152,6 +152,12 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 				ETriggerEvent::Started,
 				this,
 				&ACameraPawn::CameraReturnHandle);
+			//ChoSungMin - 취소키
+			EIC->BindAction(
+	            MyPlayerController->CancelAction,
+	            ETriggerEvent::Started,
+	            this,
+	            &ACameraPawn::CancelHandle);
 		}
 	}
 }
@@ -482,4 +488,24 @@ void ACameraPawn::ServerRPCRightClick_Implementation()
 		this,
 		UDamageType::StaticClass()
 	);
+}
+
+void ACameraPawn::CancelHandle(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT: Cancel (ESC)"));
+    
+	// 아이템 사용 중이면 취소
+	if (InventoryComponent && InventoryComponent->IsUsingItem())
+	{
+		ServerRPC_CancelItemUse();
+		return;
+	}
+}
+
+void ACameraPawn::ServerRPC_CancelItemUse_Implementation()
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->CancelItemUse();
+	}
 }

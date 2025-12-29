@@ -24,7 +24,7 @@ void UInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// 서버에서만 초기화 (클라이언트는 복제받음)
-	if (GetOwner() && GetOwner()->HasAuthority())
+	if (Slots.Num() == 0)
 	{
 		InitializeSlots();
 	}
@@ -409,7 +409,8 @@ UItemEffectBase* UInventoryComponent::GetCurrentEffect() const
 
 FInventorySlot UInventoryComponent::GetSlot(int32 SlotIndex) const
 {
-	if (SlotIndex < 0 || SlotIndex >= Max_SLOTS)
+	// 배열이 비어있거나 범위 초과면 빈 슬롯 반환
+	if (Slots.Num() == 0 || SlotIndex < 0 || SlotIndex >= Slots.Num())
 	{
 		return FInventorySlot();
 	}

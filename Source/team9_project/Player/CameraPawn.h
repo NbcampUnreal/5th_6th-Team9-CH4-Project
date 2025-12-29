@@ -44,6 +44,9 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPCRightClick();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_CancelItemUse();
 
 	// 내화면에만 움직이면 됌
 	void CameraKeyMoveHandle(const FInputActionValue&);
@@ -95,7 +98,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_ConfirmItemUse();
 	
-
+	void CancelHandle(const FInputActionValue& Value);
 protected:
 	UPROPERTY()
 	USceneComponent* Root;
