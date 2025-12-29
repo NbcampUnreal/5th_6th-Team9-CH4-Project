@@ -5,6 +5,7 @@
 #include "MainGameMode.generated.h"
 
 class AMyPlayerController;
+enum class EEndType;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundEnd);
 
@@ -53,7 +54,7 @@ private:
 	void WaitForReady();
 
 	//점수에 따른 플레이어 순위 확인 및 각 클라이언트에게 전달
-	void CheckAndSendPlayerRank();
+	void CheckAndSendPlayerRank(EEndType EndType);
 	
 	//다음 플레이어 턴 시작
 	void NextPlayerTurn(bool bRoundStart);
