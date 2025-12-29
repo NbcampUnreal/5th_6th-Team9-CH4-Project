@@ -44,5 +44,5 @@ private:
 	int32 PlayerNumber;
 
 	//메인 게임 맵 이름
-	FName MAIN_GAME_MAP_NAME = TEXT("Main");
+	FName MAIN_GAME_MAP_NAME = TEXT("Tile");
 };
