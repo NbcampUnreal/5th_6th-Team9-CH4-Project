@@ -151,12 +151,13 @@ void APlayerCharacter::UpdateMove()
 		TArray<ATile*> NextTiles = TileManager->GetTile(CurrentIndex)->GetNextTiles();
 
 		CurrentIndex = NextTiles[0]->GetIndex();
-
+		
 		GetWorldTimerManager().ClearTimer(MoveTimerHandle);
 
 		remainingMove--;
 		if (remainingMove > 0) // 지나가는중
 		{
+			MyPlayerState->SetTileIndex(CurrentIndex);
 			TileManager->PlayerPassed(CurrentIndex, this);
 			UE_LOG(LogTemp, Warning, TEXT("PlayerPassed"));
 			MoveToNextNode(remainingMove);
