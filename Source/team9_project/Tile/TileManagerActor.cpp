@@ -20,11 +20,17 @@ ATile* ATileManagerActor::GetTile(int32 Index)
 {
 	ATile* Result = nullptr;
 
-	if (_Tiles[Index].IsValid())
+	if (Index >= 0 && Index < _Tiles.Num() && _Tiles[Index].IsValid())
 	{
 		Result = _Tiles[Index].Get();
 	}
 	return Result;
+}
+
+// Cho_SungMin - 전체 타일 수 반환
+int32 ATileManagerActor::GetTileCount() const
+{
+	return _Tiles.Num();
 }
 
 void ATileManagerActor::PlayerArrive_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)

@@ -52,6 +52,11 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiRPCMove(int DiceValue);
 
+	// Cho_SungMin - 텔레포트 (NetMulticast로 모든 클라이언트에서 위치 동기화)
+	// ATile*이 아닌 int32 TileIndex를 전달 (ATile은 서버/클라이언트가 각자 스폰하므로 포인터 공유 불가)
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRPC_Teleport(int32 TargetTileIndex);
+
 private:
 	void UpdateMove();
 

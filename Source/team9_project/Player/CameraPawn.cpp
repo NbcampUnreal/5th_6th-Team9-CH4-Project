@@ -15,6 +15,8 @@
 // Cho_Sungmin
 #include "Inventory/InventoryComponent.h"
 #include "Item/Effects/ItemEffectBase_DirectControl.h"
+#include "Item/Effects/ItemEffectBase.h"
+#include "Item/Data/ItemTypes.h"
 
 ACameraPawn::ACameraPawn() :
 	ScreenSpeed(1500.f),
@@ -78,9 +80,9 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 		if (InventoryComponent)
 		{
 			InventoryComponent->AddItem(FName("RCCar"));
-			InventoryComponent->AddItem(FName("BaseballBat"));
+			InventoryComponent->AddItem(FName("BrokenTeleporter"));
 			InventoryComponent->AddItem(FName("Shotgun"));
-			InventoryComponent->AddItem(FName("RCCar"));
+			InventoryComponent->AddItem(FName("Teleporter"));
 			UE_LOG(LogTemp, Warning, TEXT("ADDITEM for %s"), *GetName());
 		}
 	}
@@ -152,6 +154,12 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 				ETriggerEvent::Started,
 				this,
 				&ACameraPawn::CameraReturnHandle);
+			//ChoSungMin - 취소키
+			EIC->BindAction(
+	            MyPlayerController->CancelAction,
+	            ETriggerEvent::Started,
+	            this,
+	            &ACameraPawn::CancelHandle);
 		}
 	}
 }
@@ -336,12 +344,35 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 	const FVector2D ArrowInput = Value.Get<FVector2D>();
 	
 
-	// Cho_Sungmin 아이템 사용 중이면 서버로 입력 전달
+	// Cho_SungMin 아이템 사용 중이면
 	if (InventoryComponent && InventoryComponent->IsUsingItem())
 	{
-		UE_LOG(LogTemp, Warning, TEXT(">>> Sending to ServerRPC! Input: %s"), *ArrowInput.ToString());
-		ServerRPC_SetItemControlInput(ArrowInput);
-		return;
+		EItemUseType UseType = InventoryComponent->GetCurrentUseType();
+        
+		// DirectControl: WASD 이동
+		if (UseType == EItemUseType::DirectControl)
+		{
+			ServerRPC_SetItemControlInput(ArrowInput);
+			return;
+		}
+		// TileTarget: A/D로 타일 선택
+		else if (UseType == EItemUseType::TileTarget)
+		{
+			if (ArrowInput.Y > 0.5f)
+			{
+				ServerRPC_CycleTileTarget(true);
+			}
+			else if (ArrowInput.Y < -0.5f)
+			{
+				ServerRPC_CycleTileTarget(false);
+			}
+			return;
+		}
+		// MouseAim: 카메라 이동 막기
+		else if (UseType == EItemUseType::MouseAim)
+		{
+			return;
+		}
 	}
 	
 	if (ArrowInput.IsNearlyZero())
@@ -380,7 +411,18 @@ FVector ACameraPawn::GetItemCameraTargetLocation() const
 		return GetActorLocation();
 	}
 
-	// Replicated된 ControlledActor 사용
+	// Cho_SungMin - TileTarget 타입이면 타일 셀렉터 위치 사용
+	EItemUseType UseType = InventoryComponent->GetCurrentUseType();
+	if (UseType == EItemUseType::TileTarget)
+	{
+		FVector SelectorLocation = InventoryComponent->GetTileSelectorLocation();
+		if (!SelectorLocation.IsZero())
+		{
+			return SelectorLocation;
+		}
+	}
+
+	// DirectControl: Replicated된 ControlledActor 사용
 	AActor* ControlledActor = InventoryComponent->CurrentControlledActor;
 	if (ControlledActor)
 	{
@@ -483,4 +525,32 @@ void ACameraPawn::ServerRPCRightClick_Implementation()
 		this,
 		UDamageType::StaticClass()
 	);
+}
+
+void ACameraPawn::CancelHandle(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT: Cancel (ESC)"));
+    
+	// 아이템 사용 중이면 취소
+	if (InventoryComponent && InventoryComponent->IsUsingItem())
+	{
+		ServerRPC_CancelItemUse();
+		return;
+	}
+}
+
+void ACameraPawn::ServerRPC_CancelItemUse_Implementation()
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->CancelItemUse();
+	}
+}
+
+void ACameraPawn::ServerRPC_CycleTileTarget_Implementation(bool bNext)
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->CycleTileTarget(bNext);
+	}
 }

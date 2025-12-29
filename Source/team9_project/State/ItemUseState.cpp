@@ -14,7 +14,10 @@ void UItemUseState::OnEnter()
 void UItemUseState::OnUpdate(float DeltaTime)
 {
 	ACameraPawn* CP = Cast<ACameraPawn>(GetCameraPawn());
-	if (CP ->GetIsUsingItem())
+	if (!CP) return;
+    
+	// Cho_SungMin아이템 사용이 끝나면 Idle로
+	if (!CP->GetIsUsingItem())
 	{
 		GetStateMachine()->ChangeState(EStates::Idle);
 	}
