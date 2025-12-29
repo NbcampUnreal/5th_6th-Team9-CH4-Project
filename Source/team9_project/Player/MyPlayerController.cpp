@@ -140,12 +140,12 @@ void AMyPlayerController::SetupInputComponent()
 
 void AMyPlayerController::Client_ReceiveFirstOrder_Implementation(const TArray<int32>& PlayerNumbers, const TArray<int32>& DiceNums)
 {
-	OnFirstReady.Broadcast(PlayerNumbers, DiceNums);
+    OnFirstReady.Broadcast(PlayerNumbers, DiceNums);
 }
 
 void AMyPlayerController::Client_ReceiveTurnEndInfo_Implementation(const TArray<int32>& PlayerNumbers, const TArray<int32>& Scores)
 {
-	TurnEndInfo.Broadcast(PlayerNumbers, Scores);
+    TurnEndInfo.Broadcast(PlayerNumbers, Scores);
 }
 
 void AMyPlayerController::TestShowResult()
