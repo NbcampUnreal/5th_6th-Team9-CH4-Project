@@ -31,12 +31,14 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 }
 
 void APlayerCharacter::InitCharacter(ACameraPawn* InCameraPawn, AMyPlayerState* InPlyaerState)
 {
 	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::InitCharacter"));
 	CameraPawn = InCameraPawn;
+	SetOwner(CameraPawn);
 	MyPlayerState = InPlyaerState;
 }
 
@@ -69,36 +71,15 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), ActualDamage);
 
 	GetPlayerState()->SetHP(FMath::Clamp(GetPlayerState()->GetHP() - (int)ActualDamage, 0, GetPlayerState()->GetMaxHP()));
-	UE_LOG(LogTemp, Warning, TEXT("Current HP : %d"), GetPlayerState()->GetHP());
 
 	return ActualDamage;
 }
 
 void APlayerCharacter::MoveToNextNode(int DiceValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("MoveToNextNode"));
-
-
-	MultiRPCMove(DiceValue);
-
-}
-
-void APlayerCharacter::SetCharacterPosition()
-{
-	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
-	CurrentIndex = MyPlayerState->GetTileIndex();
-	ATile* Tile = TileManager->GetTile(CurrentIndex);
-
-	SetActorLocation(Tile->GetActorLocation());
-}
-
-void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
-{
 	remainingMove = DiceValue;
-
 	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
 	CurrentIndex = MyPlayerState->GetTileIndex();
-	UE_LOG(LogTemp, Warning, TEXT("CurrentTileIndex : %d"), MyPlayerState->GetTileIndex());
 
 	ATile* Tile = TileManager->GetTile(CurrentIndex);
 	if (IsValid(Tile))
@@ -122,7 +103,6 @@ void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
 	if (bPlayerLeave == false)
 	{
 		TileManager->PlayerLeave(CurrentIndex, this);
-		UE_LOG(LogTemp, Warning, TEXT("PlayerLeave"));
 	}
 
 	bPlayerLeave = true;
@@ -135,6 +115,20 @@ void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
 		0.01f,
 		true
 	);
+}
+
+void APlayerCharacter::SetCharacterPosition()
+{
+	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+	CurrentIndex = MyPlayerState->GetTileIndex();
+	ATile* Tile = TileManager->GetTile(CurrentIndex);
+
+	SetActorLocation(Tile->GetActorLocation());
+}
+
+void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
+{
+	MoveToNextNode(DiceValue);
 }
 
 void APlayerCharacter::UpdateMove()
@@ -151,27 +145,20 @@ void APlayerCharacter::UpdateMove()
 		TArray<ATile*> NextTiles = TileManager->GetTile(CurrentIndex)->GetNextTiles();
 
 		CurrentIndex = NextTiles[0]->GetIndex();
-
+		MyPlayerState->SetTileIndex(CurrentIndex);
 		GetWorldTimerManager().ClearTimer(MoveTimerHandle);
-
+		
 		remainingMove--;
 		if (remainingMove > 0) // 지나가는중
 		{
 			TileManager->PlayerPassed(CurrentIndex, this);
-			UE_LOG(LogTemp, Warning, TEXT("PlayerPassed"));
 			MoveToNextNode(remainingMove);
 		}
 		else // 도착
 		{
 			TileManager->PlayerArrive(CurrentIndex, this);
-			// playerState Index 저장
-			MyPlayerState->SetTileIndex(CurrentIndex);
-			UE_LOG(LogTemp, Warning, TEXT("EndTileIndex : %d"), MyPlayerState->GetTileIndex());
 			SetCurrentTile(NextTiles[0]);
-
 			bPlayerLeave = false;
-
-			UE_LOG(LogTemp, Warning, TEXT("PlayerArrive"));
 		}
 	}
 }
@@ -204,4 +191,41 @@ void APlayerCharacter::SetCurrentTile(ATile* TileNode)
 ATile* APlayerCharacter::GetCurrentTile()
 {
 	return CurrentTile;
+}
+
+// Cho_SungMin - 텔레포트 NetMulticast 구현
+void APlayerCharacter::MultiRPC_Teleport_Implementation(int32 TargetTileIndex)
+{
+	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
+	if (!TileManager)
+	{
+		return;
+	}
+
+	ATile* TargetTile = TileManager->GetTile(TargetTileIndex);
+	if (!TargetTile)
+	{
+		return;
+	}
+
+	FVector TeleportLocation = TargetTile->GetActorLocation();
+	TeleportLocation.Z += 140.0f;
+
+	SetActorLocation(TeleportLocation);
+
+	// Cho_SungMin - 카메라도 텔레포트 위치로 이동
+	if (CameraPawn)
+	{
+		CameraPawn->SetActorLocation(FVector(TeleportLocation.X, TeleportLocation.Y, CameraPawn->GetActorLocation().Z));
+	}
+
+	if (HasAuthority())
+	{
+		CurrentTile = TargetTile;
+
+		if (MyPlayerState)
+		{
+			MyPlayerState->SetTileIndex(TargetTileIndex);
+		}
+	}
 }

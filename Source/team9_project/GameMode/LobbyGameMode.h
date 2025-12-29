@@ -33,7 +33,7 @@ private:
 	FTimerHandle TimerHandleForStart;
 
 	//이 시간마다 준비 완료된 플레이어를 찾아 게임을 시작한다.
-	UPROPERTY(EditInstanceOnly, Category = "Game Start", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start", meta = (AllowPrivateAccess = true))
 	float StartGameDelay;
 	
 	//로비에 있는 플레이어 목록
@@ -44,5 +44,5 @@ private:
 	int32 PlayerNumber;
 
 	//메인 게임 맵 이름
-	FName MAIN_GAME_MAP_NAME = TEXT("Main");
+	FName MAIN_GAME_MAP_NAME = TEXT("Tile");
 };

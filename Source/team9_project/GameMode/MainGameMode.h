@@ -5,6 +5,7 @@
 #include "MainGameMode.generated.h"
 
 class AMyPlayerController;
+enum class EEndType;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundEnd);
 
@@ -17,12 +18,16 @@ public:
 	AMainGameMode();
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	
 public:
 	virtual void Logout(AController* Exiting) override;
 
+private:
+	//게임 시작
+	void GameStart();
+	
+public:
 	//주사위 굴리기 (턴 플레이어 체크, 모든 플레이어가 알 수 있음)
 	int32 ThrowDice(const int32 MyPlayerNumber);
 
@@ -49,7 +54,7 @@ private:
 	void WaitForReady();
 
 	//점수에 따른 플레이어 순위 확인 및 각 클라이언트에게 전달
-	void CheckAndSendPlayerRank();
+	void CheckAndSendPlayerRank(EEndType EndType);
 	
 	//다음 플레이어 턴 시작
 	void NextPlayerTurn(bool bRoundStart);
@@ -94,6 +99,10 @@ private:
 	//라운드 종료후 미니게임 시작시까지 지연 시간
 	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
 	float MiniGameWaitTime;
+
+	//게임 시작에 필요한 인원
+	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
+	int32 NeedPlayers;
 
 	//최대 라운드
 	UPROPERTY(EditDefaultsOnly, category = "Game Rule", meta = (allowPrivateAccess = true))

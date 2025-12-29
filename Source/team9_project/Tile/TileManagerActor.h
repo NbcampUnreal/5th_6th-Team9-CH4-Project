@@ -27,6 +27,10 @@ public:
 
 	ATile* GetTile(int32 Index);
 
+	// Cho_SungMin - 전체 타일 수 반환
+	UFUNCTION(BlueprintCallable, Category = "Tile")
+	int32 GetTileCount() const;
+
 protected:
 
 
@@ -40,19 +44,10 @@ private:
 	TArray<TWeakObjectPtr<ATile>> _Tiles;
 
 public:
-	UFUNCTION(Server, Reliable)
 	void PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter);
-
-	UFUNCTION(Server, Reliable)
 	void PlayerPassed(int32 TileIndex, APlayerCharacter* PlayerCharacter);
-
-	UFUNCTION(Server, Reliable)
 	void PlayerLeave(int32 TileIndex, APlayerCharacter* PlayerCharacter);
-
-	UFUNCTION(Server, Reliable)
 	void PlayerUseItem(int32 TileIndex, APlayerCharacter* PlayerCharacter);
-
-	UFUNCTION(Server, Reliable)
 	void PlayerRollDice(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 
 protected:
@@ -62,6 +57,21 @@ private:
 	void SpawnTiles();
 	void LinkTiles();
 	TArray<TWeakObjectPtr<ATile>> GetTilesByIndexes(TArray<int32>& Indexes) const ;
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_PlayerPassed(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_PlayerLeave(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_PlayerUseItem(int32 TileIndex, APlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_PlayerRollDice(int32 TileIndex, APlayerCharacter* PlayerCharacter);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticastRPC_PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter);
