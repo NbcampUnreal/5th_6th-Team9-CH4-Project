@@ -2,14 +2,21 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MinimapCameraActor.h"
 #include "GameHUDWidget.generated.h"
 
+class UUIManagerSubsystem;
+class APlayerController;
+class AMyPlayerState;
+class AMainGameMode;
+class ACameraPawn;
+class APlayerCharacter;
+class UInventoryComponent;
+class AMinimapCameraActor;
+
 class UButton;
-class UImage;
 class UProgressBar;
+class UImage;
 class UTextBlock;
-class UMaterialInstanceDynamic;
 
 UCLASS()
 class TEAM9_PROJECT_API UGameHUDWidget : public UUserWidget
@@ -18,23 +25,34 @@ class TEAM9_PROJECT_API UGameHUDWidget : public UUserWidget
 
 protected:
     virtual void NativeConstruct() override;
-
-    AMinimapCameraActor* FindMinimapCamera();
-
     virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-    // 버튼 클릭 핸들러
+    // 버튼 핸들러
     void OnDiceClicked();
-
     void OnItemUseClicked();
+    void OnInventoryClicked();
+    bool bIsInventoryOpen = false;
 
-public:
-    // HP 갱신 함수 (외부에서 호출 가능)
-    UFUNCTION(BlueprintCallable, Category = "HUD")
+    // UI 업데이트 함수들
     void UpdateHP(float CurrentHp, float MaxHp);
+    void UpdateHPFromPlayerState();
+    void UpdateTurnUI();
 
-    // 미니맵 마커 갱신
+    // 미니맵 관련
+    AMinimapCameraActor* FindMinimapCamera();
     void UpdatePlayerMarkers();
+
+private:
+    // 캐싱된 객체들
+    AMyPlayerState* MyPlayerState = nullptr;
+    UInventoryComponent* InventoryComponent = nullptr;
+
+    // 미니맵 월드 범위 (에디터에서 조정 가능하게 UPROPERTY로 변경 추천)
+    float WorldMapMinX = -5000.0f;
+    float WorldMapMaxX = 5000.0f;
+    float WorldMapMinY = -5000.0f;
+    float WorldMapMaxY = 5000.0f;
+    float MinimapSize = 200.0f;  // 미니맵 UMG 위젯 크기 (정사각형 기준)
 
 protected:
     // --- 버튼 바인딩 ---
@@ -43,6 +61,9 @@ protected:
 
     UPROPERTY(meta = (BindWidget))
     UButton* Btn_ItemUse;
+
+    UPROPERTY(meta = (BindWidget))
+    UButton* Btn_Inventory;
 
     // --- HP 바인딩 ---
     UPROPERTY(meta = (BindWidget))
@@ -67,14 +88,4 @@ protected:
 
     UPROPERTY(meta = (BindWidget))
     UImage* Img_PlayerMarker_3;
-
-private:
-    // 미니맵 월드 범위 (맵 크기에 맞게 조정)
-    float WorldMapMinX = -5000.0f;
-    float WorldMapMaxX = 5000.0f;
-    float WorldMapMinY = -5000.0f;
-    float WorldMapMaxY = 5000.0f;
-
-    // 미니맵 UMG 크기 (정사각형 기준)
-    float MinimapSize = 200.0f;
 };

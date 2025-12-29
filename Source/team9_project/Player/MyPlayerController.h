@@ -7,6 +7,7 @@
 #include "MyPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDiceResultReceived, int32, PlayerNumber, int32, DiceNum);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnFirstReady, TArray<int32>, PlayerNumbers, TArray<int32>, DiceNums);
 
 class UInputMappingContext;
 class UInputAction;
@@ -16,7 +17,7 @@ UCLASS()
 class TEAM9_PROJECT_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 public:
 	AMyPlayerController();
 
@@ -24,38 +25,41 @@ public:
 
 	virtual void BeginPlay() override;
 
-    void Server_RequestThrowDice_Implementation();
+	void Server_RequestThrowDice_Implementation();
 
 	//void IMCChange(Mode mode);
 
 	// 서버 주사위 요청 RPC
-    UFUNCTION(Server, Reliable)
-    void Server_RequestThrowDice();
+	UFUNCTION(Server, Reliable)
+	void Server_RequestThrowDice();
 
 	// UI 상태 변경 Client RPC
-    UFUNCTION(Client, Reliable)
-    void Client_SetUIState(EGameUIState NewState);
-	
-	// 주사위 결과 수신 Client RPC
-    UFUNCTION(Client, Reliable)
-    void Client_ReceiveDiceResult(int32 PlayerNumber, int32 DiceNum);
+	UFUNCTION(Client, Reliable)
+	void Client_SetUIState(EGameUIState NewState);
 
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_ShowResult();
+	// 주사위 결과 수신 Client RPC
+	UFUNCTION(Client, Reliable)
+	void Client_ReceiveDiceResult(int32 PlayerNumber, int32 DiceNum);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ShowResult();
 
 protected:
-    void TestShowResult();
+	void TestShowResult();
 
-    //TEST
-    virtual void SetupInputComponent() override;
+	//TEST
+	virtual void SetupInputComponent() override;
 
 public:
 
-    UPROPERTY()
-    AMinimapCameraActor* MinimapCamera;
+	UPROPERTY()
+	AMinimapCameraActor* MinimapCamera;
 
-    UPROPERTY(BlueprintAssignable, Category = "Dice")
-    FOnDiceResultReceived OnDiceResultReceived;
+	UPROPERTY(BlueprintAssignable, Category = "Dice")
+	FOnDiceResultReceived OnDiceResultReceived;
+
+	UPROPERTY(BlueprintAssignable, Category = "Dice")
+	FOnFirstReady OnFirstReady;
 
 	UPROPERTY()
 	UInputMappingContext* CurrentIMC;
@@ -77,4 +81,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* CameraWheelAction;
+
+	// Cho_Sungmin - 인벤토리 위젯
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> InventoryWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* InventoryWidget;
 };

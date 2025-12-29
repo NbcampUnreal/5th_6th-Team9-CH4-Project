@@ -7,124 +7,72 @@
 #include "PlayerCharacter.h"
 #include "Player/MyPlayerState.h"
 #include "Ui/ResultWidget.h"
-#include <Kismet/GameplayStatics.h>
 
 
 AMyPlayerController::AMyPlayerController()
 {
-	bReplicates = true;
+    bReplicates = true;
 
-	bShowMouseCursor = true;
-	//bEnableClickEvents = true;
-	//bEnableMouseOverEvents = true;
+    bShowMouseCursor = true;
+    //bEnableClickEvents = true;
+    //bEnableMouseOverEvents = true;
 
 }
 
 void AMyPlayerController::OnPossess(APawn* InPawn)
 {
-	Super::OnPossess(InPawn);
+    Super::OnPossess(InPawn);
 
-	UE_LOG(LogTemp, Warning, TEXT("Possessed: %s"), *GetNameSafe(InPawn));
+    UE_LOG(LogTemp, Warning, TEXT("Possessed: %s"), *GetNameSafe(InPawn));
 }
 
 void AMyPlayerController::BeginPlay()
 {
-	Super::BeginPlay();
-    //Dedicated Server에서는 미니맵 카메라 관련 로직 스킵
-    ENetMode NetMode = GetWorld()->GetNetMode();
-    if (NetMode == NM_DedicatedServer)
+    Super::BeginPlay();
+
+    // 내 클라에서만 실행?
+    if (!IsLocalController())
     {
-        UE_LOG(LogTemp, Warning, TEXT("[MyPlayerController] Dedicated Server detected - Skipping MinimapCamera spawn and input setup"));
         return;
     }
-	// 내 클라에서만 실행?
-	if (!IsLocalController())
-	{
-		return;
-	}
 
-	UE_LOG(LogTemp, Warning, TEXT("APlayerController::BeginPlay"));
+    UE_LOG(LogTemp, Warning, TEXT("APlayerController::BeginPlay"));
 
-	ULocalPlayer* LocalPlayer = GetLocalPlayer();
-    if (LocalPlayer)
+    ULocalPlayer* LocalPlayer = GetLocalPlayer();
+    UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem
+        = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+    EnhancedInputLocalPlayerSubsystem->AddMappingContext(BoardIMC, 0);
+    CurrentIMC = BoardIMC;
+
+    //UI_PART
+    UWorld* World = GetWorld();
+    if (!World) return;
+
+    // 이미 있으면 스폰 안 함
+    if (MinimapCamera) return;
+
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    MinimapCamera = World->SpawnActor<AMinimapCameraActor>(AMinimapCameraActor::StaticClass(), FVector(0, 0, 10000), FRotator(-90, 0, 0), SpawnParams);
+
+    if (MinimapCamera)
     {
-        UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-        if (Subsystem && BoardIMC)
+        MinimapCamera->CaptureComp->OrthoWidth = 12000.0f;  // 맵 크기
+        if (MinimapCamera->MinimapRT)
         {
-            Subsystem->AddMappingContext(BoardIMC, 0);
-            CurrentIMC = BoardIMC;
+            MinimapCamera->CaptureComp->TextureTarget = MinimapCamera->MinimapRT;
         }
     }
-    // 미니맵 카메라 스폰 (클라이언트에서만)
-    TArray<AActor*> FoundCameras;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMinimapCameraActor::StaticClass(), FoundCameras);
-    if (FoundCameras.Num() > 0)
+    // Cho_Sungmin - 인벤토리 위젯 생성
+    if (InventoryWidgetClass)
     {
-        MinimapCamera = Cast<AMinimapCameraActor>(FoundCameras[0]);
-        UE_LOG(LogTemp, Log, TEXT("[MyPlayerController] Found existing MinimapCamera"));
-    }
-    else
-    {
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.Owner = this;
-        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-        MinimapCamera = GetWorld()->SpawnActor<AMinimapCameraActor>(
-            AMinimapCameraActor::StaticClass(),
-            FVector(0, 0, 10000),
-            FRotator(-90, 0, 0),
-            SpawnParams
-        );
-
-        if (MinimapCamera)
+        InventoryWidget = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
+        if (InventoryWidget)
         {
-            MinimapCamera->CaptureComp->OrthoWidth = 12000.0f;
-
-            if (MinimapCamera->MinimapRT)
-            {
-                MinimapCamera->CaptureComp->TextureTarget = MinimapCamera->MinimapRT;
-                UE_LOG(LogTemp, Log, TEXT("[MyPlayerController] MinimapCamera spawned and configured"));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Warning, TEXT("[MyPlayerController] MinimapRT is null!"));
-            }
+            InventoryWidget->AddToViewport();
         }
     }
-	UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem
-		= LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-	EnhancedInputLocalPlayerSubsystem->AddMappingContext(BoardIMC, 0);
-	CurrentIMC = BoardIMC;
-
-	//UI_PART
-	UWorld* World = GetWorld();
-	if (!World) return;
-
-	// 이미 있으면 스폰 안 함
-	if (MinimapCamera) return;
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	MinimapCamera = World->SpawnActor<AMinimapCameraActor>(AMinimapCameraActor::StaticClass(), FVector(0, 0, 10000), FRotator(-90, 0, 0), SpawnParams);
-
-	if (MinimapCamera)
-	{
-		MinimapCamera->CaptureComp->OrthoWidth = 12000.0f;  // 맵 크기
-		if (MinimapCamera->MinimapRT)
-		{
-			MinimapCamera->CaptureComp->TextureTarget = MinimapCamera->MinimapRT;
-		}
-	}
-	// Cho_Sungmin - 인벤토리 위젯 생성
-	if (InventoryWidgetClass)
-	{
-		InventoryWidget = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
-		if (InventoryWidget)
-		{
-			InventoryWidget->AddToViewport();
-		}
-	}
 }
 // 모든 RPC는 뒤에 _Implementation을 붙여서 본체를 만듭니다.
 
@@ -134,7 +82,7 @@ void AMyPlayerController::Server_RequestThrowDice_Implementation()
     if (AMainGameMode* GM = GetWorld()->GetAuthGameMode<AMainGameMode>())
     {
         AMyPlayerState* Ps = GetPlayerState<AMyPlayerState>();
-        int32 Pn = Ps -> GetPlayerNumber();
+        int32 Pn = Ps->GetPlayerNumber();
         GM->ThrowDice(Pn);
     }
 }

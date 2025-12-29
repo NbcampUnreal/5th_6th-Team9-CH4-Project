@@ -11,5 +11,6 @@ enum class EGameUIState : uint8
     Lobby       UMETA(DisplayName = "Lobby"),
     GameOver    UMETA(DisplayName = "Game Over"),
     Pause       UMETA(DisplayName = "Pause"),
-    Result      UMETA(DisplayName = "Result")
+    Result      UMETA(DisplayName = "Result"),
+    Inventory   UMETA(DisplayName = "Inventory")
 };
