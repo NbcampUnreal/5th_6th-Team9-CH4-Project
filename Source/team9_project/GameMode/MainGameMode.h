@@ -23,10 +23,6 @@ protected:
 public:
 	virtual void Logout(AController* Exiting) override;
 
-	//(제거 예정)
-	UFUNCTION(meta = (DeprecatedFunction, DeprecationMessage = "Use ThrowDice(int8) instead."))
-	int32 ThrowDice(AController* Controller);
-
 	//주사위 굴리기 (턴 플레이어 체크, 모든 플레이어가 알 수 있음)
 	int32 ThrowDice(const int32 MyPlayerNumber);
 
