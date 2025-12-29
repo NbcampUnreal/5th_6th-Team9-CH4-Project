@@ -8,11 +8,16 @@
 void UItemEffectBase_MouseAim::StartUse(AActor* User)
 {
 	Super::StartUse(User);
-
+	bIsOperating = true;      
+	CurrentUser = User;       
+	ElapsedTime = 0.0f;       
 	AimDirection = FVector::ForwardVector;
 
 }
-
+void UItemEffectBase_MouseAim::SetAimDirection(FVector Direction)
+{
+	AimDirection = Direction.GetSafeNormal();
+}
 void UItemEffectBase_MouseAim::TickUse(float DeltaTime)
 {
 	Super::TickUse(DeltaTime);

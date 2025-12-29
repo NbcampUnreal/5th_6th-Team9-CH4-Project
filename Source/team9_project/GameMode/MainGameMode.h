@@ -33,6 +33,9 @@ public:
 	//주사위 굴리기 (무조건 굴림, 반환값만 존재)
 	int32 ThrowDice();
 
+	//턴 종료 요청
+	void RequestTurnEnd(const int32 RequestPlayerNum);
+
 	//지정한 플레이어의 턴인가
 	bool CheckPlayerTurn(const int32 MyPlayerNumber);
 
@@ -40,7 +43,7 @@ public:
 	bool UsingItem(const int32 MyPlayerNumber, const int32 InventoryIndex);
 
 	//현재 진행중인 턴인 플레이어 인덱스
-	int8 GetTurnPlayerNumber();
+	int32 GetTurnPlayerNumber();
 	
 private:
 	//플레이어 순서 정하기
@@ -48,6 +51,9 @@ private:
 
 	//게임 처음 시작시 각 플레이어의 준비를 기다린다.
 	void WaitForReady();
+
+	//점수에 따른 플레이어 순위 확인 및 각 클라이언트에게 전달
+	void CheckAndSendPlayerRank();
 	
 	//다음 플레이어 턴 시작
 	void NextPlayerTurn(bool bRoundStart);
@@ -64,9 +70,11 @@ private:
 	UPROPERTY()
 	TMap<int32, AMyPlayerController*> PlayersInGame;
 
-	//턴 진행 순서
-	UPROPERTY()
-	TArray<int32> OrderedPlayerNumbers;
+	//턴 진행 순서에 따라 정렬된 플레이어 번호
+	TArray<int32> TurnOrderedPlayerNums;
+
+	//점수에 따라 정렬된 플레이어 번호
+	TArray<int32> RankOrderedPlayerNums;
 
 	//제일 처음 준비를 기다릴 때 사용하는 타이머 핸들
 	FTimerHandle FirstReadyHandle;

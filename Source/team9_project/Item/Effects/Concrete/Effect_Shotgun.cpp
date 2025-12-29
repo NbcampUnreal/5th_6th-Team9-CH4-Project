@@ -6,40 +6,75 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacter.h"
 
 void UEffect_Shotgun::ExecuteEffect(AActor* User, const FItemUseContext& Context)
 {
 	Super::ExecuteEffect(User, Context);
 
-	if (!User || !User->GetWorld())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Effect_Shotgun: User or World is null"));
-		return;
-	}
+	if (!User || !User->GetWorld()) return;
 
-	// AimDirection 사용 (Context가 아닌 클래스 멤버 변수)
-	FVector BaseDirection = AimDirection.GetSafeNormal();
+    FVector BaseDirection = AimDirection.GetSafeNormal();
+    if (BaseDirection.IsNearlyZero()) return;
 
-	if (BaseDirection.IsNearlyZero())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Effect_Shotgun: AimDirection is zero"));
-		return;
-	}
+    FVector StartLocation = User->GetActorLocation();
+    StartLocation.Z += 50.0f;
 
-	// 부채꼴로 여러 총알 발사
-	for (int32 i = 0; i < BulletCount; ++i)
-	{
-		// 각 총알의 각도 계산 (-SpreadAngle ~ +SpreadAngle)
-		float Angle = FMath::Lerp(-SpreadAngle, SpreadAngle, (float)i / FMath::Max(1, BulletCount - 1));
+#if WITH_EDITOR
+    // 부채꼴 범위 디버그
+    for (int32 i = 0; i <= BulletCount; ++i)
+    {
+        float Angle = FMath::Lerp(-SpreadAngle, SpreadAngle, (float)i / FMath::Max(1, BulletCount));
+        FVector RotatedDirection = BaseDirection.RotateAngleAxis(Angle, FVector::UpVector);
+        FVector EndPoint = StartLocation + RotatedDirection * Range;
+        
+        DrawDebugLine(
+            User->GetWorld(),
+            StartLocation,
+            EndPoint,
+            FColor::Orange,
+            false,
+            3.0f,
+            0,
+            2.0f
+        );
+    }
+    
+    // 부채꼴 호(Arc) 그리기
+    int32 ArcSegments = 16;
+    for (int32 i = 0; i < ArcSegments; ++i)
+    {
+        float Angle1 = FMath::Lerp(-SpreadAngle, SpreadAngle, (float)i / ArcSegments);
+        float Angle2 = FMath::Lerp(-SpreadAngle, SpreadAngle, (float)(i + 1) / ArcSegments);
+        
+        FVector Dir1 = BaseDirection.RotateAngleAxis(Angle1, FVector::UpVector);
+        FVector Dir2 = BaseDirection.RotateAngleAxis(Angle2, FVector::UpVector);
+        
+        FVector Point1 = StartLocation + Dir1 * Range;
+        FVector Point2 = StartLocation + Dir2 * Range;
+        
+        DrawDebugLine(
+            User->GetWorld(),
+            Point1,
+            Point2,
+            FColor::Orange,
+            false,
+            3.0f,
+            0,
+            2.0f
+        );
+    }
+#endif
 
-		// 각도만큼 방향 회전
-		FVector RotatedDirection = BaseDirection.RotateAngleAxis(Angle, FVector::UpVector);
+    // 기존 총알 발사 로직
+    for (int32 i = 0; i < BulletCount; ++i)
+    {
+        float Angle = FMath::Lerp(-SpreadAngle, SpreadAngle, (float)i / FMath::Max(1, BulletCount - 1));
+        FVector RotatedDirection = BaseDirection.RotateAngleAxis(Angle, FVector::UpVector);
+        FireBullet(User, RotatedDirection);
+    }
 
-		// 총알 발사
-		FireBullet(User, RotatedDirection);
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("Effect_Shotgun: %s fired %d bullets"), *User->GetName(), BulletCount);
+    UE_LOG(LogTemp, Log, TEXT("Effect_Shotgun: %s fired %d bullets"), *User->GetName(), BulletCount);
 }
 
 void UEffect_Shotgun::FireBullet(AActor* User, const FVector& Direction)
@@ -89,14 +124,21 @@ void UEffect_Shotgun::FireBullet(AActor* User, const FVector& Direction)
 	{
 		AActor* HitActor = HitResult.GetActor();
 
+		// PlayerCharacter만 타격
+		APlayerCharacter* TargetPlayer = Cast<APlayerCharacter>(HitActor);
+		if (!TargetPlayer)
+		{
+			return;
+		}
+
 		UGameplayStatics::ApplyDamage(
-			HitActor,
+			TargetPlayer,
 			DamagePerBullet,
 			User->GetInstigatorController(),
 			User,
 			nullptr
 		);
 
-		UE_LOG(LogTemp, Log, TEXT("Effect_Shotgun: Hit %s for %.0f damage"), *HitActor->GetName(), DamagePerBullet);
+		UE_LOG(LogTemp, Log, TEXT("Effect_Shotgun: Hit %s for %.0f damage"), *TargetPlayer->GetName(), DamagePerBullet);
 	}
 }

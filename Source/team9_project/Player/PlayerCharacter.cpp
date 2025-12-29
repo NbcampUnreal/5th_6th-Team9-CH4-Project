@@ -17,7 +17,10 @@ APlayerCharacter::APlayerCharacter() :
 	MoveDuration(0.f),
 	MoveElapsed(0.f),
 	remainingMove(0),
-	bIsMoving(false)
+	bIsMoving(false),
+	bIsUsingItem(false),
+	bIsDie(false),
+	bIsHit(false)
 {
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = false;
@@ -49,6 +52,10 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 	DOREPLIFETIME(APlayerCharacter, CameraPawn);
 	DOREPLIFETIME(APlayerCharacter, MyPlayerState);
 	DOREPLIFETIME(APlayerCharacter, CurrentTile);
+	DOREPLIFETIME(APlayerCharacter, bIsMoving);
+	DOREPLIFETIME(APlayerCharacter, bIsUsingItem);
+	DOREPLIFETIME(APlayerCharacter, bIsDie);
+	DOREPLIFETIME(APlayerCharacter, bIsHit);
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -112,13 +119,13 @@ void APlayerCharacter::MultiRPCMove_Implementation(int DiceValue)
 	MoveDuration = Distance / MoveSpeed;
 	MoveElapsed = 0.f;
 
-	if (bIsMoving == false)
+	if (bPlayerLeave == false)
 	{
 		TileManager->PlayerLeave(CurrentIndex, this);
 		UE_LOG(LogTemp, Warning, TEXT("PlayerLeave"));
 	}
 
-	bIsMoving = true;
+	bPlayerLeave = true;
 
 	// 0.01초 간격으로 이동 업데이트
 	GetWorldTimerManager().SetTimer(
@@ -136,7 +143,7 @@ void APlayerCharacter::UpdateMove()
 
 	float Alpha = FMath::Clamp(MoveElapsed / MoveDuration, 0.f, 1.f);
 	FVector NewLocation = FMath::Lerp(MoveStart, MoveTarget, Alpha);
-	SetActorLocation(FVector(NewLocation.X, NewLocation.Y, NewLocation.Z + 46));
+	SetActorLocation(FVector(NewLocation.X, NewLocation.Y, NewLocation.Z + 140));
 
 	if (Alpha >= 1.f)
 	{  
@@ -162,7 +169,7 @@ void APlayerCharacter::UpdateMove()
 			UE_LOG(LogTemp, Warning, TEXT("EndTileIndex : %d"), MyPlayerState->GetTileIndex());
 			SetCurrentTile(NextTiles[0]);
 
-			bIsMoving = false;
+			bPlayerLeave = false;
 
 			UE_LOG(LogTemp, Warning, TEXT("PlayerArrive"));
 		}
@@ -173,6 +180,7 @@ bool APlayerCharacter::OnDie()
 {
 	if (MyPlayerState->GetHP() <= 0)
 	{
+		bIsDie = true;
 		return true;
 	}
 	return false;
