@@ -33,6 +33,14 @@ void AT9_TimingGameState::AddPlayerPress(int32 PlayerId, float PressServerTime)
     int32 Delta = FMath::Abs(PressMs - TargetTime);
 
     Results.Add({ PlayerId, PressMs, Delta });
+
+    UE_LOG(LogTemp, Log,
+        TEXT("[AddPlayerPress] Player=%d PressMs=%d Target=%d Delta=%d ResultsCount=%d"),
+        PlayerId,
+        PressMs,
+        TargetTime,
+        Delta,
+        Results.Num());
 }
 
 void AT9_TimingGameState::OnRep_Results()

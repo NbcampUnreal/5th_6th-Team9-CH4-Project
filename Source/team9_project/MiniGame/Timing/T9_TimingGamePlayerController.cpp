@@ -10,7 +10,7 @@ void AT9_TimingGamePlayerController::ServerRPC_StopTimer_Implementation()
 {
 	AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
 	if (!GS) return;
-
+	UE_LOG(LogTemp, Log,TEXT("StopTimer"));
 	GS->AddPlayerPress(1, GetWorld()->GetTimeSeconds());//PlayerId Change
 }
 

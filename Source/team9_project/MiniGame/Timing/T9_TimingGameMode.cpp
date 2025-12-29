@@ -50,16 +50,20 @@ int32 AT9_TimingGameMode::Winner()
 {
 	AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
 	int32 WinnerPlayer = 0;
+	UE_LOG(LogTemp, Error, TEXT("Winner %d"), WinnerPlayer);
 	for (const FTimingPlayerResult& R : GS->Results)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Record %d"), R.DeltaMs);
 		if (R.DeltaMs < BestDeltaMs)
 		{
+			UE_LOG(LogTemp, Error, TEXT("Winner %d"), WinnerPlayer);
 			BestDeltaMs = R.DeltaMs;
 			WinnerPlayer = R.PlayerId;
 		}
 		else if (R.DeltaMs == BestDeltaMs)//동등한기록
 		{
 			//고민중
+			UE_LOG(LogTemp, Error, TEXT("Winner"));
 		}
 	}
 	return WinnerPlayer;
