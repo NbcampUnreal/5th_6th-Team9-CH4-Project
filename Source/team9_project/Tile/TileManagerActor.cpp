@@ -27,7 +27,7 @@ ATile* ATileManagerActor::GetTile(int32 Index)
 	return Result;
 }
 
-void ATileManagerActor::PlayerArrive_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+void ATileManagerActor::ServerRPC_PlayerArrive_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
 {
 	if (HasAuthority() == false) return;
 
@@ -40,7 +40,7 @@ void ATileManagerActor::PlayerArrive_Implementation(int32 TileIndex, APlayerChar
 	}
 }
 
-void ATileManagerActor::PlayerPassed_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+void ATileManagerActor::ServerRPC_PlayerPassed_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
 {
 	if (HasAuthority() == false) return;
 
@@ -53,7 +53,7 @@ void ATileManagerActor::PlayerPassed_Implementation(int32 TileIndex, APlayerChar
 	}
 }
 
-void ATileManagerActor::PlayerLeave_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+void ATileManagerActor::ServerRPC_PlayerLeave_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
 {
 	if (HasAuthority() == false) return;
 
@@ -66,7 +66,7 @@ void ATileManagerActor::PlayerLeave_Implementation(int32 TileIndex, APlayerChara
 	}
 }
 
-void ATileManagerActor::PlayerUseItem_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+void ATileManagerActor::ServerRPC_PlayerUseItem_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
 {
 	if (HasAuthority() == false) return;
 
@@ -79,7 +79,7 @@ void ATileManagerActor::PlayerUseItem_Implementation(int32 TileIndex, APlayerCha
 	}
 }
 
-void ATileManagerActor::PlayerRollDice_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+void ATileManagerActor::ServerRPC_PlayerRollDice_Implementation(int32 TileIndex, APlayerCharacter* PlayerCharacter)
 {
 	if (HasAuthority() == false) return;
 
@@ -92,6 +92,66 @@ void ATileManagerActor::PlayerRollDice_Implementation(int32 TileIndex, APlayerCh
 	}
 }
 
+void ATileManagerActor::PlayerArrive(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	Tile->PlayerArrive(PlayerCharacter);
+
+	//IsServer
+	if (GetWorld() && GetWorld()->GetNetMode() != NM_DedicatedServer)
+	{
+		ServerRPC_PlayerArrive(TileIndex, PlayerCharacter);
+	}
+}
+
+void ATileManagerActor::PlayerPassed(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	Tile->PlayerPassed(PlayerCharacter);
+
+	//IsServer
+	if (GetWorld() && GetWorld()->GetNetMode() != NM_DedicatedServer)
+	{
+		ServerRPC_PlayerPassed(TileIndex, PlayerCharacter);
+	}
+}
+
+void ATileManagerActor::PlayerLeave(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	Tile->PlayerLeave(PlayerCharacter);
+
+	//IsServer
+	if (GetWorld() && GetWorld()->GetNetMode() != NM_DedicatedServer)
+	{
+		ServerRPC_PlayerLeave(TileIndex, PlayerCharacter);
+	}
+}
+
+void ATileManagerActor::PlayerUseItem(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	Tile->PlayerUseItem(PlayerCharacter);
+	
+	//IsServer
+	if (GetWorld() && GetWorld()->GetNetMode() != NM_DedicatedServer)
+	{
+		PlayerUseItem(TileIndex, PlayerCharacter);
+	}
+}
+
+void ATileManagerActor::PlayerRollDice(int32 TileIndex, APlayerCharacter* PlayerCharacter)
+{
+	ATile* Tile = GetTile(TileIndex);
+	Tile->PlayerRollDice(PlayerCharacter);
+
+	//IsServer
+	if (GetWorld() && GetWorld()->GetNetMode() != NM_DedicatedServer)
+	{
+		ServerRPC_PlayerRollDice(TileIndex, PlayerCharacter);
+	}
+}
+
 // Called when the game starts or when spawned
 void ATileManagerActor::BeginPlay()
 {
@@ -99,10 +159,11 @@ void ATileManagerActor::BeginPlay()
 	SpawnTiles();
 	LinkTiles();
 
-	if (IsValid(SingletonInstance.Get()) == false)
+	SingletonInstance = this;
+	/*if (IsValid(SingletonInstance.Get()) == false)
 	{
 		SingletonInstance = this;
-	}
+	}*/
 }
 
 void ATileManagerActor::SpawnTiles() {
