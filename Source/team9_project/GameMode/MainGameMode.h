@@ -101,13 +101,13 @@ private:
 	float MiniGameWaitTime;
 
 	//게임 시작에 필요한 인원
-	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
-	int32 NeedPlayers;
+	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true, ClampMin = 1, ClampMax = 6))
+	int16 NeedPlayers;
 
 	//최대 라운드
-	UPROPERTY(EditDefaultsOnly, category = "Game Rule", meta = (allowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, category = "Game Rule", meta = (allowPrivateAccess = true, ClampMin = 1, ClampMax = 50))
 	int16 MaxRound;
 
 	//미니게임 맵 목록
-	const TArray<FName> MiniGameMapNames = { TEXT("RapidInputRacingMinigame"), TEXT("TimingGame") };
+	const TArray<FString> MiniGameMapNames = { TEXT("RapidInputRacingMinigame"), TEXT("TimingGame") };
 };

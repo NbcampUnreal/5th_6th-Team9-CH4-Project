@@ -20,7 +20,7 @@ public:
 	virtual void Logout(AController* Exiting) override;
 
 	//이름 지정하기
-	void SetPlayerName(AController* Exiting, const FString& NewPlayerName);
+	void SetPlayerName(int32 TargetPlayerNumber, const FString& NewPlayerName);
 
 private:
 	//준비 완료된 플레이어 중 4명을 모아 게임 시작
@@ -35,6 +35,10 @@ private:
 	//이 시간마다 준비 완료된 플레이어를 찾아 게임을 시작한다.
 	UPROPERTY(EditDefaultsOnly, Category = "Game Start", meta = (AllowPrivateAccess = true))
 	float StartGameDelay;
+
+	//게임 시작에 필요한 인원
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start", meta = (allowPrivateAccess = true, ClampMin = 1, ClampMax = 6))
+	int16 NeedPlayers;
 	
 	//로비에 있는 플레이어 목록
 	UPROPERTY()
@@ -43,6 +47,6 @@ private:
 	//접속한 플레이어에게 부여할 번호
 	int32 PlayerNumber;
 
-	//메인 게임 맵 이름
-	FName MAIN_GAME_MAP_NAME = TEXT("Tile");
+	//메인 게임 맵 경로
+	FString MAIN_GAME_MAP_NAME = TEXT("Tile");
 };

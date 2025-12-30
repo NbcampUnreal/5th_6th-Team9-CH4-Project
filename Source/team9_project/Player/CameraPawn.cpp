@@ -132,22 +132,10 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 				&ACameraPawn::LeftClickHandle);
 
 			EIC->BindAction(
-				MyPlayerController->RightClickAction,
-				ETriggerEvent::Started,
-				this,
-				&ACameraPawn::RightClickHandle);
-
-			EIC->BindAction(
 				MyPlayerController->CameraKeyMoveAction,
 				ETriggerEvent::Triggered,
 				this,
 				&ACameraPawn::CameraKeyMoveHandle);
-
-			EIC->BindAction(
-				MyPlayerController->CameraWheelAction,
-				ETriggerEvent::Started,
-				this,
-				&ACameraPawn::CameraWheelHandle);
 
 			EIC->BindAction(
 				MyPlayerController->CameraReturnAction,
@@ -252,22 +240,13 @@ void ACameraPawn::LeftClickHandle(const FInputActionValue& Value)
 	ServerRPCLeftClick();
 }
 
-void ACameraPawn::RightClickHandle(const FInputActionValue& Value)
-{
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: RightClick"));
-
-	ServerRPCRightClick();
-}
-
 void ACameraPawn::ServerRPCItemUseStart_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemUseStart1111111111111111111111111111111"));
-	StateMachine->GetCurrentState()->ItemUse();
+	SetItemUseState();
 }
 
 void ACameraPawn::ServerRPCItemUseEnd_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemUseEnd222222222222222222222222222222"));
 	GetPlayerCharacter()->bIsUsingItem = false;
 }
 
@@ -279,6 +258,21 @@ bool ACameraPawn::GetIsUsingItem()
 		return InventoryComponent->IsUsingItem();
 	}
 	return GetPlayerCharacter()->bIsUsingItem;
+}
+
+void ACameraPawn::SetMoveState()
+{
+	StateMachine->GetCurrentState()->Move();
+}
+
+void ACameraPawn::SetHitState()
+{
+	StateMachine->GetCurrentState()->Hit();
+}
+
+void ACameraPawn::SetItemUseState()
+{
+	StateMachine->GetCurrentState()->ItemUse();
 }
 
 // Cho_Sungmin - InventoryComponent Getter
@@ -301,7 +295,6 @@ bool ACameraPawn::UseItem(int32 SlotIndex)
 		// 조작형 아이템인 경우 ItemUseState로 전환
 		if (InventoryComponent->IsUsingItem())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ItemUseStart33333333333333333333333333"));
 			StateMachine->GetCurrentState()->ItemUse();
 		}
 	}
@@ -480,51 +473,19 @@ void ACameraPawn::ServerRPC_ConfirmItemUse_Implementation()
 	}
 }
 
-void ACameraPawn::CameraWheelHandle(const FInputActionValue& Value)
-{
-	if (IsLocallyControlled() == false)
-	{
-		return;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraWheelHandle"));
-}
-
 void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 {
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraReturnHandle"));
-
 	if (PlayerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("CLIENT: PlayerCharacter not"));
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: PlayerCharacter"));
 	SetActorLocation(PlayerCharacter->GetActorLocation());
 }
 
-// 이동 테스트
 void ACameraPawn::ServerRPCLeftClick_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Sever : LeftClick"));
-
-	StateMachine->GetCurrentState()->Move();
-}
-
-// 공격받기 테스트
-void ACameraPawn::ServerRPCRightClick_Implementation()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Sever : RightClick"));
-
-	StateMachine->GetCurrentState()->Hit();
-
-	UGameplayStatics::ApplyDamage(
-		PlayerCharacter,
-		50.f,
-		nullptr,
-		this,
-		UDamageType::StaticClass()
-	);
+	SetMoveState();
 }
 
 void ACameraPawn::CancelHandle(const FInputActionValue& Value)
