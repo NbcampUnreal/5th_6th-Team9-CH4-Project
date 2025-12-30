@@ -51,12 +51,12 @@ void ALobbyGameMode::Logout(AController* Exiting)
 
 void ALobbyGameMode::SetPlayerName(int32 TargetPlayerNumber, const FString& NewPlayerName)
 {
-	if (!PlayersInLobby.Find(PlayerNumber))
+	if (!PlayersInLobby.Find(TargetPlayerNumber))
 	{
 		return;
 	}
 
-	AMyPlayerState* MyPlayerState = PlayersInLobby[PlayerNumber]->GetPlayerState<AMyPlayerState>();
+	AMyPlayerState* MyPlayerState = PlayersInLobby[TargetPlayerNumber]->GetPlayerState<AMyPlayerState>();
 	if (!IsValid(MyPlayerState))
 	{
 		return;
