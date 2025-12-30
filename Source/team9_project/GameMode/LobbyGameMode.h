@@ -35,6 +35,10 @@ private:
 	//이 시간마다 준비 완료된 플레이어를 찾아 게임을 시작한다.
 	UPROPERTY(EditDefaultsOnly, Category = "Game Start", meta = (AllowPrivateAccess = true))
 	float StartGameDelay;
+
+	//게임 시작에 필요한 인원
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start", meta = (allowPrivateAccess = true, ClampMin = 1, ClampMax = 6))
+	int16 NeedPlayers;
 	
 	//로비에 있는 플레이어 목록
 	UPROPERTY()
