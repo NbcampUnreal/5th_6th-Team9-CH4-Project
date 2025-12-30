@@ -147,7 +147,8 @@ void ULobbyWidget::OnActionClicked()
             if (AMyPlayerState* TestPS = Cast<AMyPlayerState>(PS))
             {
                 PlayerName = TestPS->DisplayName;  // ¶Ç´Â GetPlayerName()
-                TestPS->bIsReady = true;
+                //TestPS->bIsReady = true;
+                TestPS->SetReadyServerRPC();
             }
         }
         
@@ -155,3 +156,4 @@ void ULobbyWidget::OnActionClicked()
         //UISubsystem->StartHostGame(TEXT("/Game/KJH/Test/MainMap"), PlayerName);
     //}
 }
+
