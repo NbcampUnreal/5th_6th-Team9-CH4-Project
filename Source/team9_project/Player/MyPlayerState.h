@@ -43,8 +43,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_CallMainGameStart();
+	//UFUNCTION(Server, Reliable)
+	//void ServerRPC_CallMainGameStart();
 
 private:
 	UPROPERTY(Replicated)
