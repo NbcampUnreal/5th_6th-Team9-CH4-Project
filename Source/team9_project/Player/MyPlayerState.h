@@ -43,6 +43,9 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_CallMainGameStart();
+
 private:
 	int CurrentHp;
 
@@ -55,6 +58,9 @@ private:
 	//int32 PlayerNumber;
 
 public:
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_CallMainGameStart();
+
 	    // UI용 표시 이름 (복제로 모든 클라이언트에 전달됨)
     UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
     FString DisplayName;

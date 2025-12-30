@@ -33,7 +33,7 @@ void ALobbyGameMode::OnPostLogin(AController* NewPlayer)
 	PlayersInLobby.Add(NewNumber, NewPlayer);
 
 	//4인 이상이면 게임 시작
-	if (PlayersInLobby.Num() >= 4)
+	if (PlayersInLobby.Num() >= 2)
 	{
 		MainGameStart();
 	}
@@ -56,6 +56,7 @@ void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlaye
 
 void ALobbyGameMode::MainGameStart()
 {
+	UE_LOG(LogTemp, Error, TEXT("MainGameStart"));
 	//준비 완료된 4명의 플레이어를 찾는다.
 	TArray<AMyPlayerState*> LobbyPlayerStates;
 	for (auto PlayerInfo : PlayersInLobby)
@@ -65,11 +66,11 @@ void ALobbyGameMode::MainGameStart()
 		{
 			continue;
 		}
-		
+
 		if (MyPlayerState->bIsReady)
 		{
 			LobbyPlayerStates.Add(MyPlayerState);
-			if (LobbyPlayerStates.Num() >= 4)
+			if (LobbyPlayerStates.Num() >= 2)
 			{
 				break;
 			}
@@ -86,7 +87,7 @@ void ALobbyGameMode::MainGameStart()
 	{
 		GameInstance->PropertyInit();
 	}
-	
+
 	UGameplayStatics::OpenLevel(this, MAIN_GAME_MAP_NAME);
 }
 
@@ -96,6 +97,6 @@ int32 ALobbyGameMode::GivePlayerNumber()
 	{
 		PlayerNumber = 1;
 	}
-	
-	return PlayerNumber; 
+
+	return PlayerNumber;
 }

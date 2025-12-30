@@ -13,6 +13,9 @@ class TEAM9_PROJECT_API UUIManagerSubsystem : public UGameInstanceSubsystem
     GENERATED_BODY()
 
 public:
+    void Test();
+    void UpdateUIForCurrentMap();
+
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
     virtual void Deinitialize() override;
 
@@ -35,7 +38,11 @@ protected:
     UPROPERTY()
     UUserWidget* ActiveStateWidget = nullptr;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Settings")
     TMap<EGameUIState, TSubclassOf<UUserWidget>> UIWidgetMap;
+
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void ShowWidgetByPath(const FString& WidgetPath);
 
     UPROPERTY(EditAnywhere, Category = "Map to UI Mapping")
     TMap<FString, EGameUIState> MapKeywordToUIState;

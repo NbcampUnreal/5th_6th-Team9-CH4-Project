@@ -97,3 +97,7 @@ void AMyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ThisClass, CurrentScore);
 	DOREPLIFETIME(ThisClass, FinalRank);
 }
+//void AMyPlayerState::ServerRPC_CallMainGameStart_Implementation()
+//{
+//
+//}

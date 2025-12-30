@@ -4,14 +4,13 @@
 #include "Blueprint/UserWidget.h"
 #include "GameHUDWidget.generated.h"
 
-class UUIManagerSubsystem;
-class APlayerController;
 class AMyPlayerState;
 class AMainGameMode;
 class ACameraPawn;
 class APlayerCharacter;
 class UInventoryComponent;
 class AMinimapCameraActor;
+class AMyPlayerController;
 
 class UButton;
 class UProgressBar;
@@ -23,39 +22,48 @@ class TEAM9_PROJECT_API UGameHUDWidget : public UUserWidget
 {
     GENERATED_BODY()
 
-protected:
+public:
     virtual void NativeConstruct() override;
     virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+    // 델리게이트 핸들러 (턴 순서 및 라운드 종료 정보 수신)
+    void OnReceivedFirstOrder(const TArray<int32>& PlayerNumbers, const TArray<int32>& DiceNums);
+    void OnReceivedTurnEndInfo(const TArray<int32>& PlayerNumbers, const TArray<int32>& Scores);
+private:
     // 버튼 핸들러
     void OnDiceClicked();
     void OnItemUseClicked();
     void OnInventoryClicked();
-    bool bIsInventoryOpen = false;
 
-    // UI 업데이트 함수들
+    // UI 업데이트
     void UpdateHP(float CurrentHp, float MaxHp);
     void UpdateHPFromPlayerState();
     void UpdateTurnUI();
-
-    // 미니맵 관련
-    AMinimapCameraActor* FindMinimapCamera();
     void UpdatePlayerMarkers();
+    void UpdateTurnOrderDisplay(); // 턴 순서 표시 업데이트
+
+
+    AMinimapCameraActor* FindMinimapCamera();
 
 private:
-    // 캐싱된 객체들
+    // 캐싱된 객체
     AMyPlayerState* MyPlayerState = nullptr;
     UInventoryComponent* InventoryComponent = nullptr;
 
-    // 미니맵 월드 범위 (에디터에서 조정 가능하게 UPROPERTY로 변경 추천)
+    // 턴 순서 저장 (서버에서 받은 그대로)
+    TArray<int32> CurrentTurnOrder;
+
+    // 미니맵 변환용 상수
     float WorldMapMinX = -5000.0f;
     float WorldMapMaxX = 5000.0f;
     float WorldMapMinY = -5000.0f;
     float WorldMapMaxY = 5000.0f;
-    float MinimapSize = 200.0f;  // 미니맵 UMG 위젯 크기 (정사각형 기준)
+    float MinimapSize = 200.0f;
+
+    bool bIsInventoryOpen = false;
 
 protected:
-    // --- 버튼 바인딩 ---
+    // 기존 BindWidget
     UPROPERTY(meta = (BindWidget))
     UButton* Btn_Dice;
 
@@ -65,18 +73,15 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UButton* Btn_Inventory;
 
-    // --- HP 바인딩 ---
     UPROPERTY(meta = (BindWidget))
     UProgressBar* HP_Bar;
 
     UPROPERTY(meta = (BindWidget))
     UTextBlock* Text_PlayerHP;
 
-    // --- 미니맵 배경 ---
     UPROPERTY(meta = (BindWidget))
     UImage* Img_MinimapBackground;
 
-    // --- 플레이어 마커 (4명) ---
     UPROPERTY(meta = (BindWidget))
     UImage* Img_PlayerMarker_0;
 
@@ -88,4 +93,20 @@ protected:
 
     UPROPERTY(meta = (BindWidget))
     UImage* Img_PlayerMarker_3;
+
+    // 턴 순서 표시용
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* Text_TurnOrder1;
+
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* Text_TurnOrder2;
+
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* Text_TurnOrder3;
+
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* Text_TurnOrder4;
+
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* Text_CurrentTurn; // "현재 턴: X번 플레이어"
 };

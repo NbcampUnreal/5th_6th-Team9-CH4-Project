@@ -1,4 +1,5 @@
 #include "GameMode/Team9GameInstance.h"
+#include "Ui/UIManagerSubsystem.h"
 
 void UTeam9GameInstance::SetCurrentRound(int32 CurrentR)
 {
@@ -47,4 +48,22 @@ void UTeam9GameInstance::ClearPlayerData(int32 PlayerID)
 void UTeam9GameInstance::ClearAllPlayerData()
 {
 	PlayerDataMap.Empty();
+}
+void UTeam9GameInstance::Init()
+{
+	Super::Init();
+	if (UUIManagerSubsystem* UISubsystem = GetSubsystem<UUIManagerSubsystem>())
+	{
+		//UISubsystem->Test();
+	}
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UTeam9GameInstance::Callback_PostLoadMapWithWorld);
+
+}
+
+void UTeam9GameInstance::Callback_PostLoadMapWithWorld(UWorld* inWorld)
+{
+	if (UUIManagerSubsystem* UISubsystem = GetSubsystem<UUIManagerSubsystem>())
+	{
+		UISubsystem->Test();
+	}
 }

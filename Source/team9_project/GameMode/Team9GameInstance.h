@@ -11,6 +11,9 @@ class TEAM9_PROJECT_API UTeam9GameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	// 게임 시작 시 자동 실행 → UI 서브시스템에 위젯 등록
+	virtual void Init() override;
+	void Callback_PostLoadMapWithWorld(UWorld* inWorld);
 	void SetCurrentRound(int32 CurrentR);
 
 	int32 GetCurrentRound();
