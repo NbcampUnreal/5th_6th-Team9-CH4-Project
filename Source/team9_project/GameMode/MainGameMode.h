@@ -109,5 +109,5 @@ private:
 	int16 MaxRound;
 
 	//미니게임 맵 목록
-	const TArray<FName> MiniGameMapNames = { TEXT("RapidInputRacingMinigame"), TEXT("TimingGame") };
+	const TArray<FString> MiniGameMapNames = { TEXT("RapidInputRacingMinigame"), TEXT("TimingGame") };
 };

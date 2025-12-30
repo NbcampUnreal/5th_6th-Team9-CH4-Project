@@ -47,6 +47,6 @@ private:
 	//접속한 플레이어에게 부여할 번호
 	int32 PlayerNumber;
 
-	//메인 게임 맵 이름
-	FName MAIN_GAME_MAP_NAME = TEXT("Tile");
+	//메인 게임 맵 경로
+	FString MAIN_GAME_MAP_NAME = TEXT("Tile");
 };

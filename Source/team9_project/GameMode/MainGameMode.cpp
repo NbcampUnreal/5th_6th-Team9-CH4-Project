@@ -281,12 +281,10 @@ void AMainGameMode::MoveToMiniGameMap()
 
 	//잠시후 미니게임 시작
 	GetWorld()->GetTimerManager().SetTimer(WaitForMiniGameHandle, FTimerDelegate::CreateLambda([&]()
-		{
-			//TODO : 미니게임 시작 알림
-
-			//무작위 미니게임맵 하나 사용
-			int32 RandomIndex = FMath::RandRange(0, MiniGameMapNames.Num() - 1);
-			UGameplayStatics::OpenLevel(this, MiniGameMapNames[RandomIndex]);
-
-		}), MiniGameWaitTime, false);
+	{
+		//무작위 미니게임맵 하나 사용
+		int32 RandomIndex = FMath::RandRange(0, MiniGameMapNames.Num() - 1);
+		GetWorld()->ServerTravel(MiniGameMapNames[RandomIndex], true, true);
+		
+	}), MiniGameWaitTime, false);
 }
