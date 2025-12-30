@@ -31,12 +31,6 @@ void ALobbyGameMode::OnPostLogin(AController* NewPlayer)
 	}
 
 	PlayersInLobby.Add(NewNumber, NewPlayer);
-
-	//4인 이상이면 게임 시작
-	if (PlayersInLobby.Num() >= 4)
-	{
-		MainGameStart();
-	}
 }
 
 void ALobbyGameMode::Logout(AController* Exiting)
