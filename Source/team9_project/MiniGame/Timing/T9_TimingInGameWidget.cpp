@@ -20,14 +20,16 @@ void UT9_TimingInGameWidget::NativeTick(const FGeometry& MyGeometry, float InDel
     Super::NativeTick(MyGeometry, InDeltaTime);
 
     AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
-    if (!GS)
-    {
-        return;
-    }
-    float Elapsed = GetWorld()->GetTimeSeconds() - GS->GameStartTime;
-    float Remaining = (GS->TargetTime / 1000.f) - Elapsed;
+    if (!GS) return;
 
-    CountdownText->SetText(FText::AsNumber(FMath::Max(0.f, Remaining)));
+    float ElapsedSec = GetWorld()->GetTimeSeconds() - GS->GameStartTime;
+
+    int32 ElapsedMs = int32(ElapsedSec * 1000.f);
+    int32 RemainMs = FMath::Max(0, GS->TargetTimeMs - ElapsedMs);
+
+    float RemainSec = RemainMs / 1000.f;
+
+    CountdownText->SetText(FText::AsNumber(FMath::Max(0.f, RemainSec)));
 }
 
 void UT9_TimingInGameWidget::OnStopClicked()
@@ -38,7 +40,7 @@ void UT9_TimingInGameWidget::OnStopClicked()
 
     if (PC)
     {
-        PC->ServerRPC_StopTimer();
+        PC->ServerRPC_StopTimer(GetWorld()->GetTimeSeconds());
     }
 }
 
