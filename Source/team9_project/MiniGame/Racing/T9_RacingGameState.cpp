@@ -17,3 +17,13 @@ FText AT9_RacingGameState::GetGameName()
 {
     return GameName;
 }
+
+FText AT9_RacingGameState::GetGameDescription()
+{
+    return GameDescription;
+}
+
+UTexture2D* AT9_RacingGameState::GetGameTexture()
+{
+    return GameTexture;
+}

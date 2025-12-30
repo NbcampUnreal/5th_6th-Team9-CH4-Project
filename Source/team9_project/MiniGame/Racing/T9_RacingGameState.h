@@ -27,8 +27,17 @@ public:
 
     virtual FText GetGameName() override;
 
+    virtual FText GetGameDescription() override;
+
+    virtual UTexture2D* GetGameTexture() override;
+
 public:
     TArray<FRacingRanking> Ranking;
 
     FText GameName = FText::FromString(TEXT("RacingGame"));
+
+    FText GameDescription = FText::FromString(TEXT("RacingGameDescription"));
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+    TObjectPtr<UTexture2D> GameTexture;
 };

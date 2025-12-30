@@ -3,6 +3,7 @@
 #include "MiniGame/T9_MiniGameStateBase.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Components/Image.h"
 
 void UT9_MiniGameReadyWidget::NativeConstruct()
 {
@@ -17,6 +18,8 @@ void UT9_MiniGameReadyWidget::NativeConstruct()
     if (AT9_MiniGameStateBase* GS = GetWorld()->GetGameState<AT9_MiniGameStateBase>())
     {
         SetGameNameText(GS->GetGameName());
+        SetGameImageText(GS->GetGameTexture());
+        SetGameDescriptionText(GS->GetGameDescription());
     }
 }
 
@@ -35,5 +38,21 @@ void UT9_MiniGameReadyWidget::SetGameNameText(const FText& NewText)
     if (GameName)
     {
         GameName->SetText(NewText);
+    }
+}
+
+void UT9_MiniGameReadyWidget::SetGameImageText(UTexture2D* NewTexture)
+{
+    if (GameImage)
+    {
+        GameImage->SetBrushFromTexture(NewTexture);
+    }
+}
+
+void UT9_MiniGameReadyWidget::SetGameDescriptionText(const FText& NewText)
+{
+    if (GameDescription)
+    {
+        GameDescription->SetText(NewText);
     }
 }

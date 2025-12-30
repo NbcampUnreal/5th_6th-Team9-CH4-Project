@@ -48,6 +48,16 @@ FText AT9_TimingGameState::GetGameName()
     return GameName;
 }
 
+FText AT9_TimingGameState::GetGameDescription()
+{
+    return GameDescription;
+}
+
+UTexture2D* AT9_TimingGameState::GetGameTexture()
+{
+    return GameTexture;
+}
+
 void AT9_TimingGameState::OnRep_Results()
 {
     UWorld* World = GetWorld();

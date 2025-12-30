@@ -36,6 +36,10 @@ public:
 
     virtual FText GetGameName() override;
 
+    virtual FText GetGameDescription() override;
+
+    virtual UTexture2D* GetGameTexture() override;
+
 public:
     UPROPERTY(Replicated)
     float GameStartTime;
@@ -47,4 +51,9 @@ public:
     TArray<FTimingPlayerResult> Results;
 
     FText GameName = FText::FromString(TEXT("TimingGame"));
+
+    FText GameDescription = FText::FromString(TEXT("TimingGameDescription"));
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+    TObjectPtr<UTexture2D> GameTexture;
 };

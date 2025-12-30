@@ -54,14 +54,15 @@ public:
 
 	virtual FText GetGameName();
 
+	virtual FText GetGameDescription();
+
+	virtual UTexture2D* GetGameTexture();
+
 	void SetPhase(EMiniGamePhase NewPhase);
 
 public:
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerReady)
 	TArray<FMiniGamePlayerReady> PlayerReadys;
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UTexture2D> GameImage;
 
 	bool bInGame = false;
 
