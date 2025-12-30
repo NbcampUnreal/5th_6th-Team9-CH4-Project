@@ -25,7 +25,6 @@ void AT9_MiniGameModeBase::BeginPlay()
 			);
 		}
 	}
-	//UI최초 업데이트 리플리케이션 OnRep직접 호출해야함
 	SetPhase(EMiniGamePhase::Ready);
 }
 
@@ -77,6 +76,7 @@ void AT9_MiniGameModeBase::CheckStartGame()
 void AT9_MiniGameModeBase::ComeBackMainGame()
 {
 	UE_LOG(LogTemp, Error, TEXT("SeverTravel"));
+	GetWorld()->ServerTravel(TEXT("/Game/MiniGame/Maps/TestMainLevel?listen"), true);
 	//GetWorld()->ServerTravel(TEXT("/Game/MiniGame/Maps/RapidInputRacingMinigame.RapidInputRacingMinigame?listen"), true);
 }
 

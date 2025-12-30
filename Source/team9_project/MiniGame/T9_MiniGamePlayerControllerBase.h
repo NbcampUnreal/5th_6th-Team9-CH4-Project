@@ -18,6 +18,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	virtual void ServerRPCUpdatePlayerReady();
 
+	UFUNCTION(Client, Reliable)
+	void ClientRPCUpdatePlayerList();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPCWinner();
+
 	virtual void BeginPlay() override;
 
 	virtual void CreateUI();

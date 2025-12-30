@@ -31,12 +31,6 @@ void ALobbyGameMode::OnPostLogin(AController* NewPlayer)
 	}
 
 	PlayersInLobby.Add(NewNumber, NewPlayer);
-
-	//4인 이상이면 게임 시작
-	if (PlayersInLobby.Num() >= 4)
-	{
-		MainGameStart();
-	}
 }
 
 void ALobbyGameMode::Logout(AController* Exiting)
@@ -49,9 +43,20 @@ void ALobbyGameMode::Logout(AController* Exiting)
 	}
 }
 
-void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlayerName)
+void ALobbyGameMode::SetPlayerName(int32 TargetPlayerNumber, const FString& NewPlayerName)
 {
-	//TODO : 이름 지정하기 구현
+	if (!PlayersInLobby.Find(TargetPlayerNumber))
+	{
+		return;
+	}
+
+	AMyPlayerState* MyPlayerState = PlayersInLobby[TargetPlayerNumber]->GetPlayerState<AMyPlayerState>();
+	if (!IsValid(MyPlayerState))
+	{
+		return;
+	}
+
+	MyPlayerState->DisplayName = NewPlayerName;
 }
 
 void ALobbyGameMode::MainGameStart()

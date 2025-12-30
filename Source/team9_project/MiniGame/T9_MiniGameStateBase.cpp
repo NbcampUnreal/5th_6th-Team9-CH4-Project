@@ -2,7 +2,7 @@
 #include "MiniGame/T9_MiniGameModeBase.h"
 #include "Player/MyPlayerState.h"
 #include "Net/UnrealNetwork.h"
-
+#include "MiniGame/T9_MiniGamePlayerControllerBase.h"
 void AT9_MiniGameStateBase::SetPhase(EMiniGamePhase NewPhase)
 {
 	if (CurrentPhase == NewPhase)
@@ -19,10 +19,27 @@ void AT9_MiniGameStateBase::OnRep_Phase()
 	UE_LOG(LogTemp, Error, TEXT("OnRep_Phase"));
 }
 
+void AT9_MiniGameStateBase::OnRep_Winner()
+{
+	for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (AT9_MiniGamePlayerControllerBase* PC = Cast<AT9_MiniGamePlayerControllerBase>(It->Get()))
+		{
+			UE_LOG(LogTemp, Error, TEXT("ClientRPCWinner"));
+			PC->ClientRPCWinner();
+		}
+	}
+}
+
 void AT9_MiniGameStateBase::OnRep_PlayerReady()
 {
-	//UI업데이트
-	UE_LOG(LogTemp, Error, TEXT("OnRep_PlayerReady"));
+	for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (AT9_MiniGamePlayerControllerBase* PC = Cast<AT9_MiniGamePlayerControllerBase>(It->Get()))
+		{
+			PC->ClientRPCUpdatePlayerList();
+		}
+	}
 }
 
 void AT9_MiniGameStateBase::InitializePlayerReadys()
@@ -45,6 +62,7 @@ void AT9_MiniGameStateBase::InitializePlayerReadys()
 			ReadyInfo.bReady = false;
 
 			PlayerReadys.Add(ReadyInfo);
+
 		}
 	}
 }
@@ -85,10 +103,15 @@ void AT9_MiniGameStateBase::OnPhaseChanged(EMiniGamePhase NewPhase)
 
 }
 
+FText AT9_MiniGameStateBase::GetGameName()
+{
+	return FText();
+}
+
 void AT9_MiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AT9_MiniGameStateBase, PlayerResults);
 	DOREPLIFETIME(AT9_MiniGameStateBase, CurrentPhase);
+	DOREPLIFETIME(AT9_MiniGameStateBase, WinnerPlayer);
 	DOREPLIFETIME(AT9_MiniGameStateBase, PlayerReadys);
 }
