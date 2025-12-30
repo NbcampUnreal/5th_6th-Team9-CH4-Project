@@ -13,10 +13,10 @@ struct FTimingPlayerResult
     int32 PlayerId;
 
     UPROPERTY(BlueprintReadOnly)
-    float PressTimeMs;
+    int32 PressTimeMs;
 
     UPROPERTY(BlueprintReadOnly)
-    float DeltaMs;
+    int32 DeltaMs;
 };
 
 UCLASS()
@@ -37,11 +37,11 @@ public:
     virtual FText GetGameName() override;
 
 public:
-    UPROPERTY(Replicated, BlueprintReadOnly)
-    float TargetTime;
-
-    UPROPERTY(Replicated, BlueprintReadOnly)
+    UPROPERTY(Replicated)
     float GameStartTime;
+
+    UPROPERTY(Replicated)
+    int32 TargetTimeMs;
 
     UPROPERTY(ReplicatedUsing = OnRep_Results, BlueprintReadOnly)
     TArray<FTimingPlayerResult> Results;
