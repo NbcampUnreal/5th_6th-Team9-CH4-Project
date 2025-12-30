@@ -92,8 +92,8 @@ void ALobbyGameMode::MainGameStart()
 	{
 		GameInstance->PropertyInit();
 	}
-	
-	UGameplayStatics::OpenLevel(this, MAIN_GAME_MAP_NAME);
+
+	GetWorld()->ServerTravel(MAIN_GAME_MAP_NAME, true, true);
 }
 
 int32 ALobbyGameMode::GivePlayerNumber()
