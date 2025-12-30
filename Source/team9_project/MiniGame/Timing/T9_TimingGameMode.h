@@ -23,11 +23,13 @@ public:
 	void OnTimeOver();
 
 public:
-	float TimerTime;
+	UPROPERTY()
+	int32 TargetTimeMs = 0;
 
-	float StartServerTime;
+	UPROPERTY()
+	float GameStartTime = 0.f;
 
 	FTimerHandle TimeOverHandle;
 
-	float BestDeltaMs;
+	int32 BestDeltaMs;
 };

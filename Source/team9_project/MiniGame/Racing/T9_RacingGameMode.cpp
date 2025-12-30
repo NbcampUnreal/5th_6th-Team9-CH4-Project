@@ -21,4 +21,6 @@ void AT9_RacingGameMode::EndGame()
 	Super::EndGame();
 	UE_LOG(LogTemp, Error, TEXT("EndRacingGame"));
 	UE_LOG(LogTemp, Error, TEXT("Winner %d"), Winner);
+	AT9_RacingGameState* GS = GetWorld()->GetGameState<AT9_RacingGameState>();
+	GS->WinnerPlayer = Winner;
 }

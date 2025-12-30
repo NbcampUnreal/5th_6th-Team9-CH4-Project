@@ -7,14 +7,15 @@
 #include "Player/MyPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
-void AT9_TimingGamePlayerController::ServerRPC_StopTimer_Implementation()
+void AT9_TimingGamePlayerController::ServerRPC_StopTimer_Implementation(float PressServerTime)
 {
 	AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
 	if (!GS) return;
-	UE_LOG(LogTemp, Log,TEXT("StopTimer"));
-	AMyPlayerState* PS =GetPlayerState<AMyPlayerState>();
+
+	APlayerState* PS = GetPlayerState<APlayerState>();
 	if (!PS) return;
-	GS->AddPlayerPress(PS->GetPlayerNumber(), GetWorld()->GetTimeSeconds());
+
+	GS->AddPlayerPress(PS->GetPlayerId(), PressServerTime);
 }
 
 void AT9_TimingGamePlayerController::BeginPlay()
@@ -96,5 +97,13 @@ void AT9_TimingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 		ShowResultUI();
 		SetInputEnabled(false);
 		break;
+	}
+}
+
+void AT9_TimingGamePlayerController::NotifyTimingResultUpdated()
+{
+	if (InGameWidgetInstance)
+	{
+		InGameWidgetInstance->UpdateRankingUI();
 	}
 }

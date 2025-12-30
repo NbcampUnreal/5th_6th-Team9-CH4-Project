@@ -13,7 +13,7 @@ class TEAM9_PROJECT_API AT9_TimingGamePlayerController : public AT9_MiniGamePlay
 	
 public:
 	UFUNCTION(Server, Reliable)
-	void ServerRPC_StopTimer();
+	void ServerRPC_StopTimer(float PressServerTime);
 
 	virtual void BeginPlay() override;
 
@@ -24,6 +24,8 @@ public:
 	virtual void RemoveAllUI() override;
 
 	virtual void ChangeUI(EMiniGamePhase NewPhase) override;
+
+	void NotifyTimingResultUpdated();
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")

@@ -17,10 +17,18 @@ public:
 	UFUNCTION()
 	void OnStopClicked();
 
+	void UpdateRankingUI();
+
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* CountdownText;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* StopButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StopCheck;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* FadeOutCountdown;
 };
