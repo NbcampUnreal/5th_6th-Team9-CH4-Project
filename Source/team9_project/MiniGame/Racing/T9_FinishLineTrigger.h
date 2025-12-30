@@ -28,6 +28,12 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	FVector GetFinishLocation() const
+	{
+		return GetActorLocation();
+	}
+
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FinishLine")
 	USceneComponent* Root;
 
