@@ -14,20 +14,20 @@ void AT9_TimingGameMode::StartGame()
 {
 	Super::StartGame();
 	UE_LOG(LogTemp, Error, TEXT("TimingStartGame"));
-	TimerTime= FMath::RandRange(5000, 10000);
-	BestDeltaMs = TimerTime;
-	StartServerTime = GetWorld()->GetTimeSeconds();
+	TargetTimeMs = FMath::RandRange(5000, 10000);
+	BestDeltaMs = int32(TargetTimeMs);
+	GameStartTime = GetWorld()->GetTimeSeconds();
 	AT9_TimingGameState* GS = GetGameState<AT9_TimingGameState>();
 	if (GS)
 	{
-		GS->TargetTime=TimerTime;
-		GS->GameStartTime=StartServerTime;
+		GS->TargetTimeMs = TargetTimeMs;
+		GS->GameStartTime = GameStartTime;
 	}
 	GetWorld()->GetTimerManager().SetTimer(
 		TimeOverHandle,
 		this,
 		&AT9_TimingGameMode::OnTimeOver,
-		TimerTime / 1000.f,
+		TargetTimeMs / 1000.f,
 		false
 	);
 }
@@ -39,7 +39,6 @@ void AT9_TimingGameMode::EndGame()
 	GetWorld()->GetTimerManager().ClearTimer(TimeOverHandle);
 	Winner();
 	UE_LOG(LogTemp, Error, TEXT("Winner3"));
-	//ResultWidget업데이트
 }
 
 void AT9_TimingGameMode::OnTimeOver()
@@ -54,7 +53,7 @@ void AT9_TimingGameMode::Winner()
 	UE_LOG(LogTemp, Error, TEXT("Winner1 %d"), WinnerPlayer);
 	for (const FTimingPlayerResult& R : GS->Results)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Record %f"), R.DeltaMs);
+		UE_LOG(LogTemp, Error, TEXT("Record %d"), R.DeltaMs);
 		if (R.DeltaMs < BestDeltaMs)
 		{
 			BestDeltaMs = R.DeltaMs;
