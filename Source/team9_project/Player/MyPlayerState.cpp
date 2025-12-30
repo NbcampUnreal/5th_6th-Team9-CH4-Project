@@ -96,8 +96,9 @@ void AMyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ThisClass, PlayerNumber);
 	DOREPLIFETIME(ThisClass, CurrentScore);
 	DOREPLIFETIME(ThisClass, FinalRank);
+
+	// Cho_SungMin - 게임 플레이 관련 변수 복제 추가
+	DOREPLIFETIME(ThisClass, CurrentHp);
+	DOREPLIFETIME(ThisClass, MaxHp);
+	DOREPLIFETIME(ThisClass, TileIndex);
 }
-//void AMyPlayerState::ServerRPC_CallMainGameStart_Implementation()
-//{
-//
-//}

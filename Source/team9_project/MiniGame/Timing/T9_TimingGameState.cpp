@@ -16,7 +16,7 @@ void AT9_TimingGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME(AT9_TimingGameState, TargetTime);
+    DOREPLIFETIME(AT9_TimingGameState, TargetTimeMs);
     DOREPLIFETIME(AT9_TimingGameState, GameStartTime);
     DOREPLIFETIME(AT9_TimingGameState, Results);
 }
@@ -29,13 +29,37 @@ void AT9_TimingGameState::AddPlayerPress(int32 PlayerId, float PressServerTime)
             return;
     }
 
-    int32 PressMs = int32((PressServerTime - GameStartTime) * 1000.f);
-    int32 Delta = FMath::Abs(PressMs - TargetTime);
+    int32 PressMs = int32((PressServerTime - GameStartTime)*1000.f);
+    int32 Delta = FMath::Abs(PressMs - TargetTimeMs);
 
     Results.Add({ PlayerId, PressMs, Delta });
+
+    UE_LOG(LogTemp, Log,
+        TEXT("[AddPlayerPress] Player=%d PressMs=%d Target=%d Delta=%d ResultsCount=%d"),
+        PlayerId,
+        PressMs,
+        TargetTimeMs,
+        Delta,
+        Results.Num());
+}
+
+FText AT9_TimingGameState::GetGameName()
+{
+    return GameName;
 }
 
 void AT9_TimingGameState::OnRep_Results()
 {
-    //Player UI Update 
+    UWorld* World = GetWorld();
+    if (!World) return;
+
+    for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
+    {
+        AT9_TimingGamePlayerController* PC =
+            Cast<AT9_TimingGamePlayerController>(It->Get());
+
+        if (!PC) continue;
+
+        PC->NotifyTimingResultUpdated();
+    }
 }

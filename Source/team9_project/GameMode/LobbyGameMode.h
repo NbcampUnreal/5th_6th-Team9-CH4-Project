@@ -20,7 +20,7 @@ public:
 	virtual void Logout(AController* Exiting) override;
 
 	//이름 지정하기
-	void SetPlayerName(AController* Exiting, const FString& NewPlayerName);
+	void SetPlayerName(int32 TargetPlayerNumber, const FString& NewPlayerName);
 
 private:
 	//준비 완료된 플레이어 중 4명을 모아 게임 시작
@@ -33,7 +33,7 @@ private:
 	FTimerHandle TimerHandleForStart;
 
 	//이 시간마다 준비 완료된 플레이어를 찾아 게임을 시작한다.
-	UPROPERTY(EditInstanceOnly, Category = "Game Start", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = "Game Start", meta = (AllowPrivateAccess = true))
 	float StartGameDelay;
 
 	//로비에 있는 플레이어 목록

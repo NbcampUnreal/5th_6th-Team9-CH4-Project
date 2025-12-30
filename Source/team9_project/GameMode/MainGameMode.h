@@ -5,6 +5,7 @@
 #include "MainGameMode.generated.h"
 
 class AMyPlayerController;
+enum class EEndType;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundEnd);
 
@@ -53,8 +54,8 @@ private:
 	void WaitForReady();
 
 	//점수에 따른 플레이어 순위 확인 및 각 클라이언트에게 전달
-	void CheckAndSendPlayerRank();
-
+	void CheckAndSendPlayerRank(EEndType EndType);
+	
 	//다음 플레이어 턴 시작
 	void NextPlayerTurn(bool bRoundStart);
 
@@ -99,8 +100,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true))
 	float MiniGameWaitTime;
 
+	//게임 시작에 필요한 인원
+	UPROPERTY(EditDefaultsOnly, Category = "Game Rule", meta = (allowPrivateAccess = true, ClampMin = 1, ClampMax = 6))
+	int16 NeedPlayers;
+
 	//최대 라운드
-	UPROPERTY(EditDefaultsOnly, category = "Game Rule", meta = (allowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, category = "Game Rule", meta = (allowPrivateAccess = true, ClampMin = 1, ClampMax = 50))
 	int16 MaxRound;
 
 	//미니게임 맵 목록

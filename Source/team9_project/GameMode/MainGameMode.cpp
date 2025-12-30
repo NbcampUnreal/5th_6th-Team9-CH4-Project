@@ -12,6 +12,7 @@ AMainGameMode::AMainGameMode()
 	CurrentRound = 0;
 	FirstReadyCheckTime = 1.0f;
 	MiniGameWaitTime = 1.0f;
+	NeedPlayers = 4;
 	MaxRound = 5;
 }
 
@@ -31,8 +32,8 @@ void AMainGameMode::OnPostLogin(AController* NewPlayer)
 		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), MyPlayerController);
 	}
 
-	//4명이 들어오면 시작한다.
-	if (PlayersInGame.Num() < 4)
+	//지정한 인원이 들어오면 시작한다.
+	if (PlayersInGame.Num() < NeedPlayers)
 	{
 		return;
 	}
@@ -67,7 +68,7 @@ void AMainGameMode::GameStart()
 	//1라운드(처음 시작)인 경우 진행 순서 정하고 준비를 기다린다.
 	if (CurrentRound <= 1)
 	{
-		WaitForReady();
+		//WaitForReady();
 		SetPlayerNumbersOrder();
 
 		return;
@@ -222,7 +223,7 @@ void AMainGameMode::WaitForReady()
 		}), FirstReadyCheckTime, true);
 }
 
-void AMainGameMode::CheckAndSendPlayerRank()
+void AMainGameMode::CheckAndSendPlayerRank(EEndType EndType)
 {
 	//점수 기준으로 정렬
 	RankOrderedPlayerNums.Sort([this](const int32& NumA, const  int32& NumB)
@@ -243,18 +244,12 @@ void AMainGameMode::CheckAndSendPlayerRank()
 	//각 클라이언트에게 전달
 	for (auto PlayerInfo : PlayersInGame)
 	{
-		PlayerInfo.Value->Client_ReceiveTurnEndInfo(RankOrderedPlayerNums, SendScores);
+		PlayerInfo.Value->Client_ReceiveTurnEndInfo(RankOrderedPlayerNums, SendScores, EndType);
 	}
 }
 
 void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 {
-	//라운드 시작시가 아니면 이 함수 실행시 순위 정보를 클라이언트에게 전달
-	if (!bRoundStart)
-	{
-		CheckAndSendPlayerRank();
-	}
-
 	//라운드 시작시 첫 번째 플레이어를 지정
 	if (bRoundStart)
 	{
@@ -267,11 +262,13 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 		OnRoundEnd.Broadcast();
 
 		MoveToMiniGameMap();
+		CheckAndSendPlayerRank(CurrentRound > MaxRound ? EEndType::GameEnd : EEndType::RoundEnd);
 		return;
 	}
 
 	//아직 라운드 종료가 아니라면 다음 플레이어의 차례 진행
 	TurnPlayerNumber = TurnOrderedPlayerNums[TurnIndex];
+	CheckAndSendPlayerRank(EEndType::TurnEnd);
 }
 
 void AMainGameMode::MoveToMiniGameMap()

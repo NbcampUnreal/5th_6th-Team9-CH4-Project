@@ -2,6 +2,7 @@
 #include "MiniGame/T9_MiniGameStateBase.h"
 #include "MiniGame/T9_MiniGameModeBase.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 #include "MiniGame/T9_MiniGameCharacterBase.h"
 #include "MiniGame/T9_MiniGameReadyWidget.h"
 #include "MiniGame/T9_MiniGameResultWidget.h"
@@ -32,6 +33,39 @@ void AT9_MiniGamePlayerControllerBase::SetInputEnabled(bool bEnable)
 	if (MiniGameCharacter)
 	{
 		MiniGameCharacter->SetAcceptInput(bEnable);
+	}
+}
+
+void AT9_MiniGamePlayerControllerBase::ClientRPCUpdatePlayerList_Implementation()
+{
+	if (ReadyWidgetInstance)
+	{
+		AT9_MiniGameStateBase* GS = GetWorld()->GetGameState<AT9_MiniGameStateBase>();
+		if (GS) 
+		{
+			FString List;
+			for (const FMiniGamePlayerReady& Info : GS->PlayerReadys)
+			{
+				List += FString::Printf(TEXT("%d : %s\n"),Info.PlayerId,Info.bReady ? TEXT("Ready") : TEXT("Not Ready"));
+			}
+			ReadyWidgetInstance->PlayerList->SetText(FText::FromString(List));
+		}
+	}
+}
+
+void AT9_MiniGamePlayerControllerBase::ClientRPCWinner_Implementation()
+{
+	if (ResultWidgetInstance)
+	{
+		AT9_MiniGameStateBase* GS = GetWorld()->GetGameState<AT9_MiniGameStateBase>();
+		if (GS)
+		{
+			if (GS->WinnerPlayer != 0)
+			{
+				FString List = FString::Printf(TEXT("Win : %d"), GS->WinnerPlayer);
+				ResultWidgetInstance->Result->SetText(FText::FromString(List));
+			}
+		}
 	}
 }
 

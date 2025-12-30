@@ -47,21 +47,22 @@ public:
 	void ServerRPC_CallMainGameStart();
 
 private:
+	UPROPERTY(Replicated)
 	int CurrentHp;
 
+	UPROPERTY(Replicated)
 	int MaxHp;
 
 	//int CurrentScore;
 
+	// Cho_SungMin - TileIndexë¥¼ Replicatedë¡œ ë³€ê²½ (í…”ë ˆí¬íŠ¸ í›„ ì´ë™ ë²„ê·¸ ìˆ˜ì •)
+	UPROPERTY(Replicated)
 	int TileIndex;
 
 	//int32 PlayerNumber;
 
 public:
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_CallMainGameStart();
-
-	    // UI¿ë Ç¥½Ã ÀÌ¸§ (º¹Á¦·Î ¸ğµç Å¬¶óÀÌ¾ğÆ®¿¡ Àü´ŞµÊ)
+	    // UIï¿½ï¿½ Ç¥ï¿½ï¿½ ï¿½Ì¸ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½Şµï¿½)
     UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
     FString DisplayName;
 
@@ -71,7 +72,7 @@ public:
     UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
     int32 PlayerNumber = -1;
 
-    // Á¡¼ö¿Í ¼øÀ§ º¯¼ö (º¹Á¦ ¼³Á¤)
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
     UPROPERTY(Replicated, BlueprintReadOnly, Category = "Result")
     int32 CurrentScore = 0;
 	

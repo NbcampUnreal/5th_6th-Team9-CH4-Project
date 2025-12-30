@@ -1,5 +1,6 @@
 #include "MiniGame/Racing/T9_RacingGameState.h"
 #include "MiniGame/Racing/T9_RacingGamePlayerController.h"
+#include "Net/UnrealNetwork.h"
 
 void AT9_RacingGameState::OnPhaseChanged(EMiniGamePhase NewPhase)
 {
@@ -10,4 +11,9 @@ void AT9_RacingGameState::OnPhaseChanged(EMiniGamePhase NewPhase)
             RPC->ChangeUI(NewPhase);
         }
     }
+}
+
+FText AT9_RacingGameState::GetGameName()
+{
+    return GameName;
 }

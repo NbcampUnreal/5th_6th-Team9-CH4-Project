@@ -15,6 +15,8 @@
 // Cho_Sungmin
 #include "Inventory/InventoryComponent.h"
 #include "Item/Effects/ItemEffectBase_DirectControl.h"
+#include "Item/Effects/ItemEffectBase.h"
+#include "Item/Data/ItemTypes.h"
 
 ACameraPawn::ACameraPawn() :
 	ScreenSpeed(1500.f),
@@ -61,7 +63,8 @@ void ACameraPawn::BeginPlay()
 	}
 	
 	
-	
+	GetInventoryComponent()->OnItemUseStarted.AddDynamic(this, &ACameraPawn::ServerRPCItemUseStart);
+	GetInventoryComponent()->OnItemUseCancelled.AddDynamic(this, &ACameraPawn::ServerRPCItemUseEnd);
 }
 
 void ACameraPawn::PossessedBy(AController* NewControlle)
@@ -77,9 +80,9 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 		if (InventoryComponent)
 		{
 			InventoryComponent->AddItem(FName("RCCar"));
-			InventoryComponent->AddItem(FName("BaseballBat"));
+			InventoryComponent->AddItem(FName("BrokenTeleporter"));
 			InventoryComponent->AddItem(FName("Shotgun"));
-			InventoryComponent->AddItem(FName("RCCar"));
+			InventoryComponent->AddItem(FName("Teleporter"));
 			UE_LOG(LogTemp, Warning, TEXT("ADDITEM for %s"), *GetName());
 		}
 	}
@@ -129,28 +132,22 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 				&ACameraPawn::LeftClickHandle);
 
 			EIC->BindAction(
-				MyPlayerController->RightClickAction,
-				ETriggerEvent::Started,
-				this,
-				&ACameraPawn::RightClickHandle);
-
-			EIC->BindAction(
 				MyPlayerController->CameraKeyMoveAction,
 				ETriggerEvent::Triggered,
 				this,
 				&ACameraPawn::CameraKeyMoveHandle);
 
 			EIC->BindAction(
-				MyPlayerController->CameraWheelAction,
-				ETriggerEvent::Started,
-				this,
-				&ACameraPawn::CameraWheelHandle);
-
-			EIC->BindAction(
 				MyPlayerController->CameraReturnAction,
 				ETriggerEvent::Started,
 				this,
 				&ACameraPawn::CameraReturnHandle);
+			//ChoSungMin - 취소키
+			EIC->BindAction(
+	            MyPlayerController->CancelAction,
+	            ETriggerEvent::Started,
+	            this,
+	            &ACameraPawn::CancelHandle);
 		}
 	}
 }
@@ -243,21 +240,12 @@ void ACameraPawn::LeftClickHandle(const FInputActionValue& Value)
 	ServerRPCLeftClick();
 }
 
-void ACameraPawn::RightClickHandle(const FInputActionValue& Value)
+void ACameraPawn::ServerRPCItemUseStart_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: RightClick"));
-
-	ServerRPCRightClick();
+	SetItemUseState();
 }
 
-void ACameraPawn::ItemUseStart()
-{
-	GetPlayerCharacter()->bIsUsingItem = true;
-	// Cho_Sungmin
-	StateMachine->GetCurrentState()->ItemUse();
-}
-
-void ACameraPawn::ItemUseEnd()
+void ACameraPawn::ServerRPCItemUseEnd_Implementation()
 {
 	GetPlayerCharacter()->bIsUsingItem = false;
 }
@@ -270,6 +258,21 @@ bool ACameraPawn::GetIsUsingItem()
 		return InventoryComponent->IsUsingItem();
 	}
 	return GetPlayerCharacter()->bIsUsingItem;
+}
+
+void ACameraPawn::SetMoveState()
+{
+	StateMachine->GetCurrentState()->Move();
+}
+
+void ACameraPawn::SetHitState()
+{
+	StateMachine->GetCurrentState()->Hit();
+}
+
+void ACameraPawn::SetItemUseState()
+{
+	StateMachine->GetCurrentState()->ItemUse();
 }
 
 // Cho_Sungmin - InventoryComponent Getter
@@ -334,12 +337,35 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 	const FVector2D ArrowInput = Value.Get<FVector2D>();
 	
 
-	// Cho_Sungmin 아이템 사용 중이면 서버로 입력 전달
+	// Cho_SungMin 아이템 사용 중이면
 	if (InventoryComponent && InventoryComponent->IsUsingItem())
 	{
-		UE_LOG(LogTemp, Warning, TEXT(">>> Sending to ServerRPC! Input: %s"), *ArrowInput.ToString());
-		ServerRPC_SetItemControlInput(ArrowInput);
-		return;
+		EItemUseType UseType = InventoryComponent->GetCurrentUseType();
+        
+		// DirectControl: WASD 이동
+		if (UseType == EItemUseType::DirectControl)
+		{
+			ServerRPC_SetItemControlInput(ArrowInput);
+			return;
+		}
+		// TileTarget: A/D로 타일 선택
+		else if (UseType == EItemUseType::TileTarget)
+		{
+			if (ArrowInput.Y > 0.5f)
+			{
+				ServerRPC_CycleTileTarget(true);
+			}
+			else if (ArrowInput.Y < -0.5f)
+			{
+				ServerRPC_CycleTileTarget(false);
+			}
+			return;
+		}
+		// MouseAim: 카메라 이동 막기
+		else if (UseType == EItemUseType::MouseAim)
+		{
+			return;
+		}
 	}
 	
 	if (ArrowInput.IsNearlyZero())
@@ -378,7 +404,18 @@ FVector ACameraPawn::GetItemCameraTargetLocation() const
 		return GetActorLocation();
 	}
 
-	// Replicated된 ControlledActor 사용
+	// Cho_SungMin - TileTarget 타입이면 타일 셀렉터 위치 사용
+	EItemUseType UseType = InventoryComponent->GetCurrentUseType();
+	if (UseType == EItemUseType::TileTarget)
+	{
+		FVector SelectorLocation = InventoryComponent->GetTileSelectorLocation();
+		if (!SelectorLocation.IsZero())
+		{
+			return SelectorLocation;
+		}
+	}
+
+	// DirectControl: Replicated된 ControlledActor 사용
 	AActor* ControlledActor = InventoryComponent->CurrentControlledActor;
 	if (ControlledActor)
 	{
@@ -436,49 +473,45 @@ void ACameraPawn::ServerRPC_ConfirmItemUse_Implementation()
 	}
 }
 
-void ACameraPawn::CameraWheelHandle(const FInputActionValue& Value)
-{
-	if (IsLocallyControlled() == false)
-	{
-		return;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraWheelHandle"));
-}
-
 void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 {
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: CameraReturnHandle"));
-
 	if (PlayerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("CLIENT: PlayerCharacter not"));
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: PlayerCharacter"));
 	SetActorLocation(PlayerCharacter->GetActorLocation());
 }
 
-// 이동 테스트
 void ACameraPawn::ServerRPCLeftClick_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Sever : LeftClick"));
-
-	StateMachine->GetCurrentState()->Move();
+	SetMoveState();
 }
 
-// 공격받기 테스트
-void ACameraPawn::ServerRPCRightClick_Implementation()
+void ACameraPawn::CancelHandle(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Sever : RightClick"));
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT: Cancel (ESC)"));
+    
+	// 아이템 사용 중이면 취소
+	if (InventoryComponent && InventoryComponent->IsUsingItem())
+	{
+		ServerRPC_CancelItemUse();
+		return;
+	}
+}
 
-	StateMachine->GetCurrentState()->Hit();
+void ACameraPawn::ServerRPC_CancelItemUse_Implementation()
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->CancelItemUse();
+	}
+}
 
-	UGameplayStatics::ApplyDamage(
-		PlayerCharacter,
-		50.f,
-		nullptr,
-		this,
-		UDamageType::StaticClass()
-	);
+void ACameraPawn::ServerRPC_CycleTileTarget_Implementation(bool bNext)
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->CycleTileTarget(bNext);
+	}
 }

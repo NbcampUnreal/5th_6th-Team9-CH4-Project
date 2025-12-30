@@ -14,18 +14,6 @@ enum class EMiniGamePhase : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FMiniGamePlayerResult
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 PlayerId = 0;
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 Score = 0;
-};
-
-USTRUCT(BlueprintType)
 struct FMiniGamePlayerReady
 {
 	GENERATED_BODY()
@@ -47,6 +35,9 @@ public:
 	void OnRep_Phase();
 
 	UFUNCTION()
+	void OnRep_Winner();
+
+	UFUNCTION()
 	void OnRep_PlayerReady();
 
 	UFUNCTION()
@@ -61,17 +52,21 @@ public:
 
 	virtual void OnPhaseChanged(EMiniGamePhase NewPhase);
 
+	virtual FText GetGameName();
+
 	void SetPhase(EMiniGamePhase NewPhase);
 
-
 public:
-	UPROPERTY(Replicated)
-	FMiniGamePlayerResult PlayerResults;
-
 	UPROPERTY(ReplicatedUsing = OnRep_PlayerReady)
 	TArray<FMiniGamePlayerReady> PlayerReadys;
 
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UTexture2D> GameImage;
+
 	bool bInGame = false;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Winner)
+	int32 WinnerPlayer = 0;
 
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_Phase)

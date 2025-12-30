@@ -4,14 +4,18 @@
 #include "MiniGame/Timing/T9_TimingGameState.h"
 #include "MiniGame/Timing/T9_TimingGameMode.h"
 #include "MiniGame/Timing/T9_TimingInGameWidget.h"
+#include "Player/MyPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
-void AT9_TimingGamePlayerController::ServerRPC_StopTimer_Implementation()
+void AT9_TimingGamePlayerController::ServerRPC_StopTimer_Implementation(float PressServerTime)
 {
 	AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
 	if (!GS) return;
 
-	GS->AddPlayerPress(1, GetWorld()->GetTimeSeconds());//PlayerId Change
+	APlayerState* PS = GetPlayerState<APlayerState>();
+	if (!PS) return;
+
+	GS->AddPlayerPress(PS->GetPlayerId(), PressServerTime);
 }
 
 void AT9_TimingGamePlayerController::BeginPlay()
@@ -93,5 +97,13 @@ void AT9_TimingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 		ShowResultUI();
 		SetInputEnabled(false);
 		break;
+	}
+}
+
+void AT9_TimingGamePlayerController::NotifyTimingResultUpdated()
+{
+	if (InGameWidgetInstance)
+	{
+		InGameWidgetInstance->UpdateRankingUI();
 	}
 }

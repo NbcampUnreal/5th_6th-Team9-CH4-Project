@@ -18,14 +18,16 @@ public:
 
 	virtual void EndGame() override;
 
-	int32 Winner() ;
+	void Winner();
 
 	void OnTimeOver();
 
 public:
-	int32 TimerTime;
+	UPROPERTY()
+	int32 TargetTimeMs = 0;
 
-	float StartServerTime;
+	UPROPERTY()
+	float GameStartTime = 0.f;
 
 	FTimerHandle TimeOverHandle;
 

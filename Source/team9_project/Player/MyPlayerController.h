@@ -6,9 +6,18 @@
 #include "Ui/MinimapCameraActor.h"
 #include "MyPlayerController.generated.h"
 
+//턴 종료 종류
+UENUM()
+enum class EEndType
+{
+	TurnEnd,//단순 턴 종료 (라운드 계속됨)
+	RoundEnd,//한 라운드의 모든 턴 종료
+	GameEnd//제일 마지막 턴이 종료되어 게임 진행 완료됨
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDiceResultReceived, int32, PlayerNumber, int32, DiceNum);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnFirstReady, TArray<int32>, PlayerNumbers, TArray<int32>, DiceNums);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTurnEndInfo, TArray<int32>, PlayerNumbers, TArray<int32>, Scores);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FTurnEndInfo, TArray<int32>, PlayerNumbers, TArray<int32>, Scores, EEndType, EndType);
 
 class UInputMappingContext;
 class UInputAction;
@@ -48,7 +57,7 @@ public:
 
 	// 턴 종료시마다 순위 확인용 RPC
 	UFUNCTION(Client, Reliable)
-	void Client_ReceiveTurnEndInfo(const TArray<int32>& PlayerNumbers, const TArray<int32>& Scores);
+	void Client_ReceiveTurnEndInfo(const TArray<int32>& PlayerNumbers, const TArray<int32>& Scores, EEndType EndType);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ShowResult();
@@ -72,7 +81,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Dice")
 	FOnFirstReady OnFirstReady;
 
-	//턴 종료시마다 플레이어 순위 확인용으로 실행
+	//턴 종료시마다 플레이어 순위 확인 및 라운드 종료 등의 목적으로 실행
 	UPROPERTY(BlueprintAssignable, Category = "Turn")
 	FTurnEndInfo TurnEndInfo;
 
@@ -96,7 +105,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* CameraWheelAction;
-
+	
+	UPROPERTY(EditAnywhere)
+	UInputAction* CancelAction;     // Cho_SungMin ESC 취소
+	
 	// Cho_Sungmin - 인벤토리 위젯
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
