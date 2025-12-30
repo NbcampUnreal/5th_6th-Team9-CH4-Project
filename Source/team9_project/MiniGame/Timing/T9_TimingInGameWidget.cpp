@@ -12,6 +12,7 @@ void UT9_TimingInGameWidget::NativeConstruct()
     {
         StopButton->OnClicked.AddDynamic(this, &UT9_TimingInGameWidget::OnStopClicked);
     }
+    PlayAnimation(FadeOutCountdown);
 }
 
 void UT9_TimingInGameWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -38,5 +39,26 @@ void UT9_TimingInGameWidget::OnStopClicked()
     if (PC)
     {
         PC->ServerRPC_StopTimer();
+    }
+}
+
+void UT9_TimingInGameWidget::UpdateRankingUI()
+{
+    AT9_TimingGameState* GS = GetWorld()->GetGameState<AT9_TimingGameState>();
+    if (!GS)
+    {
+        return;
+    }
+    if (StopCheck)
+    {
+        FString StopString;
+        for (int32 i = 0; i < GS->Results.Num(); i++)
+        {
+            StopString += FString::Printf(
+                TEXT("Player %d : Stop\n"),
+                GS->Results[i].PlayerId
+            );
+        }
+        StopCheck->SetText(FText::FromString(StopString));
     }
 }

@@ -17,4 +17,7 @@ public:
 public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> Result;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> SeverTravelTimer;
 };

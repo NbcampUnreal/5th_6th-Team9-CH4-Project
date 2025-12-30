@@ -50,5 +50,16 @@ FText AT9_TimingGameState::GetGameName()
 
 void AT9_TimingGameState::OnRep_Results()
 {
-    //Player UI Update 
+    UWorld* World = GetWorld();
+    if (!World) return;
+
+    for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
+    {
+        AT9_TimingGamePlayerController* PC =
+            Cast<AT9_TimingGamePlayerController>(It->Get());
+
+        if (!PC) continue;
+
+        PC->NotifyTimingResultUpdated();
+    }
 }

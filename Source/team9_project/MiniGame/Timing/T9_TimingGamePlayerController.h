@@ -25,6 +25,8 @@ public:
 
 	virtual void ChangeUI(EMiniGamePhase NewPhase) override;
 
+	void NotifyTimingResultUpdated();
+
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UT9_TimingInGameWidget> InGameWidgetClass;

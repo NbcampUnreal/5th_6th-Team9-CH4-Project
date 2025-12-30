@@ -98,3 +98,11 @@ void AT9_TimingGamePlayerController::ChangeUI(EMiniGamePhase NewPhase)
 		break;
 	}
 }
+
+void AT9_TimingGamePlayerController::NotifyTimingResultUpdated()
+{
+	if (InGameWidgetInstance)
+	{
+		InGameWidgetInstance->UpdateRankingUI();
+	}
+}
