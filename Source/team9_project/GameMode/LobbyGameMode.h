@@ -20,7 +20,7 @@ public:
 	virtual void Logout(AController* Exiting) override;
 
 	//이름 지정하기
-	void SetPlayerName(AController* Exiting, const FString& NewPlayerName);
+	void SetPlayerName(int32 TargetPlayerNumber, const FString& NewPlayerName);
 
 private:
 	//준비 완료된 플레이어 중 4명을 모아 게임 시작

@@ -49,9 +49,20 @@ void ALobbyGameMode::Logout(AController* Exiting)
 	}
 }
 
-void ALobbyGameMode::SetPlayerName(AController* Exiting, const FString& NewPlayerName)
+void ALobbyGameMode::SetPlayerName(int32 TargetPlayerNumber, const FString& NewPlayerName)
 {
-	//TODO : 이름 지정하기 구현
+	if (!PlayersInLobby.Find(PlayerNumber))
+	{
+		return;
+	}
+
+	AMyPlayerState* MyPlayerState = PlayersInLobby[PlayerNumber]->GetPlayerState<AMyPlayerState>();
+	if (!IsValid(MyPlayerState))
+	{
+		return;
+	}
+
+	MyPlayerState->DisplayName = NewPlayerName;
 }
 
 void ALobbyGameMode::MainGameStart()
