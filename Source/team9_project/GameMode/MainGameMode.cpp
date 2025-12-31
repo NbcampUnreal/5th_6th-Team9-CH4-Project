@@ -11,6 +11,7 @@ AMainGameMode::AMainGameMode()
 	
 	TurnPlayerNumber = 0;
 	TurnIndex = 0;
+	bIsThrownDice = false;
 	CurrentRound = 0;
 	FirstReadyCheckTime = 1.0f;
 	MiniGameWaitTime = 1.0f;
@@ -88,7 +89,9 @@ int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 		return 0;
 	}
 
+	//주사위 던지기
 	const int32 DiceNum = FMath::RandRange(1, 6);
+	bIsThrownDice = true;
 
 	//주사위 결과를 각 플레이어 컨트롤러에게 전달
 	for (auto PlayerInfo : PlayersInGame)
@@ -149,6 +152,11 @@ bool AMainGameMode::UsingItem(const int32 MyPlayerNumber)
 int32 AMainGameMode::GetTurnPlayerNumber()
 {
 	return TurnPlayerNumber;
+}
+
+bool AMainGameMode::GetIsThrowDice()
+{
+	return bIsThrownDice;
 }
 
 void AMainGameMode::SetPlayerNumbersOrder()
@@ -287,6 +295,7 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 
 	//다음 플레이어의 차례 진행
 	TurnPlayerNumber = TurnOrderedPlayerNums[TurnIndex];
+	bIsThrownDice = false;
 	CheckAndSendPlayerRank(EEndType::TurnEnd);
 
 	//차례가 시작된 플레이어의 아이템 사용 허용

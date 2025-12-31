@@ -46,6 +46,9 @@ public:
 	//현재 진행중인 턴인 플레이어 인덱스
 	int32 GetTurnPlayerNumber();
 
+	//이번 턴에 주사위를 던졌는가
+	bool GetIsThrowDice();
+
 private:
 	//플레이어 순서 정하기
 	void SetPlayerNumbersOrder();
@@ -88,6 +91,9 @@ private:
 
 	//현재 턴 진행중인 플레이어 인덱스
 	int32 TurnIndex;
+
+	//이 턴 중에 주사위를 굴렸는가
+	bool bIsThrownDice;
 
 	//현재 라운드
 	int16 CurrentRound;
