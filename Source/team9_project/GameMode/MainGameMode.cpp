@@ -1,12 +1,12 @@
 #include "MainGameMode.h"
 #include "Team9GameInstance.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/MyPlayerState.h"
 #include "Player/MyPlayerController.h"
 
 AMainGameMode::AMainGameMode()
 {
 	bUseSeamlessTravel = true;
+	
 	TurnPlayerNumber = 0;
 	TurnIndex = 0;
 	CurrentRound = 0;
@@ -282,11 +282,9 @@ void AMainGameMode::MoveToMiniGameMap()
 	//잠시후 미니게임 시작
 	GetWorld()->GetTimerManager().SetTimer(WaitForMiniGameHandle, FTimerDelegate::CreateLambda([&]()
 	{
-		//TODO : 미니게임 시작 알림
-	
 		//무작위 미니게임맵 하나 사용
 		int32 RandomIndex = FMath::RandRange(0, MiniGameMapNames.Num() - 1);
-		UGameplayStatics::OpenLevel(this, MiniGameMapNames[RandomIndex]);
+		GetWorld()->ServerTravel(MiniGameMapNames[RandomIndex]);
 		
 	}), MiniGameWaitTime, false);
 }

@@ -1,14 +1,16 @@
 #include "GameMode/LobbyGameMode.h"
 #include "Team9GameInstance.h"
-#include "Kismet/GameplayStatics.h"
 #include "Player/MyPlayerState.h"
 
 class UTeam9GameInstance;
 
 ALobbyGameMode::ALobbyGameMode()
 {
+	bUseSeamlessTravel = true;
+	
 	PlayerNumber = 0;
 	StartGameDelay = 10.0f;
+	NeedPlayers = 4;
 }
 
 void ALobbyGameMode::BeginPlay()
@@ -61,7 +63,7 @@ void ALobbyGameMode::SetPlayerName(int32 TargetPlayerNumber, const FString& NewP
 
 void ALobbyGameMode::MainGameStart()
 {
-	//준비 완료된 4명의 플레이어를 찾는다.
+	//준비 완료된 플레이어를 지정한 수가 될 때까지 찾는다.
 	TArray<AMyPlayerState*> LobbyPlayerStates;
 	for (auto PlayerInfo : PlayersInLobby)
 	{
@@ -74,14 +76,14 @@ void ALobbyGameMode::MainGameStart()
 		if (MyPlayerState->bIsReady)
 		{
 			LobbyPlayerStates.Add(MyPlayerState);
-			if (LobbyPlayerStates.Num() >= 4)
+			if (LobbyPlayerStates.Num() >= NeedPlayers)
 			{
 				break;
 			}
 		}
 	}
 
-	if (LobbyPlayerStates.Num() < 4)
+	if (LobbyPlayerStates.Num() < NeedPlayers)
 	{
 		return;
 	}
@@ -91,8 +93,8 @@ void ALobbyGameMode::MainGameStart()
 	{
 		GameInstance->PropertyInit();
 	}
-	
-	UGameplayStatics::OpenLevel(this, MAIN_GAME_MAP_NAME);
+
+	GetWorld()->ServerTravel(MAIN_GAME_MAP_NAME);
 }
 
 int32 ALobbyGameMode::GivePlayerNumber()
