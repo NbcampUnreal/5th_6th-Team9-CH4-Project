@@ -13,5 +13,6 @@ UCLASS()
 class TEAM9_PROJECT_API UClientTileAction : public UTileAction
 {
 	GENERATED_BODY()
-	
+public:
+	virtual void Active(APlayerCharacter* PlayerCharacter);
 };
