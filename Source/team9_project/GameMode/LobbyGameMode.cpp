@@ -2,8 +2,6 @@
 #include "Team9GameInstance.h"
 #include "Player/MyPlayerState.h"
 
-class UTeam9GameInstance;
-
 ALobbyGameMode::ALobbyGameMode()
 {
 	bUseSeamlessTravel = true;

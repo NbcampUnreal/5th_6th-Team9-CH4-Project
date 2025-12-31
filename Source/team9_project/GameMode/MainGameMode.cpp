@@ -234,7 +234,7 @@ void AMainGameMode::WaitForReady()
 			return;
 		}
 
-		MyPlayerState->bIsReady = false;
+		MyPlayerState->bIsReady = true;//임시로 준비 완료로 변경
 		PlayerStates.Add(MyPlayerState);
 	}
 
