@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Tile/TileAction/ServerTileAction/IncreaseHPTileAction.h"
@@ -9,6 +9,8 @@ void UIncreaseHPTileAction::Active(APlayerCharacter* PlayerCharacter)
 {
 	Super::Active(PlayerCharacter);
 	AMyPlayerState* PlayerState = Cast<AMyPlayerState>(PlayerCharacter->GetPlayerState());
-	int32 PlayerHP = PlayerState->GetHP();
-	PlayerState->SetHP(PlayerHP + Amount);
+	if (IsValid(PlayerState))
+	{
+		PlayerState->AddHP(Amount);
+	}
 }
