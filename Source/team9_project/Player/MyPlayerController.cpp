@@ -1,5 +1,4 @@
-#include "Player/MyPlayerController.h"
-#include "Ui/Test/MyTestGameMode.h"
+﻿#include "Player/MyPlayerController.h"
 #include "Ui/UIManagerSubsystem.h"
 #include "Ui/MinimapCameraActor.h"
 #include "GameMode/MainGameMode.h"
@@ -75,7 +74,6 @@ void AMyPlayerController::BeginPlay()
     }
 
     // 4. 인벤토리 위젯 생성은 주석 처리 (GameHUDWidget 버튼으로 토글)
-    /*
     if (InventoryWidgetClass)
     {
         InventoryWidget = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
@@ -84,7 +82,6 @@ void AMyPlayerController::BeginPlay()
             InventoryWidget->AddToViewport();  // 중복 생성 문제 해결됨
         }
     }
-    */
 }
 
 void AMyPlayerController::Server_RequestThrowDice_Implementation()

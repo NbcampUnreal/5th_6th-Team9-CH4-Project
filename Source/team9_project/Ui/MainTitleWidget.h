@@ -1,12 +1,13 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableText.h"
-#include "Components/TextBlock.h" // Ãß°¡
+#include "Components/TextBlock.h" // ì¶”ê°€
 #include "MainTitleWidget.generated.h"
 
+class Team9GameInstance;
 UCLASS()
 class TEAM9_PROJECT_API UMainTitleWidget : public UUserWidget
 {
@@ -16,7 +17,7 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void OnConfirmNameClicked(); // ÀÌ¸§ È®Á¤ ¹öÆ° ÇÚµé·¯
+	void OnConfirmNameClicked(); // ì´ë¦„ í™•ì • ë²„íŠ¼ í•¸ë“¤ëŸ¬
 
 	UFUNCTION()
 	void OnCreateGameClicked();
@@ -32,10 +33,10 @@ public:
 	UEditableText* Input_Name;
 
 	UPROPERTY(meta = (BindWidget))
-	UEditableText* Input_Port; // IP ÁÖ¼Ò ÀÔ·ÂÃ¢
+	UEditableText* Input_Port; // IP ì£¼ì†Œ ì…ë ¥ì°½
 
 	UPROPERTY(meta = (BindWidget))
-	UButton* Btn_ConfirmName; // »õ ¹öÆ°: ÀÌ¸§ È®Á¤
+	UButton* Btn_ConfirmName; // ìƒˆ ë²„íŠ¼: ì´ë¦„ í™•ì •
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* Btn_CreateGame;
@@ -47,5 +48,5 @@ public:
 	UButton* Btn_Quit;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* Text_CurrentName; // ÇöÀç È®Á¤µÈ ÀÌ¸§À» º¸¿©ÁÙ ÅØ½ºÆ® (¼±ÅÃ»çÇ×)
+	UTextBlock* Text_CurrentName; // í˜„ì¬ í™•ì •ëœ ì´ë¦„ì„ ë³´ì—¬ì¤„ í…ìŠ¤íŠ¸ (ì„ íƒì‚¬í•­)
 };
