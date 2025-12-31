@@ -40,8 +40,8 @@ public:
 	//지정한 플레이어의 턴인가
 	bool CheckPlayerTurn(const int32 MyPlayerNumber);
 
-	//아이템 사용하기
-	bool UsingItem(const int32 MyPlayerNumber, const int32 InventoryIndex);
+	//아이템 사용 진행
+	bool UsingItem(const int32 MyPlayerNumber);
 
 	//현재 진행중인 턴인 플레이어 인덱스
 	int32 GetTurnPlayerNumber();
