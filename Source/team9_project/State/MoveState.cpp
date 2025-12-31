@@ -9,7 +9,6 @@ void UMoveState::OnEnter()
 {
 	UE_LOG(LogTemp, Warning, TEXT("MoveState OnEnter"));
 	GetPlayerCharacter()->bIsMoving = true;
-	UE_LOG(LogTemp, Warning, TEXT("bIsMoving : true"));
 
 	AMainGameMode* GM = GetWorld()->GetAuthGameMode<AMainGameMode>();
 	if (IsValid(GM) == false)

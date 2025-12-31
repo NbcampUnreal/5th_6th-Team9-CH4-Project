@@ -17,35 +17,35 @@
 #include "Components/TextBlock.h"
 #include "Engine/World.h"
 
-// ÃÊ±âÈ­
+// ï¿½Ê±ï¿½È­
 void UGameHUDWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    // 1. ¹öÆ° ¹ÙÀÎµù (Á¸ÀçÇÒ ¶§¸¸)
+    // 1. ï¿½ï¿½Æ° ï¿½ï¿½ï¿½Îµï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
     if (Btn_Dice)
     {
         Btn_Dice->OnClicked.AddDynamic(this, &UGameHUDWidget::OnDiceClicked);
-    }
+    } 
 
-    // 2. OwningPlayer ¾ÈÀüÇÏ°Ô °¡Á®¿À±â
+    // 2. OwningPlayer ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     APlayerController* PC = GetOwningPlayer();
     if (!PC)
     {
         UE_LOG(LogTemp, Warning, TEXT("[GameHUD] OwningPlayer is null in NativeConstruct"));
-        return;  // ´õ ÀÌ»ó ÁøÇà ¾È ÇÔ
+        return;  // ï¿½ï¿½ ï¿½Ì»ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½
     }
 
-    // 3. PlayerState Ä³½Ì
+    // 3. PlayerState Ä³ï¿½ï¿½
     MyPlayerState = PC->GetPlayerState<AMyPlayerState>();
 
-    // 4. Pawn Ä³½ºÆÃ ¹× ÀÎº¥Åä¸® ÄÄÆ÷³ÍÆ®
+    // 4. Pawn Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     if (ACameraPawn* CameraPawn = Cast<ACameraPawn>(PC->GetPawn()))
     {
         InventoryComponent = CameraPawn->GetInventoryComponent();
     }
 
-    // 5. µ¨¸®°ÔÀÌÆ® ¹ÙÀÎµù (Áßº¹ ¹æÁö Æ÷ÇÔ)
+    // 5. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½Îµï¿½ (ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
     if (AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC))
     {
         if (!bDelegatesBound)
@@ -57,8 +57,8 @@ void UGameHUDWidget::NativeConstruct()
         }
     }
 
-    // 6. ¹Ì´Ï¸Ê ¹è°æ ¿¬°á (Å¬¶óÀÌ¾ðÆ®¿¡¼­¸¸, Áßº¹ ¹æÁö)
-    //if (Img_MinimapBackground && PC->IsLocalController())  // ·ÎÄÃ Å¬¶óÀÌ¾ðÆ®¿¡¼­¸¸
+    // 6. ï¿½Ì´Ï¸ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½)
+    //if (Img_MinimapBackground && PC->IsLocalController())  // ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     //{
     //    if (UMaterialInstanceDynamic* DynMat = Img_MinimapBackground->GetDynamicMaterial())
     //    {
@@ -77,7 +77,7 @@ void UGameHUDWidget::NativeConstruct()
     //    }
     //}
 
-    // ÃÊ±â UI ¾÷µ¥ÀÌÆ®
+    // ï¿½Ê±ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     UpdateHPFromPlayerState();
     UpdateTurnUI();
     UpdateTurnOrderDisplay();
@@ -94,7 +94,7 @@ void UGameHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     UpdatePlayerMarkers();
     UpdateHPFromPlayerState();
     UpdateTurnUI();
-    UpdateTurnOrderDisplay(); // ÇöÀç ÅÏ °­Á¶ ½Ç½Ã°£ °»½Å
+    UpdateTurnOrderDisplay(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ç½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
 }
 
 void UGameHUDWidget::OnDiceResultReceived(int32 PlayerNumber, int32 DiceNum)
@@ -103,23 +103,23 @@ void UGameHUDWidget::OnDiceResultReceived(int32 PlayerNumber, int32 DiceNum)
     UE_LOG(LogTemp, Log, TEXT("Dice Result: Player %d rolled %d"), PlayerNumber, DiceNum);
 }
 
-// µ¨¸®°ÔÀÌÆ® ÇÚµé·¯
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Úµé·¯
 void UGameHUDWidget::OnReceivedFirstOrder(TArray<int32> PlayerNumbers, TArray<int32> DiceNums)
 {
-    CurrentTurnOrder = PlayerNumbers; // ¼­¹ö°¡ °áÁ¤ÇÑ ¼ø¼­ ÀúÀå
+    CurrentTurnOrder = PlayerNumbers; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     //UE_LOG(LogTemp, Log, TEXT("PlayerNUM %d"), CurrentTurnOrder);
     UpdateTurnOrderDisplay();
 
-    // TODO: ÁÖ»çÀ§ ±¼¸² ¾Ö´Ï¸ÞÀÌ¼Ç Àç»ý (ºí·çÇÁ¸°Æ® ÀÌº¥Æ® È£Ãâ µî)
+    // TODO: ï¿½Ö»ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ìºï¿½Æ® È£ï¿½ï¿½ ï¿½ï¿½)
 }
 
 void UGameHUDWidget::OnReceivedTurnEndInfo(TArray<int32> PlayerNumbers, TArray<int32> Scores, EEndType EndType)
 {
-    // ¼ø¼­´Â ±×´ë·Î À¯Áö, ÇÊ¿ä½Ã Á¡¼ö Ç¥½Ã Ãß°¡
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½Ê¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ ï¿½ß°ï¿½
     UpdateTurnOrderDisplay();
 }
 
-// ÅÏ ¼ø¼­ Ç¥½Ã
+// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
 void UGameHUDWidget::UpdateTurnOrderDisplay()
 {
     TArray<UTextBlock*> OrderTexts = { Text_TurnOrder1, Text_TurnOrder2, Text_TurnOrder3, Text_TurnOrder4 };
@@ -137,7 +137,7 @@ void UGameHUDWidget::UpdateTurnOrderDisplay()
             int32 PlayerNum = CurrentTurnOrder[i];
             TextBlock->SetText(FText::FromString(FString::Printf(TEXT("Num%d"), PlayerNum)));
 
-            // ÇöÀç ÅÏÀÎ ÇÃ·¹ÀÌ¾î´Â ³ë¶õ»ö °­Á¶
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             if (PlayerNum == CurrentTurnPlayer)
             {
                 TextBlock->SetColorAndOpacity(FSlateColor(FLinearColor::Yellow));
@@ -231,10 +231,30 @@ void UGameHUDWidget::UpdatePlayerMarkers()
 
 void UGameHUDWidget::OnDiceClicked()
 {
-    if (AMyPlayerController* MyPC = Cast<AMyPlayerController>(GetOwningPlayer()))
+    // ì£¼ì‚¬ìœ„
+    /*if (AMyPlayerController* MyPC = Cast<AMyPlayerController>(GetOwningPlayer()))
     {
         MyPC->Server_RequestThrowDice();
+    }*/
+
+    AMyPlayerController* PC = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+    if (IsValid(PC) == false)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PC Not Casting"));
+    } 
+    ACameraPawn* Pawn = Cast<ACameraPawn>(PC->GetPawn());
+    if (IsValid(Pawn) == false)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Pawn Not Casting"));
     }
+
+    if (Pawn->GetInventoryComponent() && Pawn->GetInventoryComponent()->IsUsingItem())
+    {
+        Pawn->ServerRPC_ConfirmItemUse();
+        return;
+    }
+
+    Pawn->ServerRPCMove();
 }
 
 void UGameHUDWidget::OnItemUseClicked()
@@ -261,11 +281,11 @@ void UGameHUDWidget::OnInventoryClicked()
     {
         if (bIsInventoryOpen)
         {
-            UISubsystem->SetUIState(EGameUIState::InGame);  // ÀÎº¥Åä¸® ´Ý±â
+            UISubsystem->SetUIState(EGameUIState::InGame);  // ï¿½Îºï¿½ï¿½ä¸® ï¿½Ý±ï¿½
         }
         else
         {
-            UISubsystem->SetUIState(EGameUIState::Inventory);  // ÀÎº¥Åä¸® ¿­±â (°ãÄ¡°Ô²û)
+            UISubsystem->SetUIState(EGameUIState::Inventory);  // ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Ä¡ï¿½Ô²ï¿½)
         }
         bIsInventoryOpen = !bIsInventoryOpen;
     }
