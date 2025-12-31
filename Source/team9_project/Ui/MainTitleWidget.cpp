@@ -56,8 +56,7 @@ void UMainTitleWidget::OnCreateGameClicked()
     {
         FString PlayerName = Input_Name ? Input_Name->GetText().ToString().TrimStartAndEnd() : TEXT("Player");
         if (PlayerName.IsEmpty()) PlayerName = TEXT("Player");
-
-        UISubsystem->StartHostGame(TEXT("/Game/KJH/Test/NewMap"), PlayerName);
+        UISubsystem->StartHostGame(TEXT("/Game/KJH/Test/NewMap.NewMap"), PlayerName);
     }
 }
 

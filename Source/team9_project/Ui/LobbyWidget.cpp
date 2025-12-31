@@ -9,6 +9,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
 #include "Blueprint/WidgetTree.h"
+#include "GameMode/LobbyGameMode.h"
 #include "Player/MyPlayerState.h"
 
 void ULobbyWidget::NativeConstruct()
@@ -41,7 +42,7 @@ void ULobbyWidget::UpdatePlayerList()
     if (!GS) return;
 
     const int32 MaxPlayers = 4; // 슬롯 수 (UI에 보여줄 최대 칸 수)
-    const int32 RequiredPlayers = 4; // 자동 시작에 필요한 최소 인원
+    const int32 RequiredPlayers = 2; // 자동 시작에 필요한 최소 인원
 
     TArray<APlayerState*> Players = GS->PlayerArray;
 
@@ -103,7 +104,8 @@ void ULobbyWidget::UpdatePlayerList()
     // 1. 4명 모이면 자동 시작 (이미 시작된 경우 중복 방지)
     if (CurrentCount >= RequiredPlayers)
     {
-        if (bIsHost && !bGameStarted)
+        //if (bIsHost && !bGameStarted)
+        if (true && !bGameStarted)
         {
             UE_LOG(LogTemp, Warning, TEXT("[Lobby] Outo Start"));
             OnActionClicked();
@@ -114,13 +116,14 @@ void ULobbyWidget::UpdatePlayerList()
     // 2. Start 버튼 활성화: 호스트에게만 항상 보이고 클릭 가능
     if (Btn_Action)
     {
-        Btn_Action->SetIsEnabled(bIsHost);                         // 클릭 가능
-        Btn_Action->SetVisibility(bIsHost ? ESlateVisibility::Visible : ESlateVisibility::Hidden); // 호스트에게만 보임
+        Btn_Action->SetIsEnabled(true);                         // 클릭 가능
+        Btn_Action->SetVisibility(true ? ESlateVisibility::Visible : ESlateVisibility::Visible); // 호스트에게만 보임
     }
 
     if (RoundSettingSpinner)
     {
-        RoundSettingSpinner->SetIsEnabled(bIsHost);
+        RoundSettingSpinner->SetIsEnabled(true);
+        //RoundSettingSpinner->SetIsEnabled(bIsHost);
     }
 }
 
@@ -129,9 +132,13 @@ void ULobbyWidget::OnActionClicked()
     UUIManagerSubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UUIManagerSubsystem>();
     if (!UISubsystem) return;
 
-    if (GetOwningPlayer()->HasAuthority())
+    //if (GetOwningPlayer()->HasAuthority())
+    //{
+    if (Btn_Action)
     {
-        if (Btn_Action) Btn_Action->SetIsEnabled(false);
+        Btn_Action->SetIsEnabled(false);
+        UE_LOG(LogTemp, Warning, TEXT("Btn_Cliced"));
+    }
         FString PlayerName = TEXT("Player");  // 기본값
 
         // 현재 플레이어 이름 가져오기 (예: PlayerState에서)
@@ -140,10 +147,13 @@ void ULobbyWidget::OnActionClicked()
             if (AMyPlayerState* TestPS = Cast<AMyPlayerState>(PS))
             {
                 PlayerName = TestPS->DisplayName;  // 또는 GetPlayerName()
+                //TestPS->bIsReady = true;
+                TestPS->SetReadyServerRPC();
             }
         }
-
+        
         // 이름 전달
-        UISubsystem->StartHostGame(TEXT("/Game/KJH/Test/MainMap"), PlayerName);
-    }
+        //UISubsystem->StartHostGame(TEXT("/Game/KJH/Test/MainMap"), PlayerName);
+    //}
 }
+

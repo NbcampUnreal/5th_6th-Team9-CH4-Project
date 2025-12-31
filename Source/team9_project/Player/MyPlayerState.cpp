@@ -102,3 +102,9 @@ void AMyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ThisClass, MaxHp);
 	DOREPLIFETIME(ThisClass, TileIndex);
 }
+
+void AMyPlayerState::SetReadyServerRPC_Implementation()
+{
+	bIsReady = true;
+	UE_LOG(LogTemp, Warning, TEXT("SetReadyServerRPC Start"));
+}

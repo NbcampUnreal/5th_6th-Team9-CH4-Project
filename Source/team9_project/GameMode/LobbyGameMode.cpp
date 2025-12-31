@@ -72,7 +72,7 @@ void ALobbyGameMode::MainGameStart()
 		{
 			continue;
 		}
-		
+
 		if (MyPlayerState->bIsReady)
 		{
 			LobbyPlayerStates.Add(MyPlayerState);
@@ -103,6 +103,6 @@ int32 ALobbyGameMode::GivePlayerNumber()
 	{
 		PlayerNumber = 1;
 	}
-	
-	return PlayerNumber; 
+
+	return PlayerNumber;
 }
