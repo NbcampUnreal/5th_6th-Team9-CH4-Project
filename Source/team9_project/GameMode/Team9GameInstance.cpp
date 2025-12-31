@@ -49,6 +49,21 @@ void UTeam9GameInstance::ClearAllPlayerData()
 {
 	PlayerDataMap.Empty();
 }
+
+void UTeam9GameInstance::SetTurnOrderedPlayerNums(TArray<int32> ArrayValue)
+{
+	TurnOrderedPlayerNums.Empty();
+	for (int32& PlayerNum : ArrayValue)
+	{
+		TurnOrderedPlayerNums.Add(PlayerNum);
+	}
+}
+
+TArray<int32> UTeam9GameInstance::GetTurnOrderedPlayerNums()
+{
+	return TurnOrderedPlayerNums;
+}
+
 void UTeam9GameInstance::Init()
 {
 	Super::Init();

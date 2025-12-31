@@ -11,6 +11,7 @@ AMainGameMode::AMainGameMode()
 	
 	TurnPlayerNumber = 0;
 	TurnIndex = 0;
+	bIsThrownDice = false;
 	CurrentRound = 0;
 	FirstReadyCheckTime = 1.0f;
 	MiniGameWaitTime = 1.0f;
@@ -18,20 +19,13 @@ AMainGameMode::AMainGameMode()
 	MaxRound = 5;
 }
 
-void AMainGameMode::OnPostLogin(AController* NewPlayer)
+void AMainGameMode::NotifyParticipationToServer(AMyPlayerController* NewPlayer)
 {
-	Super::OnPostLogin(NewPlayer);
-
-	AMyPlayerController* MyPlayerController = Cast<AMyPlayerController>(NewPlayer);
-	if (!IsValid(MyPlayerController))
-	{
-		return;
-	}
-
-	AMyPlayerState* MyPlayerState = MyPlayerController->GetPlayerState<AMyPlayerState>();
+	//맵에 들어온 플레이어를 저장한다.
+	AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>();
 	if (IsValid(MyPlayerState))
 	{
-		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), MyPlayerController);
+		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), NewPlayer);
 	}
 
 	//지정한 인원이 들어오면 시작한다.
@@ -71,12 +65,13 @@ void AMainGameMode::GameStart()
 	if (CurrentRound <= 1)
 	{
 		WaitForReady();
-		SetPlayerNumbersOrder();
+		SetPlayerNumbersOrder(false);
 
 		return;
 	}
 
 	//라운드 시작
+	SetPlayerNumbersOrder(true);
 	NextPlayerTurn(true);
 }
 
@@ -88,7 +83,9 @@ int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 		return 0;
 	}
 
+	//주사위 던지기
 	const int32 DiceNum = FMath::RandRange(1, 6);
+	bIsThrownDice = true;
 
 	//주사위 결과를 각 플레이어 컨트롤러에게 전달
 	for (auto PlayerInfo : PlayersInGame)
@@ -151,8 +148,34 @@ int32 AMainGameMode::GetTurnPlayerNumber()
 	return TurnPlayerNumber;
 }
 
-void AMainGameMode::SetPlayerNumbersOrder()
+bool AMainGameMode::GetIsThrowDice()
 {
+	return bIsThrownDice;
+}
+
+void AMainGameMode::SetPlayerNumbersOrder(bool bFromGameInstance)
+{
+	//게임 인스턴스에서 가져올 경우 (2번째 라운드 부터)
+	if (bFromGameInstance)
+	{
+		if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
+		{
+			TArray<int32> DataFromGameInstance = GameInstance->GetTurnOrderedPlayerNums();
+			for (int32& PlayerNum : DataFromGameInstance)
+			{
+				TurnOrderedPlayerNums.Add(PlayerNum);
+				RankOrderedPlayerNums.Add(PlayerNum);//먼저 턴 진행 순서대로 넣고 이후 정렬
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to get 'TurnOrderedPlayerNums' from GameInstance."));
+		}
+
+		return;
+	}
+
+	//여기부터 직접 순서를 정하는 과정
 	//1 ~ 6의 숫자를 무작위로 섞기
 	TArray DiceNums = { 1, 2, 3, 4, 5, 6 };
 	for (int32 iNum = 5; iNum > 0; --iNum)
@@ -189,6 +212,12 @@ void AMainGameMode::SetPlayerNumbersOrder()
 			TurnOrderedPlayerNums.Add(OrderByDiceNum[iNum]);
 			RankOrderedPlayerNums.Add(OrderByDiceNum[iNum]);//시작시 순위는 턴 진행 순서를 따른다.
 		}
+	}
+
+	//게임 인스턴스에 진행 순서 저장
+	if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
+	{
+		GameInstance->SetTurnOrderedPlayerNums(TurnOrderedPlayerNums);
 	}
 }
 
@@ -287,6 +316,7 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 
 	//다음 플레이어의 차례 진행
 	TurnPlayerNumber = TurnOrderedPlayerNums[TurnIndex];
+	bIsThrownDice = false;
 	CheckAndSendPlayerRank(EEndType::TurnEnd);
 
 	//차례가 시작된 플레이어의 아이템 사용 허용

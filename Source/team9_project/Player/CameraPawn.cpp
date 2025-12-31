@@ -124,12 +124,6 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		if (IsValid(MyPlayerController))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("MyPlayerController"))
-			//BindAction
-			EIC->BindAction(
-				MyPlayerController->LeftClickAction,
-				ETriggerEvent::Started,
-				this,
-				&ACameraPawn::LeftClickHandle);
 
 			EIC->BindAction(
 				MyPlayerController->CameraKeyMoveAction,
@@ -225,19 +219,6 @@ void ACameraPawn::Tick(float DeltaTime)
 			AddActorWorldOffset(MoveDirection * ScreenSpeed * DeltaTime, true);
 		}
 	}
-}
-
-void ACameraPawn::LeftClickHandle(const FInputActionValue& Value)
-{
-	UE_LOG(LogTemp, Warning, TEXT("CLIENT: LeftClick"));
-	// 아이템 사용 중이면 확정
-	if (InventoryComponent && InventoryComponent->IsUsingItem())
-	{
-		ServerRPC_ConfirmItemUse();
-		return;
-	}
-
-	ServerRPCLeftClick();
 }
 
 void ACameraPawn::ServerRPCItemUseStart_Implementation()
@@ -483,8 +464,9 @@ void ACameraPawn::CameraReturnHandle(const FInputActionValue&)
 	SetActorLocation(PlayerCharacter->GetActorLocation());
 }
 
-void ACameraPawn::ServerRPCLeftClick_Implementation()
+void ACameraPawn::ServerRPCMove_Implementation()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ServerRPCMove On"));
 	SetMoveState();
 }
 

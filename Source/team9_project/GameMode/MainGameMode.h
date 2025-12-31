@@ -17,11 +17,10 @@ class TEAM9_PROJECT_API AMainGameMode : public AGameModeBase
 public:
 	AMainGameMode();
 
-protected:
-	virtual void OnPostLogin(AController* NewPlayer) override;
-
-public:
 	virtual void Logout(AController* Exiting) override;
+
+	//서버에 입장을 알린다.
+	void NotifyParticipationToServer(AMyPlayerController* NewPlayer);
 
 private:
 	//게임 시작
@@ -46,9 +45,12 @@ public:
 	//현재 진행중인 턴인 플레이어 인덱스
 	int32 GetTurnPlayerNumber();
 
+	//이번 턴에 주사위를 던졌는가
+	bool GetIsThrowDice();
+
 private:
 	//플레이어 순서 정하기
-	void SetPlayerNumbersOrder();
+	void SetPlayerNumbersOrder(bool bFromGameInstance);
 
 	//게임 처음 시작시 각 플레이어의 준비를 기다린다.
 	void WaitForReady();
@@ -88,6 +90,9 @@ private:
 
 	//현재 턴 진행중인 플레이어 인덱스
 	int32 TurnIndex;
+
+	//이 턴 중에 주사위를 굴렸는가
+	bool bIsThrownDice;
 
 	//현재 라운드
 	int16 CurrentRound;
