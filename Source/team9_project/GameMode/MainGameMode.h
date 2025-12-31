@@ -17,11 +17,10 @@ class TEAM9_PROJECT_API AMainGameMode : public AGameModeBase
 public:
 	AMainGameMode();
 
-protected:
-	virtual void OnPostLogin(AController* NewPlayer) override;
-
-public:
 	virtual void Logout(AController* Exiting) override;
+
+	//서버에 입장을 알린다.
+	void NotifyParticipationToServer(AMyPlayerController* NewPlayer);
 
 private:
 	//게임 시작

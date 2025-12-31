@@ -19,20 +19,13 @@ AMainGameMode::AMainGameMode()
 	MaxRound = 5;
 }
 
-void AMainGameMode::OnPostLogin(AController* NewPlayer)
+void AMainGameMode::NotifyParticipationToServer(AMyPlayerController* NewPlayer)
 {
-	Super::OnPostLogin(NewPlayer);
-
-	AMyPlayerController* MyPlayerController = Cast<AMyPlayerController>(NewPlayer);
-	if (!IsValid(MyPlayerController))
-	{
-		return;
-	}
-
-	AMyPlayerState* MyPlayerState = MyPlayerController->GetPlayerState<AMyPlayerState>();
+	//맵에 들어온 플레이어를 저장한다.
+	AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>();
 	if (IsValid(MyPlayerState))
 	{
-		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), MyPlayerController);
+		PlayersInGame.Add(MyPlayerState->GetPlayerNumber(), NewPlayer);
 	}
 
 	//지정한 인원이 들어오면 시작한다.
