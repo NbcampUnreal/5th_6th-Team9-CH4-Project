@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Inventory/InventoryComponent.h"
@@ -442,7 +442,12 @@ bool UInventoryComponent::IsSlotEmpty(int32 SlotIndex) const
 
 int32 UInventoryComponent::GetEmptySlotIndex() const
 {
-	for (int32 i = 0; i < Max_SLOTS; ++i)
+	if (Slots.Num() == 0)
+	{
+		return -1;
+	}
+
+	for (int32 i = 0; i < Slots.Num(); ++i)
 	{
 		if (Slots[i].IsEmpty())
 		{

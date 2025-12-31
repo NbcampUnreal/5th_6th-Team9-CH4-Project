@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
@@ -17,7 +17,7 @@ protected:
     virtual void NativeConstruct() override;
 
 public:
-    // ¼­¹ö Á¡¼ö ±âÁØÀ¸·Î ¼øÀ§ °è»ê ¹× UI Ç¥½Ã (¿ÜºÎ¿¡¼­ È£Ãâ)
+    // ì„œë²„ ì ìˆ˜ ê¸°ì¤€ìœ¼ë¡œ ìˆœìœ„ ê³„ì‚° ë° UI í‘œì‹œ (ì™¸ë¶€ì—ì„œ í˜¸ì¶œ)
     UFUNCTION(BlueprintCallable, Category = "Game Result")
     void SetupResults();
 
@@ -25,19 +25,19 @@ public:
     void OnBackToMainClicked();
 
 private:
-    // ¼øÀ§ Çà UI »ı¼º (³»ºÎ ÇÔ¼ö)
+    // ìˆœìœ„ í–‰ UI ìƒì„± (ë‚´ë¶€ í•¨ìˆ˜)
     void CreateRankRow(int32 Rank, const FString& PlayerName, int32 Score, UPanelWidget* Container);
 
-    // Áßº¹ »ı¼º ¹æÁö
+    // ì¤‘ë³µ ìƒì„± ë°©ì§€
     bool bResultsShown = false;
 
 protected:
     UPROPERTY(meta = (BindWidget))
-    class UTextBlock* Text_WinnerName;  // 1À§ ÀÌ¸§ °­Á¶ (¼±ÅÃ)
+    class UTextBlock* Text_WinnerName;  // TODO: 1ìœ„ ì´ë¦„ ê°•ì¡°
 
     UPROPERTY(meta = (BindWidget))
-    class UPanelWidget* RankListContainer;  // VerticalBox·Î ¼øÀ§ ¸®½ºÆ®
+    class UPanelWidget* RankListContainer;  // VerticalBoxë¡œ ìˆœìœ„ ë¦¬ìŠ¤íŠ¸
 
     UPROPERTY(meta = (BindWidget))
-    class UButton* Btn_BackToMain;  // ¸ŞÀÎÀ¸·Î µ¹¾Æ°¡±â ¹öÆ°
+    class UButton* Btn_BackToMain;  // ë©”ì¸ìœ¼ë¡œ ëŒì•„ê°€ê¸° ë²„íŠ¼
 };

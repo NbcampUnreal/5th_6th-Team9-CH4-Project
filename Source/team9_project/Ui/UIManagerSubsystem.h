@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
@@ -32,6 +32,8 @@ public:
     void ReturnToMainTitle();
 
 protected:
+    FTimerHandle DelayHandle;
+
     UPROPERTY()
     EGameUIState CurrentState = EGameUIState::None;
 
@@ -50,9 +52,9 @@ protected:
 private:
     void UpdateInputMode(EGameUIState State);
 
-    // Å¸ÀÌ¸Ó ÇÚµé
+    // íƒ€ì´ë¨¸ í•¸ë“¤
     FTimerHandle MapCheckTimerHandle;
 
-    // ÆÄ¶ó¹ÌÅÍ ¾ø´Â ÇÔ¼ö·Î º¯°æ (Å¸ÀÌ¸Ó ¹ÙÀÎµù¿ë)
+    // íŒŒë¼ë¯¸í„° ì—†ëŠ” í•¨ìˆ˜ë¡œ ë³€ê²½ (íƒ€ì´ë¨¸ ë°”ì¸ë”©ìš©)
     void CheckAndSetUIStateForCurrentMap();
 };

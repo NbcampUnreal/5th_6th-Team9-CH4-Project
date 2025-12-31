@@ -36,10 +36,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlayerData")
 	void ClearAllPlayerData();
 
+	void SetTurnOrderedPlayerNums(TArray<int32> ArrayValue);
+
+	TArray<int32> GetTurnOrderedPlayerNums();
+
 private:
 	int32 CurrentRound;
 
 	// Cho_Sungmin - 플레이어별 저장 데이터
 	UPROPERTY()
 	TMap<int32, FPlayerPersistentData> PlayerDataMap;
+
+	//메인 게임 모드에서 사용하는 턴 플레이어 순서
+	TArray<int32> TurnOrderedPlayerNums;
 };

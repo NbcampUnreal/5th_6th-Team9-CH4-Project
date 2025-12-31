@@ -1,4 +1,4 @@
-#include "UIManagerSubsystem.h"
+ï»¿#include "UIManagerSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
@@ -8,32 +8,53 @@
 
 void UUIManagerSubsystem::SetUIState(EGameUIState NewState)
 {
-    // ±âÁ¸ À§Á¬ Á¦°Å 
+    // ê¸°ì¡´ ìœ„ì ¯ ì œê±° 
     ClearActiveWidgets();
 
-    // NoneÀº À§Á¬ ¾øÀÌ ÀÔ·Â¸ğµå¸¸ º¯°æ
-    if (NewState == EGameUIState::None)
+
+    if (GetWorld() && GetWorld()->GetNetMode() != NM_DedicatedServer)
     {
-        CurrentState = NewState;
-        UpdateInputMode(NewState);
-        return;
+        // Noneì€ ìœ„ì ¯ ì—†ì´ ì…ë ¥ëª¨ë“œë§Œ ë³€ê²½
+        if (NewState == EGameUIState::None)
+        {
+            CurrentState = NewState;
+            UpdateInputMode(NewState);
+            return;
+        }
+        ULocalPlayer* LocalPlayer = GetWorld() ? GetWorld()->GetFirstLocalPlayerFromController() : nullptr; //ë¡œì»¬ì´ ì•„ë‹ˆë¼ ì„œë²„ë¡œ í•´ì•¼í•¨
+        APlayerController* PC = LocalPlayer ? LocalPlayer->GetPlayerController(GetWorld()) : nullptr;
+
+        if (PC)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Success Local PlayerController Ready"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Success Local PlayerController NotReady"));      //ë¬´í•œëŒ€ë¡œ ë‚˜ì˜¤ëŠ” í˜„ìƒ
+
+            GetWorld()->GetTimerManager().SetTimer(DelayHandle, [this, NewState]()        //SetTimerForNextTick ëŒ€ì‹  1ì´ˆ ì •ë„ë¡œ í•´ë†“ê¸°
+                {
+                    SetUIState(NewState);
+                }, 1.0f, false);
+            return;
+        }
+        // ìœ„ì ¯ í´ë˜ìŠ¤ ì¡´ì¬ ì—¬ë¶€ + null ì²´í¬
+        if (!UIWidgetMap.Contains(NewState))// í•´ë‹¹ ë¶€ë¶„ ë¬¸ì œ
+            return;
+        if (!UIWidgetMap[NewState])
+            return;
+
+        ActiveStateWidget = CreateWidget<UUserWidget>(PC, UIWidgetMap[NewState]);
+        if (ActiveStateWidget)
+        {
+            ActiveStateWidget->AddToViewport();
+            CurrentState = NewState;
+            UpdateInputMode(NewState);
+        }
     }
-
-    // À§Á¬ Å¬·¡½º Á¸Àç ¿©ºÎ + null Ã¼Å©
-    if (!UIWidgetMap.Contains(NewState))// ÇØ´ç ºÎºĞ ¹®Á¦
-        return;
-    if(!UIWidgetMap[NewState])
-        return;
-
-    APlayerController* PC = GetWorld()->GetFirstPlayerController();
-    if (!PC) return;
-
-    ActiveStateWidget = CreateWidget<UUserWidget>(PC, UIWidgetMap[NewState]);
-    if (ActiveStateWidget)
+    else
     {
-        ActiveStateWidget->AddToViewport();
-        CurrentState = NewState;
-        UpdateInputMode(NewState);
+        UE_LOG(LogTemp, Warning, TEXT("D.S.True"));
     }
 }
 
@@ -49,7 +70,7 @@ void UUIManagerSubsystem::StartHostGame(const FString& MapName, const FString& P
 {
     if (UWorld* World = GetWorld())
     {
-        //MapName?listen?Name=ÇÃ·¹ÀÌ¾îÀÌ¸§
+        //MapName?listen?Name=í”Œë ˆì´ì–´ì´ë¦„
         FString URL = FString::Printf(TEXT("%s?listen?Name=%s"), *MapName, *PlayerName);
         UE_LOG(LogTemp, Warning, TEXT("Host URL: %s"), *URL);
         //World->ServerTravel(URL);
@@ -64,7 +85,7 @@ void UUIManagerSubsystem::StartJoinGame(const FString& IPAddress, const FString&
     if (UWorld* World = GetWorld())
     {
         FString Address = IPAddress.IsEmpty() ? TEXT("127.0.0.1") : IPAddress;
-        //IPÁÖ¼Ò?Name=ÇÃ·¹ÀÌ¾îÀÌ¸§
+        //IPì£¼ì†Œ?Name=í”Œë ˆì´ì–´ì´ë¦„
         FString URL = FString::Printf(TEXT("%s?Name=%s"), *Address, *PlayerName);
         UE_LOG(LogTemp, Warning, TEXT("Join URL: %s"), *URL);
         //GetWorld()->GetFirstPlayerController()->ClientTravel(URL, ETravelType::TRAVEL_Absolute);
@@ -114,19 +135,19 @@ void UUIManagerSubsystem::ReturnToMainTitle()
     UWorld* World = GetWorld();
     if (!World) return;
 
-    // È£½ºÆ®¸¸ ServerTravel È£Ãâ (¸ğµç Å¬¶óÀÌ¾ğÆ® ÀÌµ¿)
+    // í˜¸ìŠ¤íŠ¸ë§Œ ServerTravel í˜¸ì¶œ (ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ ì´ë™)
     if (APlayerController* PC = World->GetFirstPlayerController())
     {
         if (PC->HasAuthority())
         {
-            // ¸ŞÀÎ Å¸ÀÌÆ² ¸Ê °æ·Î
+            // ë©”ì¸ íƒ€ì´í‹€ ë§µ ê²½ë¡œ
             FString MainTitleMap = TEXT("/Game/KJH/Test/MainTitleLevel?listen");
             //World->ServerTravel(MainTitleMap);
             UE_LOG(LogTemp, Warning, TEXT("[UIManager] All Player Move To MainTitle: %s"), *MainTitleMap);
         }
     }
 
-    // UI »óÅÂ ÃÊ±âÈ­
+    // UI ìƒíƒœ ì´ˆê¸°í™”
     SetUIState(EGameUIState::MainMenu);
 }
 
@@ -142,22 +163,22 @@ void UUIManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UUIManagerSubsystem::ShowWidgetByPath(const FString& WidgetPath)
 {
-    // ±âÁ¸ À§Á¬ Áö¿ì±â
+    // ê¸°ì¡´ ìœ„ì ¯ ì§€ìš°ê¸°
     ClearActiveWidgets();
 
-    // ÁÖ¼Ò·Î À§Á¬ Å¬·¡½º ·Îµå
+    // ì£¼ì†Œë¡œ ìœ„ì ¯ í´ë˜ìŠ¤ ë¡œë“œ
     TSubclassOf<UUserWidget> WidgetClass = LoadClass<UUserWidget>(nullptr, *WidgetPath);
 
     if (WidgetClass)
     {
         if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
         {
-            // À§Á¬ »ı¼º ¹× Ãâ·Â
+            // ìœ„ì ¯ ìƒì„± ë° ì¶œë ¥
             ActiveStateWidget = CreateWidget<UUserWidget>(PC, WidgetClass);
             if (ActiveStateWidget)
             {
                 ActiveStateWidget->AddToViewport();
-                // ÀÔ·Â ¸ğµå ¼³Á¤ (InGame »óÅÂÀÇ ¼³Á¤ Àû¿ë)
+                // ì…ë ¥ ëª¨ë“œ ì„¤ì • (InGame ìƒíƒœì˜ ì„¤ì • ì ìš©)
                 UpdateInputMode(EGameUIState::InGame);
             }
         }
@@ -165,24 +186,24 @@ void UUIManagerSubsystem::ShowWidgetByPath(const FString& WidgetPath)
 }
 void UUIManagerSubsystem::UpdateUIForCurrentMap()
 {
-    CheckAndSetUIStateForCurrentMap();  // ±âÁ¸ ¸Ê ÀÌ¸§ È®ÀÎ ·ÎÁ÷ Àç»ç¿ë
+    CheckAndSetUIStateForCurrentMap();  // ê¸°ì¡´ ë§µ ì´ë¦„ í™•ì¸ ë¡œì§ ì¬ì‚¬ìš©
 }
 
 void UUIManagerSubsystem::Test() {
         UE_LOG(LogTemp, Warning, TEXT("[UIManager] Initializing UIManagerSubsystem..."));
-    // 1. UI À§Á¬ Å¬·¡½º µî·Ï (ÇÊ¿äÇÑ À§Á¬µéÀ» ¿©±â¼­ LoadClass·Î µî·Ï)
-    // ¿¹½Ã: ½ÇÁ¦ °æ·Î´Â ÇÁ·ÎÁ§Æ®¿¡ ¸Â°Ô ¼öÁ¤ÇÏ¼¼¿ä.
+    // 1. UI ìœ„ì ¯ í´ë˜ìŠ¤ ë“±ë¡ (í•„ìš”í•œ ìœ„ì ¯ë“¤ì„ ì—¬ê¸°ì„œ LoadClassë¡œ ë“±ë¡)
+    // ì˜ˆì‹œ: ì‹¤ì œ ê²½ë¡œëŠ” í”„ë¡œì íŠ¸ì— ë§ê²Œ ìˆ˜ì •í•˜ì„¸ìš”.
     RegisterUIWidget(EGameUIState::MainMenu, LoadClass<UUserWidget>(nullptr, TEXT("/Game/KJH/WBP_MainTitleWidget.WBP_MainTitleWidget_C")));
     RegisterUIWidget(EGameUIState::Lobby, LoadClass<UUserWidget>(nullptr, TEXT("/Game/KJH/WBP_LobbyWidget.WBP_LobbyWidget_C")));
     RegisterUIWidget(EGameUIState::InGame, LoadClass<UUserWidget>(nullptr, TEXT("/Game/KJH/WBP_GameHUDWidget.WBP_GameHUDWidget_C")));
     RegisterUIWidget(EGameUIState::GameOver, LoadClass<UUserWidget>(nullptr, TEXT("/Game/KJH/WBP_ResultWidget.WBP_ResultWidget_C")));
 
-    // Ãß°¡ À§Á¬ÀÌ ÀÖ´Ù¸é ¿©±â °è¼Ó Ãß°¡
+    // ì¶”ê°€ ìœ„ì ¯ì´ ìˆë‹¤ë©´ ì—¬ê¸° ê³„ì† ì¶”ê°€
     // RegisterUIWidget(EGameUIState::Inventory, LoadClass<UUserWidget>(nullptr, TEXT("/Game/UI/WBP_Inventory.WBP_Inventory_C")));
 
     UE_LOG(LogTemp, Warning, TEXT("[UIManager] All UI Widgets Registered!"));
 
-    // 2. ¸Ê Å°¿öµå ¡æ UI »óÅÂ ¸ÅÇÎ (ÄÚµå¿¡¼­ °­Á¦ Á¤ÀÇ ¡æ ¿¡µğÅÍ ¼³Á¤ ÀÇÁ¸¼º Á¦°Å)
+    // 2. ë§µ í‚¤ì›Œë“œ â†’ UI ìƒíƒœ ë§¤í•‘ (ì½”ë“œì—ì„œ ê°•ì œ ì •ì˜ â†’ ì—ë””í„° ì„¤ì • ì˜ì¡´ì„± ì œê±°)
     MapKeywordToUIState.Empty();
 
     MapKeywordToUIState.Add(TEXT("MainTitle"), EGameUIState::MainMenu);
@@ -192,12 +213,12 @@ void UUIManagerSubsystem::Test() {
     MapKeywordToUIState.Add(TEXT("TimingGame"), EGameUIState::InGame);
     MapKeywordToUIState.Add(TEXT("Result"), EGameUIState::GameOver);
 
-    // ÇÊ¿ä ½Ã Ãß°¡ (¿¹: Å×½ºÆ®¿ë)
+    // í•„ìš” ì‹œ ì¶”ê°€ (ì˜ˆ: í…ŒìŠ¤íŠ¸ìš©)
     // MapKeywordToUIState.Add(TEXT("TestMap"), EGameUIState::InGame);
 
     UE_LOG(LogTemp, Warning, TEXT("[UIManager] Map Keywords Registered! (%d entries)"), MapKeywordToUIState.Num());
 
-    // 3. ¸Ê º¯°æ °¨Áö Å¸ÀÌ¸Ó ½ÃÀÛ
+    // 3. ë§µ ë³€ê²½ ê°ì§€ íƒ€ì´ë¨¸ ì‹œì‘
     if (UWorld* World = GetWorld())
     {
         World->GetTimerManager().SetTimer(
@@ -205,7 +226,7 @@ void UUIManagerSubsystem::Test() {
             this,
             &UUIManagerSubsystem::CheckAndSetUIStateForCurrentMap,
             0.5f,
-            false  // ÇÑ ¹ø¸¸ ½ÇÇà (¸Ê ·Îµå Á÷ÈÄ ÃæºĞ)
+            false  // í•œ ë²ˆë§Œ ì‹¤í–‰ (ë§µ ë¡œë“œ ì§í›„ ì¶©ë¶„)
         );
 
         UE_LOG(LogTemp, Warning, TEXT("[UIManager] MapCheckTimer Started!"));
@@ -219,7 +240,7 @@ void UUIManagerSubsystem::Test() {
 }
 void UUIManagerSubsystem::Deinitialize()
 {
-    // Å¸ÀÌ¸Ó Á¤¸®
+    // íƒ€ì´ë¨¸ ì •ë¦¬
     if (UWorld* World = GetWorld())
     {
         World->GetTimerManager().ClearTimer(MapCheckTimerHandle);
@@ -240,9 +261,9 @@ void UUIManagerSubsystem::CheckAndSetUIStateForCurrentMap()
 
     UE_LOG(LogTemp, Warning, TEXT("[UIManager] Detected Map: %s"), *MapName);
 
-    EGameUIState TargetState = EGameUIState::MainMenu;  // ±âº»°ª
+    EGameUIState TargetState = EGameUIState::MainMenu;  // ê¸°ë³¸ê°’
 
-    // ¿¡µğÅÍ¿¡¼­ ¼³Á¤ÇÑ TMap ¼øÈ¸
+    // ì—ë””í„°ì—ì„œ ì„¤ì •í•œ TMap ìˆœíšŒ
     for (const TPair<FString, EGameUIState>& Pair : MapKeywordToUIState)
     {
         UE_LOG(LogTemp, Warning, TEXT("[UIManager] MAPNAME: %s"), *MapName);
@@ -250,11 +271,11 @@ void UUIManagerSubsystem::CheckAndSetUIStateForCurrentMap()
         if (MapName.Contains(Pair.Key, ESearchCase::IgnoreCase))
         {
             TargetState = Pair.Value;
-            UE_LOG(LogTemp, Log, TEXT("[UIManager] Matched Keyword: %s ¡æ UI State: %s"),
+            UE_LOG(LogTemp, Log, TEXT("[UIManager] Matched Keyword: %s â†’ UI State: %s"),
                 *Pair.Key, *UEnum::GetValueAsString(TargetState));
-            break;  // Ã¹ ¹øÂ° ¸ÅÄªµÈ °Í¸¸ »ç¿ë
+            break;  // ì²« ë²ˆì§¸ ë§¤ì¹­ëœ ê²ƒë§Œ ì‚¬ìš©
         }
     }
-    //UI»óÅÂ Àû¿ë
+    //UIìƒíƒœ ì ìš©
     SetUIState(TargetState);
 }

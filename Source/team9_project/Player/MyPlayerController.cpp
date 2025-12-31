@@ -1,5 +1,4 @@
-#include "Player/MyPlayerController.h"
-#include "Ui/Test/MyTestGameMode.h"
+﻿#include "Player/MyPlayerController.h"
 #include "Ui/UIManagerSubsystem.h"
 #include "Ui/MinimapCameraActor.h"
 #include "GameMode/MainGameMode.h"
@@ -18,6 +17,9 @@ void AMyPlayerController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
     UE_LOG(LogTemp, Warning, TEXT("Possessed: %s"), *GetNameSafe(InPawn));
+
+    //맵 입장후 빙의까지 완료하면 서버에 참여를 알린다.
+    NotifyToServerToParticipate();
 }
 
 void AMyPlayerController::BeginPlay()
@@ -75,7 +77,6 @@ void AMyPlayerController::BeginPlay()
     }
 
     // 4. 인벤토리 위젯 생성은 주석 처리 (GameHUDWidget 버튼으로 토글)
-    /*
     if (InventoryWidgetClass)
     {
         InventoryWidget = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
@@ -84,7 +85,6 @@ void AMyPlayerController::BeginPlay()
             InventoryWidget->AddToViewport();  // 중복 생성 문제 해결됨
         }
     }
-    */
 }
 
 void AMyPlayerController::Server_RequestThrowDice_Implementation()
@@ -140,6 +140,14 @@ void AMyPlayerController::SetupInputComponent()
     if (InputComponent)
     {
         InputComponent->BindKey(EKeys::R, IE_Pressed, this, &AMyPlayerController::TestShowResult);
+    }
+}
+
+void AMyPlayerController::NotifyToServerToParticipate_Implementation()
+{
+    if (AMainGameMode* GameMode = GetWorld()->GetAuthGameMode<AMainGameMode>())
+    {
+        GameMode->NotifyParticipationToServer(this);
     }
 }
 
