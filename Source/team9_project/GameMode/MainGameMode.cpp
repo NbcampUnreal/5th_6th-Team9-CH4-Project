@@ -1,5 +1,7 @@
 #include "MainGameMode.h"
 #include "Team9GameInstance.h"
+#include "Inventory/InventoryComponent.h"
+#include "Player/CameraPawn.h"
 #include "Player/MyPlayerState.h"
 #include "Player/MyPlayerController.h"
 
@@ -68,7 +70,7 @@ void AMainGameMode::GameStart()
 	//1라운드(처음 시작)인 경우 진행 순서 정하고 준비를 기다린다.
 	if (CurrentRound <= 1)
 	{
-		//WaitForReady();
+		WaitForReady();
 		SetPlayerNumbersOrder();
 
 		return;
@@ -123,7 +125,7 @@ bool AMainGameMode::CheckPlayerTurn(const int32 MyPlayerNumber)
 	return TurnPlayerNumber == MyPlayerNumber;
 }
 
-bool AMainGameMode::UsingItem(const int32 MyPlayerNumber, const int32 InventoryIndex)
+bool AMainGameMode::UsingItem(const int32 MyPlayerNumber)
 {
 	//차례가 아닌 플레이어는 아이템 사용 불가능
 	if (CheckPlayerTurn(MyPlayerNumber))
@@ -131,9 +133,15 @@ bool AMainGameMode::UsingItem(const int32 MyPlayerNumber, const int32 InventoryI
 		return false;
 	}
 
-	//TODO : 이미 아이템 사용시 재사용 불가
+	//이미 아이템 사용시 재사용 불가
+	ACameraPawn* CameraPawn = Cast<ACameraPawn>(PlayersInGame[TurnPlayerNumber]->GetPawn());
+	if (!IsValid(CameraPawn) || CameraPawn->GetInventoryComponent()->bHasUsedItemThisTurn)
+	{
+		return false;
+	}
 
-	//TODO : 아이템 사용 구현
+	//아이템 사용
+	CameraPawn->GetInventoryComponent()->bHasUsedItemThisTurn = false;
 
 	return true;
 }
@@ -266,9 +274,29 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 		return;
 	}
 
-	//아직 라운드 종료가 아니라면 다음 플레이어의 차례 진행
+	//차례가 끝날 플레이어의 아이템 사용 불허
+	if (PlayersInGame.Contains(TurnPlayerNumber))
+	{
+		ACameraPawn* PrevPlayerPawn = Cast<ACameraPawn>(PlayersInGame[TurnPlayerNumber]->GetPawn());
+		if (!IsValid(PrevPlayerPawn))
+		{
+			return;
+		}
+		PrevPlayerPawn->GetInventoryComponent()->bIsCurrentlyOperating = false;
+	}
+
+	//다음 플레이어의 차례 진행
 	TurnPlayerNumber = TurnOrderedPlayerNums[TurnIndex];
 	CheckAndSendPlayerRank(EEndType::TurnEnd);
+
+	//차례가 시작된 플레이어의 아이템 사용 허용
+	ACameraPawn* CurrentPlayerPawn = Cast<ACameraPawn>(PlayersInGame[TurnPlayerNumber]->GetPawn());
+	if (!IsValid(CurrentPlayerPawn))
+	{
+		return;
+	}
+	CurrentPlayerPawn->GetInventoryComponent()->bIsCurrentlyOperating = true;
+	CurrentPlayerPawn->GetInventoryComponent()->bHasUsedItemThisTurn = false;
 }
 
 void AMainGameMode::MoveToMiniGameMap()

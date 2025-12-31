@@ -1,5 +1,4 @@
 ﻿#include "Player/MyPlayerController.h"
-#include "Ui/Test/MyTestGameMode.h"
 #include "Ui/UIManagerSubsystem.h"
 #include "Ui/MinimapCameraActor.h"
 #include "GameMode/MainGameMode.h"
