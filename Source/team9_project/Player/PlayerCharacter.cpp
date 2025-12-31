@@ -79,6 +79,11 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 void APlayerCharacter::MoveToNextNode(int DiceValue)
 {
 	remainingMove = DiceValue;
+	if (remainingMove <= 0)
+	{
+		return;
+	}
+
 	ATileManagerActor* TileManager = ATileManagerActor::Get(GetWorld());
 	CurrentIndex = MyPlayerState->GetTileIndex();
 

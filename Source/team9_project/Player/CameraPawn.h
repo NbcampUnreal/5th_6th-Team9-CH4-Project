@@ -44,7 +44,7 @@ public:
 	void SetItemUseState();
 
 	UFUNCTION(Server, Reliable)
-	void ServerRPCLeftClick();
+	void ServerRPCMove();
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_CancelItemUse();
@@ -55,8 +55,6 @@ public:
 	// 내화면에만 움직이면 됌
 	void CameraKeyMoveHandle(const FInputActionValue&);
 	void CameraReturnHandle(const FInputActionValue&);
-
-	void LeftClickHandle(const FInputActionValue&);
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRPCItemUseStart();
