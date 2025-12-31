@@ -52,7 +52,7 @@ public:
 
     FText GameName = FText::FromString(TEXT("TimingGame"));
 
-    FText GameDescription = FText::FromString(TEXT("TimingGameDescription"));
+    FText GameDescription = FText::FromString(TEXT("폭탄 게임"));
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
     TObjectPtr<UTexture2D> GameTexture;

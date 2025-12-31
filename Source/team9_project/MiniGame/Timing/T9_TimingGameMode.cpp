@@ -60,11 +60,6 @@ void AT9_TimingGameMode::Winner()
 			WinnerPlayer = R.PlayerId;
 			UE_LOG(LogTemp, Error, TEXT("Winner2 %d"), WinnerPlayer);
 		}
-		else if (R.DeltaMs == BestDeltaMs)//동등한기록
-		{
-			//고민중
-			UE_LOG(LogTemp, Error, TEXT("Winner"));
-		}
 	}
 	GS->WinnerPlayer = WinnerPlayer;
 	return;
