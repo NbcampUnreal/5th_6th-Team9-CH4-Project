@@ -68,6 +68,10 @@ protected:
 	//TEST
 	virtual void SetupInputComponent() override;
 
+	//서버에 참여를 알림
+	UFUNCTION(Server, Reliable)
+	void NotifyToServerToParticipate();
+
 public:
 
 	UPROPERTY()
