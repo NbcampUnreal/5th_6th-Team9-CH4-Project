@@ -26,7 +26,7 @@ class TEAM9_PROJECT_API UGameHUDWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
     virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-    // µ¨¸®°ÔÀÌÆ® ÇÚµé·¯ (ÅÏ ¼ø¼­ ¹× ¶ó¿îµå Á¾·á Á¤º¸ ¼ö½Å)
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Úµé·¯ (ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
     UFUNCTION()
     void OnDiceResultReceived(int32 PlayerNumber, int32 DiceNum);
 
@@ -36,32 +36,33 @@ public:
     UFUNCTION()
     void OnReceivedTurnEndInfo(TArray<int32> PlayerNumbers, TArray<int32> Scores, EEndType EndType);
 private:
-    // ¹öÆ° ÇÚµé·¯
+    // ï¿½ï¿½Æ° ï¿½Úµé·¯
+    UFUNCTION()
     void OnDiceClicked();
     void OnItemUseClicked();
     void OnInventoryClicked();
 
-    // UI ¾÷µ¥ÀÌÆ®
+    // UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     void UpdateHP(float CurrentHp, float MaxHp);
     void UpdateHPFromPlayerState();
     void UpdateTurnUI();
     void UpdatePlayerMarkers();
-    void UpdateTurnOrderDisplay(); // ÅÏ ¼ø¼­ Ç¥½Ã ¾÷µ¥ÀÌÆ®
+    void UpdateTurnOrderDisplay(); // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 
 
     AMinimapCameraActor* FindMinimapCamera();
 
 private:
-    //Áßº¹ ¹ÙÀÎµù ¹æÁö
+    //ï¿½ßºï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½
     bool bDelegatesBound = false;
-    // Ä³½ÌµÈ °´Ã¼
+    // Ä³ï¿½Ìµï¿½ ï¿½ï¿½Ã¼
     AMyPlayerState* MyPlayerState = nullptr;
     UInventoryComponent* InventoryComponent = nullptr;
 
-    // ÅÏ ¼ø¼­ ÀúÀå (¼­¹ö¿¡¼­ ¹ÞÀº ±×´ë·Î)
+    // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×´ï¿½ï¿½)
     TArray<int32> CurrentTurnOrder;
 
-    // ¹Ì´Ï¸Ê º¯È¯¿ë »ó¼ö
+    // ï¿½Ì´Ï¸ï¿½ ï¿½ï¿½È¯ï¿½ï¿½ ï¿½ï¿½ï¿½
     float WorldMapMinX = -5000.0f;
     float WorldMapMaxX = 5000.0f;
     float WorldMapMinY = -5000.0f;
@@ -71,7 +72,7 @@ private:
     bool bIsInventoryOpen = false;
 
 protected:
-    // ±âÁ¸ BindWidget
+    // ï¿½ï¿½ï¿½ï¿½ BindWidget
     UPROPERTY(meta = (BindWidget))
     UButton* Btn_Dice;
 
@@ -102,7 +103,7 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UImage* Img_PlayerMarker_3;
 
-    // ÅÏ ¼ø¼­ Ç¥½Ã¿ë
+    // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½Ã¿ï¿½
     UPROPERTY(meta = (BindWidget))
     UTextBlock* Text_TurnOrder1;
 
@@ -116,5 +117,5 @@ protected:
     UTextBlock* Text_TurnOrder4;
 
     UPROPERTY(meta = (BindWidget))
-    UTextBlock* Text_CurrentTurn; // "ÇöÀç ÅÏ: X¹ø ÇÃ·¹ÀÌ¾î"
+    UTextBlock* Text_CurrentTurn; // "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½: Xï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½"
 };
