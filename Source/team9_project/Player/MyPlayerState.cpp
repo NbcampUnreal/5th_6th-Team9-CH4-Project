@@ -1,4 +1,4 @@
-#include "Player/MyPlayerState.h"
+﻿#include "Player/MyPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
 AMyPlayerState::AMyPlayerState()
@@ -49,7 +49,7 @@ int AMyPlayerState::GetMaxHP()
 
 void AMyPlayerState::AddHP(int Amount)
 {
-	CurrentHp += Amount;
+	CurrentHp = (CurrentHp + Amount) > MaxHp ? MaxHp : CurrentHp + Amount;
 }
 
 void AMyPlayerState::SetScore(int Amount)
