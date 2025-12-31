@@ -120,8 +120,8 @@ void UUIManagerSubsystem::ReturnToMainTitle()
         if (PC->HasAuthority())
         {
             // 메인 타이틀 맵 경로
-            FString MainTitleMap = TEXT("/Game/KJH/Test/MainTitleLevel");
-            World->ServerTravel(MainTitleMap);
+            FString MainTitleMap = TEXT("/Game/KJH/Test/MainTitleLevel?listen");
+            //World->ServerTravel(MainTitleMap);
             UE_LOG(LogTemp, Warning, TEXT("[UIManager] All Player Move To MainTitle: %s"), *MainTitleMap);
         }
     }

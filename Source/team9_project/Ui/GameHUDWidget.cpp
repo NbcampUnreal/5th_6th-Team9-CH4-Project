@@ -22,72 +22,98 @@ void UGameHUDWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    // 버튼 바인딩
-    if (Btn_Dice)       Btn_Dice->OnClicked.AddDynamic(this, &UGameHUDWidget::OnDiceClicked);
-    if (Btn_ItemUse)    Btn_ItemUse->OnClicked.AddDynamic(this, &UGameHUDWidget::OnItemUseClicked);
-    if (Btn_Inventory)  Btn_Inventory->OnClicked.AddDynamic(this, &UGameHUDWidget::OnInventoryClicked);
-
-    // 캐싱
-    if (APlayerController* PC = GetOwningPlayer())
+    // 1. 버튼 바인딩 (존재할 때만)
+    if (Btn_Dice)
     {
-        MyPlayerState = PC->GetPlayerState<AMyPlayerState>();
+        Btn_Dice->OnClicked.AddDynamic(this, &UGameHUDWidget::OnDiceClicked);
+    }
 
-        if (ACameraPawn* CameraPawn = Cast<ACameraPawn>(PC->GetPawn()))
-        {
-            InventoryComponent = CameraPawn->GetInventoryComponent();
-        }
+    // 2. OwningPlayer 안전하게 가져오기
+    APlayerController* PC = GetOwningPlayer();
+    if (!PC)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[GameHUD] OwningPlayer is null in NativeConstruct"));
+        return;  // 더 이상 진행 안 함
+    }
 
-        // 턴 순서 델리게이트 바인딩 (중요!)
-        if (AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC))
+    // 3. PlayerState 캐싱
+    MyPlayerState = PC->GetPlayerState<AMyPlayerState>();
+
+    // 4. Pawn 캐스팅 및 인벤토리 컴포넌트
+    if (ACameraPawn* CameraPawn = Cast<ACameraPawn>(PC->GetPawn()))
+    {
+        InventoryComponent = CameraPawn->GetInventoryComponent();
+    }
+
+    // 5. 델리게이트 바인딩 (중복 방지 포함)
+    if (AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC))
+    {
+        if (!bDelegatesBound)
         {
-            AMainGameMode* GM = Cast<AMainGameMode>(GetWorld()->GetAuthGameMode());
+            MyPC->OnFirstReady.AddDynamic(this, &UGameHUDWidget::OnReceivedFirstOrder);
+            MyPC->TurnEndInfo.AddDynamic(this, &UGameHUDWidget::OnReceivedTurnEndInfo);
+            bDelegatesBound = true;
+            UE_LOG(LogTemp, Log, TEXT("[GameHUD] Delegates bound successfully"));
         }
     }
 
-    // 미니맵 배경 연결
-    if (Img_MinimapBackground)
-    {
-        if (UMaterialInstanceDynamic* DynMat = Img_MinimapBackground->GetDynamicMaterial())
-        {
-            TArray<AActor*> Found;
-            UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMinimapCameraActor::StaticClass(), Found);
-            if (Found.Num() > 0 && Cast<AMinimapCameraActor>(Found[0]))
-            {
-                AMinimapCameraActor* Cam = Cast<AMinimapCameraActor>(Found[0]);
-                if (Cam->MinimapRT)
-                {
-                    DynMat->SetTextureParameterValue(FName("MapTexture"), Cast<UTexture>(Cam->MinimapRT));
-                }
-            }
-        }
-    }
+    // 6. 미니맵 배경 연결 (클라이언트에서만, 중복 방지)
+    //if (Img_MinimapBackground && PC->IsLocalController())  // 로컬 클라이언트에서만
+    //{
+    //    if (UMaterialInstanceDynamic* DynMat = Img_MinimapBackground->GetDynamicMaterial())
+    //    {
+    //        TArray<AActor*> Found;
+    //        UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMinimapCameraActor::StaticClass(), Found);
+    //        if (Found.Num() > 0)
+    //        {
+    //            if (AMinimapCameraActor* Cam = Cast<AMinimapCameraActor>(Found[0]))
+    //            {
+    //                if (Cam->MinimapRT)
+    //                {
+    //                    DynMat->SetTextureParameterValue(FName("MapTexture"), Cast<UTexture>(Cam->MinimapRT));
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
+    // 초기 UI 업데이트
     UpdateHPFromPlayerState();
     UpdateTurnUI();
     UpdateTurnOrderDisplay();
 }
 
-// Tick
 void UGameHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
-
+    if (!MyPlayerState)
+    {
+        UE_LOG(LogTemp, Log, TEXT("Non MyPlayer State"));
+        return;
+    }
     UpdatePlayerMarkers();
     UpdateHPFromPlayerState();
     UpdateTurnUI();
     UpdateTurnOrderDisplay(); // 현재 턴 강조 실시간 갱신
 }
 
-// 델리게이트 핸들러
-void UGameHUDWidget::OnReceivedFirstOrder(const TArray<int32>& PlayerNumbers, const TArray<int32>& DiceNums)
+void UGameHUDWidget::OnDiceResultReceived(int32 PlayerNumber, int32 DiceNum)
 {
-    CurrentTurnOrder = PlayerNumbers; // 서버가 결정한 순서 저장
-    UpdateTurnOrderDisplay();
-
-    // 여기서 주사위 굴림 애니메이션 재생 (블루프린트 이벤트 호출 등)
+    //OnDiceResultReceived.Broadcast(PlayerNumber, DiceNum);
+    UE_LOG(LogTemp, Log, TEXT("Dice Result: Player %d rolled %d"), PlayerNumber, DiceNum);
 }
 
-void UGameHUDWidget::OnReceivedTurnEndInfo(const TArray<int32>& PlayerNumbers, const TArray<int32>& Scores)
+// 델리게이트 핸들러
+void UGameHUDWidget::OnReceivedFirstOrder(TArray<int32> PlayerNumbers, TArray<int32> DiceNums)
+{
+    CurrentTurnOrder = PlayerNumbers; // 서버가 결정한 순서 저장
+    //UE_LOG(LogTemp, Log, TEXT("PlayerNUM %d"), CurrentTurnOrder);
+    UpdateTurnOrderDisplay();
+
+    // TODO: 주사위 굴림 애니메이션 재생 (블루프린트 이벤트 호출 등)
+}
+
+void UGameHUDWidget::OnReceivedTurnEndInfo(TArray<int32> PlayerNumbers, TArray<int32> Scores, EEndType EndType)
 {
     // 순서는 그대로 유지, 필요시 점수 표시 추가
     UpdateTurnOrderDisplay();
@@ -159,7 +185,7 @@ void UGameHUDWidget::UpdateTurnUI()
     bool bIsMyTurn = (GM->GetTurnPlayerNumber() == MyPlayerState->PlayerNumber);
 
     if (Btn_Dice)       Btn_Dice->SetIsEnabled(bIsMyTurn);
-    if (Btn_Inventory)  Btn_Inventory->SetIsEnabled(bIsMyTurn);
+    //if (Btn_Inventory)  Btn_Inventory->SetIsEnabled(bIsMyTurn);
 }
 
 void UGameHUDWidget::UpdatePlayerMarkers()

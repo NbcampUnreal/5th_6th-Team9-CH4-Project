@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "GameMode/MainGameMode.h"
 #include "GameHUDWidget.generated.h"
 
 class AMyPlayerState;
@@ -25,10 +26,15 @@ class TEAM9_PROJECT_API UGameHUDWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
     virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
     // 델리게이트 핸들러 (턴 순서 및 라운드 종료 정보 수신)
-    void OnReceivedFirstOrder(const TArray<int32>& PlayerNumbers, const TArray<int32>& DiceNums);
-    void OnReceivedTurnEndInfo(const TArray<int32>& PlayerNumbers, const TArray<int32>& Scores);
+    UFUNCTION()
+    void OnDiceResultReceived(int32 PlayerNumber, int32 DiceNum);
+
+    UFUNCTION()
+    void OnReceivedFirstOrder(TArray<int32> PlayerNumbers, TArray<int32> DiceNums);
+
+    UFUNCTION()
+    void OnReceivedTurnEndInfo(TArray<int32> PlayerNumbers, TArray<int32> Scores, EEndType EndType);
 private:
     // 버튼 핸들러
     void OnDiceClicked();
@@ -46,6 +52,8 @@ private:
     AMinimapCameraActor* FindMinimapCamera();
 
 private:
+    //중복 바인딩 방지
+    bool bDelegatesBound = false;
     // 캐싱된 객체
     AMyPlayerState* MyPlayerState = nullptr;
     UInventoryComponent* InventoryComponent = nullptr;
@@ -67,11 +75,11 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UButton* Btn_Dice;
 
-    UPROPERTY(meta = (BindWidget))
-    UButton* Btn_ItemUse;
+    //UPROPERTY(meta = (BindWidget))
+    //UButton* Btn_ItemUse;
 
-    UPROPERTY(meta = (BindWidget))
-    UButton* Btn_Inventory;
+    //UPROPERTY(meta = (BindWidget))
+    //UButton* Btn_Inventory;
 
     UPROPERTY(meta = (BindWidget))
     UProgressBar* HP_Bar;

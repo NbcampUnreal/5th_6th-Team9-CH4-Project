@@ -7,6 +7,7 @@ class UTeam9GameInstance;
 
 ALobbyGameMode::ALobbyGameMode()
 {
+	bUseSeamlessTravel = true;
 	PlayerNumber = 0;
 	StartGameDelay = 10.0f;
 	NeedPlayers = 4;
@@ -93,7 +94,7 @@ void ALobbyGameMode::MainGameStart()
 		GameInstance->PropertyInit();
 	}
 
-	GetWorld()->ServerTravel(MAIN_GAME_MAP_NAME, true, true);
+	GetWorld()->ServerTravel(MAIN_GAME_MAP_NAME, true);
 }
 
 int32 ALobbyGameMode::GivePlayerNumber()
