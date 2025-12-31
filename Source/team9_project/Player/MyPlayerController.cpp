@@ -17,6 +17,9 @@ void AMyPlayerController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
     UE_LOG(LogTemp, Warning, TEXT("Possessed: %s"), *GetNameSafe(InPawn));
+
+    //맵 입장후 빙의까지 완료하면 서버에 참여를 알린다.
+    NotifyToServerToParticipate();
 }
 
 void AMyPlayerController::BeginPlay()
@@ -137,6 +140,14 @@ void AMyPlayerController::SetupInputComponent()
     if (InputComponent)
     {
         InputComponent->BindKey(EKeys::R, IE_Pressed, this, &AMyPlayerController::TestShowResult);
+    }
+}
+
+void AMyPlayerController::NotifyToServerToParticipate_Implementation()
+{
+    if (AMainGameMode* GameMode = GetWorld()->GetAuthGameMode<AMainGameMode>())
+    {
+        GameMode->NotifyParticipationToServer(this);
     }
 }
 
