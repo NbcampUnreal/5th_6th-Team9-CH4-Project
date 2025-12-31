@@ -43,6 +43,11 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION(Server, Reliable)
+	void SetReadyServerRPC();
+	//UFUNCTION(Server, Reliable)
+	//void ServerRPC_CallMainGameStart();
+
 private:
 	UPROPERTY(Replicated)
 	int CurrentHp;
@@ -65,6 +70,8 @@ public:
 
     UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
     bool bIsReady = false;
+
+
 
     UPROPERTY(Replicated, BlueprintReadOnly, Category = "Lobby")
     int32 PlayerNumber = -1;

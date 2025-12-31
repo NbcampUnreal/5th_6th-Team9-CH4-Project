@@ -25,7 +25,7 @@ void AMainGameMode::OnPostLogin(AController* NewPlayer)
 	{
 		return;
 	}
-	
+
 	AMyPlayerState* MyPlayerState = MyPlayerController->GetPlayerState<AMyPlayerState>();
 	if (IsValid(MyPlayerState))
 	{
@@ -51,7 +51,7 @@ void AMainGameMode::Logout(AController* Exiting)
 }
 
 void AMainGameMode::GameStart()
-{	
+{
 	if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
 	{
 		CurrentRound = GameInstance->GetCurrentRound();
@@ -70,7 +70,7 @@ void AMainGameMode::GameStart()
 	{
 		//WaitForReady();
 		SetPlayerNumbersOrder();
-		
+
 		return;
 	}
 
@@ -81,7 +81,7 @@ void AMainGameMode::GameStart()
 int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 {
 	//차례가 아닌 플레이어는 주사위 못던진다.
-	if (CheckPlayerTurn(MyPlayerNumber))
+	if (!CheckPlayerTurn(MyPlayerNumber))
 	{
 		return 0;
 	}
@@ -96,7 +96,7 @@ int32 AMainGameMode::ThrowDice(const int32 MyPlayerNumber)
 
 	//임시 : 주사위 눈 만큼 점수 획득
 	PlayersInGame[MyPlayerNumber]->GetPlayerState<AMyPlayerState>()->AddScore(DiceNum);
-	
+
 	return DiceNum;
 }
 
@@ -119,7 +119,7 @@ void AMainGameMode::RequestTurnEnd(const int32 RequestPlayerNum)
 }
 
 bool AMainGameMode::CheckPlayerTurn(const int32 MyPlayerNumber)
-{	
+{
 	return TurnPlayerNumber == MyPlayerNumber;
 }
 
@@ -134,7 +134,7 @@ bool AMainGameMode::UsingItem(const int32 MyPlayerNumber, const int32 InventoryI
 	//TODO : 이미 아이템 사용시 재사용 불가
 
 	//TODO : 아이템 사용 구현
-	
+
 	return true;
 }
 
@@ -147,7 +147,7 @@ void AMainGameMode::SetPlayerNumbersOrder()
 {
 	//1 ~ 6의 숫자를 무작위로 섞기
 	TArray DiceNums = { 1, 2, 3, 4, 5, 6 };
-	for (int32 iNum = 5; iNum > 0 ; --iNum)
+	for (int32 iNum = 5; iNum > 0; --iNum)
 	{
 		if (int32 RandomIndex = FMath::RandRange(0, iNum); iNum != RandomIndex)
 		{
@@ -200,39 +200,39 @@ void AMainGameMode::WaitForReady()
 		MyPlayerState->bIsReady = false;
 		PlayerStates.Add(MyPlayerState);
 	}
-	
+
 	//모두의 준비 완료까지 계속 확인한다.
 	GetWorld()->GetTimerManager().SetTimer(FirstReadyHandle, FTimerDelegate::CreateLambda([&]()
-	{
-		bool bGameReady = true;
-		for (AMyPlayerState* MyPlayerState : PlayerStates)
 		{
-			if (!MyPlayerState->bIsReady)
+			bool bGameReady = true;
+			for (AMyPlayerState* MyPlayerState : PlayerStates)
 			{
-				bGameReady = false;
-				break;
+				if (!MyPlayerState->bIsReady)
+				{
+					bGameReady = false;
+					break;
+				}
 			}
-		}
 
-		//모두의 준비 완료시 게임 시작
-		if (bGameReady)
-		{
-			GetWorld()->GetTimerManager().ClearTimer(FirstReadyHandle);
-			NextPlayerTurn(true);
-		}
-	}), FirstReadyCheckTime, true);
+			//모두의 준비 완료시 게임 시작
+			if (bGameReady)
+			{
+				GetWorld()->GetTimerManager().ClearTimer(FirstReadyHandle);
+				NextPlayerTurn(true);
+			}
+		}), FirstReadyCheckTime, true);
 }
 
 void AMainGameMode::CheckAndSendPlayerRank(EEndType EndType)
 {
 	//점수 기준으로 정렬
 	RankOrderedPlayerNums.Sort([this](const int32& NumA, const  int32& NumB)
-	{
-		int32 ScoreA = PlayersInGame[NumA]->GetPlayerState<AMyPlayerState>()->GetScore();
-		int32 ScoreB = PlayersInGame[NumB]->GetPlayerState<AMyPlayerState>()->GetScore();
+		{
+			int32 ScoreA = PlayersInGame[NumA]->GetPlayerState<AMyPlayerState>()->GetScore();
+			int32 ScoreB = PlayersInGame[NumB]->GetPlayerState<AMyPlayerState>()->GetScore();
 
-		return ScoreA > ScoreB;
-	});
+			return ScoreA > ScoreB;
+		});
 
 	//정렬된 순서대로 점수 목록 생성
 	TArray<int32> SendScores;
@@ -276,7 +276,7 @@ void AMainGameMode::MoveToMiniGameMap()
 	//인스턴스에 현재 라운드 저장
 	if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
 	{
-		 GameInstance->SetCurrentRound(CurrentRound);
+		GameInstance->SetCurrentRound(CurrentRound);
 	}
 
 	//잠시후 미니게임 시작
