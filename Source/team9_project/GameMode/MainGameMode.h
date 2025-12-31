@@ -51,7 +51,7 @@ public:
 
 private:
 	//플레이어 순서 정하기
-	void SetPlayerNumbersOrder();
+	void SetPlayerNumbersOrder(bool bFromGameInstance);
 
 	//게임 처음 시작시 각 플레이어의 준비를 기다린다.
 	void WaitForReady();

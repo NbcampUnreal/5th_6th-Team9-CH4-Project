@@ -72,12 +72,13 @@ void AMainGameMode::GameStart()
 	if (CurrentRound <= 1)
 	{
 		WaitForReady();
-		SetPlayerNumbersOrder();
+		SetPlayerNumbersOrder(false);
 
 		return;
 	}
 
 	//라운드 시작
+	SetPlayerNumbersOrder(true);
 	NextPlayerTurn(true);
 }
 
@@ -159,8 +160,29 @@ bool AMainGameMode::GetIsThrowDice()
 	return bIsThrownDice;
 }
 
-void AMainGameMode::SetPlayerNumbersOrder()
+void AMainGameMode::SetPlayerNumbersOrder(bool bFromGameInstance)
 {
+	//게임 인스턴스에서 가져올 경우 (2번째 라운드 부터)
+	if (bFromGameInstance)
+	{
+		if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
+		{
+			TArray<int32> DataFromGameInstance = GameInstance->GetTurnOrderedPlayerNums();
+			for (int32& PlayerNum : DataFromGameInstance)
+			{
+				TurnOrderedPlayerNums.Add(PlayerNum);
+				RankOrderedPlayerNums.Add(PlayerNum);//먼저 턴 진행 순서대로 넣고 이후 정렬
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to get 'TurnOrderedPlayerNums' from GameInstance."));
+		}
+
+		return;
+	}
+
+	//여기부터 직접 순서를 정하는 과정
 	//1 ~ 6의 숫자를 무작위로 섞기
 	TArray DiceNums = { 1, 2, 3, 4, 5, 6 };
 	for (int32 iNum = 5; iNum > 0; --iNum)
@@ -197,6 +219,12 @@ void AMainGameMode::SetPlayerNumbersOrder()
 			TurnOrderedPlayerNums.Add(OrderByDiceNum[iNum]);
 			RankOrderedPlayerNums.Add(OrderByDiceNum[iNum]);//시작시 순위는 턴 진행 순서를 따른다.
 		}
+	}
+
+	//게임 인스턴스에 진행 순서 저장
+	if (UTeam9GameInstance* GameInstance = GetWorld()->GetGameInstance<UTeam9GameInstance>())
+	{
+		GameInstance->SetTurnOrderedPlayerNums(TurnOrderedPlayerNums);
 	}
 }
 
