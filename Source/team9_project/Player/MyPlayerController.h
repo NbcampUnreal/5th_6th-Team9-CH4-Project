@@ -27,7 +27,7 @@ UCLASS()
 class TEAM9_PROJECT_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 public:
 	AMyPlayerController();
 
@@ -35,47 +35,47 @@ public:
 
 	virtual void BeginPlay() override;
 
-    void Server_RequestThrowDice_Implementation();
+	void Server_RequestThrowDice_Implementation();
 
 	//void IMCChange(Mode mode);
 
 	// 서버 주사위 요청 RPC
-    UFUNCTION(Server, Reliable)
-    void Server_RequestThrowDice();
+	UFUNCTION(Server, Reliable)
+	void Server_RequestThrowDice();
 
 	// UI 상태 변경 Client RPC
-    UFUNCTION(Client, Reliable)
-    void Client_SetUIState(EGameUIState NewState);
-	
+	UFUNCTION(Client, Reliable)
+	void Client_SetUIState(EGameUIState NewState);
+
 	// 주사위 결과 수신 Client RPC
-    UFUNCTION(Client, Reliable)
-    void Client_ReceiveDiceResult(int32 PlayerNumber, int32 DiceNum);
+	UFUNCTION(Client, Reliable)
+	void Client_ReceiveDiceResult(int32 PlayerNumber, int32 DiceNum);
 
 	// 처음 정해진 순서 수신용 RPC
 	UFUNCTION(Client, Reliable)
 	void Client_ReceiveFirstOrder(const TArray<int32>& PlayerNumbers, const TArray<int32>& DiceNums);
-	
+
 	// 턴 종료시마다 순위 확인용 RPC
 	UFUNCTION(Client, Reliable)
 	void Client_ReceiveTurnEndInfo(const TArray<int32>& PlayerNumbers, const TArray<int32>& Scores, EEndType EndType);
 
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_ShowResult();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ShowResult();
 
 protected:
-    void TestShowResult();
+	void TestShowResult();
 
-    //TEST
-    virtual void SetupInputComponent() override;
+	//TEST
+	virtual void SetupInputComponent() override;
 
 public:
 
-    UPROPERTY()
-    AMinimapCameraActor* MinimapCamera;
+	UPROPERTY()
+	AMinimapCameraActor* MinimapCamera;
 
 	//누군가가 주사위를 굴릴때 실행
-    UPROPERTY(BlueprintAssignable, Category = "Dice")
-    FOnDiceResultReceived OnDiceResultReceived;
+	UPROPERTY(BlueprintAssignable, Category = "Dice")
+	FOnDiceResultReceived OnDiceResultReceived;
 
 	//제일 처음 순서를 정할 때 실행
 	UPROPERTY(BlueprintAssignable, Category = "Dice")
@@ -116,52 +116,3 @@ public:
 	UPROPERTY()
 	UUserWidget* InventoryWidget;
 };
-
-//#pragma once
-//
-//#include "CoreMinimal.h"
-//#include "GameFramework/PlayerController.h"
-//#include "Ui/EGameUIState.h"
-//#include "Ui/MinimapCameraActor.h"
-//#include "MyTestPlayerController.generated.h"
-//
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDiceResultReceived, int32, Result);
-//
-//UCLASS()
-//class TEAM9_PROJECT_API AMyTestPlayerController : public APlayerController
-//{
-//    GENERATED_BODY()
-//
-//public:
-//
-//    virtual void BeginPlay() override;
-//
-//    UPROPERTY()
-//    AMinimapCameraActor* MinimapCamera;
-//
-//    // ���� �ֻ��� ��û RPC
-//    UFUNCTION(Server, Reliable)
-//    void Server_RequestThrowDice();
-//
-//    // UI ���� ���� Client RPC
-//    UFUNCTION(Client, Reliable)
-//    void Client_SetUIState(EGameUIState NewState);
-//
-//    // �ֻ��� ��� ���� Client RPC
-//    UFUNCTION(Client, Reliable)
-//    void Client_ReceiveDiceResult(int32 Result);
-//
-//    UPROPERTY(BlueprintAssignable, Category = "Dice")
-//    FOnDiceResultReceived OnDiceResultReceived;
-//
-//    UFUNCTION(NetMulticast, Reliable)
-//    void Multicast_ShowResult();
-//
-//    void Multicast_ShowResult_Implementation();
-//
-//protected:
-//    void TestShowResult();
-//
-//    //TEST
-//    virtual void SetupInputComponent() override;
-//};

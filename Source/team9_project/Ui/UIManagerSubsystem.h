@@ -1,31 +1,35 @@
 #pragma once
+
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Ui/EGameUIState.h"
 #include "UIManagerSubsystem.generated.h"
 
-UCLASS()
+class UUserWidget;
+
+UCLASS(Blueprintable)
 class TEAM9_PROJECT_API UUIManagerSubsystem : public UGameInstanceSubsystem
 {
     GENERATED_BODY()
 
 public:
+    void Test();
+    void UpdateUIForCurrentMap();
+
+    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+    virtual void Deinitialize() override;
+
     void SetUIState(EGameUIState NewState);
     void RegisterUIWidget(EGameUIState State, TSubclassOf<UUserWidget> WidgetClass);
 
-    // FString으로 통일 (FName → 에러 방지)
     void StartHostGame(const FString& MapName, const FString& PlayerName);
     void StartJoinGame(const FString& IPAddress, const FString& PlayerName);
-    //void StartJoinGame(const FString& IPAddress = TEXT("127.0.0.1"));
 
     template<typename T = UUserWidget>
     T* GetActiveWidget() const { return Cast<T>(ActiveStateWidget); }
 
     void ClearActiveWidgets();
-
     void ReturnToMainTitle();
-
-    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 protected:
     UPROPERTY()
@@ -34,7 +38,21 @@ protected:
     UPROPERTY()
     UUserWidget* ActiveStateWidget = nullptr;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI Settings")
     TMap<EGameUIState, TSubclassOf<UUserWidget>> UIWidgetMap;
+
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void ShowWidgetByPath(const FString& WidgetPath);
+
+    UPROPERTY(EditAnywhere, Category = "Map to UI Mapping")
+    TMap<FString, EGameUIState> MapKeywordToUIState;
+
 private:
     void UpdateInputMode(EGameUIState State);
+
+    // 타이머 핸들
+    FTimerHandle MapCheckTimerHandle;
+
+    // 파라미터 없는 함수로 변경 (타이머 바인딩용)
+    void CheckAndSetUIStateForCurrentMap();
 };

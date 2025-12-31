@@ -21,6 +21,7 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "SaveData")
     FString SavedPlayerName = TEXT("Player"); // 이름을 저장할 변수 추가
 
+    void Callback_PostLoadMapWithWorld(UWorld* inWorld);
 protected:
     // 에디터에서 상태별로 사용할 위젯을 연결하는 맵
     // 예) MainMenu → WBP_MainTitle, InGame → WBP_GameHUD

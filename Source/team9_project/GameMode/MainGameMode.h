@@ -19,14 +19,14 @@ public:
 
 protected:
 	virtual void OnPostLogin(AController* NewPlayer) override;
-	
+
 public:
 	virtual void Logout(AController* Exiting) override;
 
 private:
 	//게임 시작
 	void GameStart();
-	
+
 public:
 	//주사위 굴리기 (턴 플레이어 체크, 모든 플레이어가 알 수 있음)
 	int32 ThrowDice(const int32 MyPlayerNumber);
@@ -45,7 +45,7 @@ public:
 
 	//현재 진행중인 턴인 플레이어 인덱스
 	int32 GetTurnPlayerNumber();
-	
+
 private:
 	//플레이어 순서 정하기
 	void SetPlayerNumbersOrder();
@@ -65,7 +65,7 @@ private:
 public:
 	//라운드 종료시 실행할 델리게이트
 	FOnRoundEnd OnRoundEnd;
-	
+
 private:
 	//게임중인 플레이어 목록
 	UPROPERTY()
