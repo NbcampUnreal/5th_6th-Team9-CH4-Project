@@ -1,4 +1,4 @@
-#include "MainGameMode.h"
+﻿#include "MainGameMode.h"
 #include "Team9GameInstance.h"
 #include "Inventory/InventoryComponent.h"
 #include "Player/CameraPawn.h"
@@ -21,6 +21,8 @@ AMainGameMode::AMainGameMode()
 
 void AMainGameMode::NotifyParticipationToServer(AMyPlayerController* NewPlayer)
 {
+	UE_LOG(LogTemp, Warning, TEXT("NotifyParticipationToServer"));
+	UE_LOG(LogTemp, Error, TEXT("NotifyParticipationToServer"));
 	//맵에 들어온 플레이어를 저장한다.
 	AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>();
 	if (IsValid(MyPlayerState))
@@ -31,6 +33,8 @@ void AMainGameMode::NotifyParticipationToServer(AMyPlayerController* NewPlayer)
 	//지정한 인원이 들어오면 시작한다.
 	if (PlayersInGame.Num() < NeedPlayers)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("NotifyParticipationToServer Retun"));
+		UE_LOG(LogTemp, Error, TEXT("NotifyParticipationToServer Retun"));
 		return;
 	}
 	GameStart();
@@ -64,6 +68,8 @@ void AMainGameMode::GameStart()
 	//1라운드(처음 시작)인 경우 진행 순서 정하고 준비를 기다린다.
 	if (CurrentRound <= 1)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRound"));
+		UE_LOG(LogTemp, Error, TEXT("CurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRoundCurrentRound"));
 		WaitForReady();
 		SetPlayerNumbersOrder(false);
 
@@ -119,6 +125,8 @@ void AMainGameMode::RequestTurnEnd(const int32 RequestPlayerNum)
 
 bool AMainGameMode::CheckPlayerTurn(const int32 MyPlayerNumber)
 {
+	UE_LOG(LogTemp, Warning, TEXT("%d %d"), MyPlayerNumber, TurnPlayerNumber);
+	UE_LOG(LogTemp, Error, TEXT("%d %d"), MyPlayerNumber, TurnPlayerNumber);
 	return TurnPlayerNumber == MyPlayerNumber;
 }
 
@@ -234,7 +242,7 @@ void AMainGameMode::WaitForReady()
 			return;
 		}
 
-		MyPlayerState->bIsReady = false;
+		MyPlayerState->bIsReady = true;//임시로 준비 완료로 변경
 		PlayerStates.Add(MyPlayerState);
 	}
 
@@ -251,6 +259,8 @@ void AMainGameMode::WaitForReady()
 				}
 			}
 
+			UE_LOG(LogTemp, Warning, TEXT("bGameReadybGameReadybGameReadybGameReady &d"), bGameReady);
+			UE_LOG(LogTemp, Error, TEXT("bGameReadybGameReadybGameReadybGameReady &d"), bGameReady);
 			//모두의 준비 완료시 게임 시작
 			if (bGameReady)
 			{
@@ -287,6 +297,8 @@ void AMainGameMode::CheckAndSendPlayerRank(EEndType EndType)
 
 void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 {
+	UE_LOG(LogTemp, Warning, TEXT("111111111111111 TurnPlayerNumber : "));
+	UE_LOG(LogTemp, Error, TEXT("111111111111111 TurnPlayerNumber : "));
 	//라운드 시작시 첫 번째 플레이어를 지정
 	if (bRoundStart)
 	{
@@ -295,6 +307,8 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 	//턴 인덱스를 1 추가하는데 마지막 플레이어가 진행하면 현재 라운드 종료 미니게임 시작
 	else if (PlayersInGame.Num() > ++TurnIndex)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("EEEEEEEEEEEELSE TurnPlayerNumber : "));
+		UE_LOG(LogTemp, Error, TEXT("EEEEEEEEEEEELSE TurnPlayerNumber : "));
 		++CurrentRound;
 		OnRoundEnd.Broadcast();
 
@@ -309,6 +323,8 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 		ACameraPawn* PrevPlayerPawn = Cast<ACameraPawn>(PlayersInGame[TurnPlayerNumber]->GetPawn());
 		if (!IsValid(PrevPlayerPawn))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("RETURN TurnPlayerNumber : "));
+			UE_LOG(LogTemp, Error, TEXT("RETURN TurnPlayerNumber : "));
 			return;
 		}
 		PrevPlayerPawn->GetInventoryComponent()->bIsCurrentlyOperating = false;
@@ -316,6 +332,9 @@ void AMainGameMode::NextPlayerTurn(bool bRoundStart)
 
 	//다음 플레이어의 차례 진행
 	TurnPlayerNumber = TurnOrderedPlayerNums[TurnIndex];
+	UE_LOG(LogTemp, Warning, TEXT("TurnPlayerNumber : %d"), TurnPlayerNumber);
+	UE_LOG(LogTemp, Error, TEXT("TurnPlayerNumber : %d"), TurnPlayerNumber);
+	UE_LOG(LogTemp, Warning, TEXT("TurnPlayerNumber : %d"), TurnPlayerNumber);
 	bIsThrownDice = false;
 	CheckAndSendPlayerRank(EEndType::TurnEnd);
 

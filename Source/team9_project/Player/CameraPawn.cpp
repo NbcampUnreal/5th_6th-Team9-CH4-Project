@@ -1,4 +1,4 @@
-#include "Player/CameraPawn.h"
+﻿#include "Player/CameraPawn.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -61,8 +61,8 @@ void ACameraPawn::BeginPlay()
 
 		PlayerCharacter->InitCharacter(this, PS);
 	}
-	
-	
+
+
 	GetInventoryComponent()->OnItemUseStarted.AddDynamic(this, &ACameraPawn::ServerRPCItemUseStart);
 	GetInventoryComponent()->OnItemUseCancelled.AddDynamic(this, &ACameraPawn::ServerRPCItemUseEnd);
 }
@@ -70,13 +70,13 @@ void ACameraPawn::BeginPlay()
 void ACameraPawn::PossessedBy(AController* NewControlle)
 {
 	Super::PossessedBy(NewControlle);
-	UE_LOG(LogTemp, Warning, TEXT("=== PossessedBy === Pawn: %s, Controller: %s"), 
+	UE_LOG(LogTemp, Warning, TEXT("=== PossessedBy === Pawn: %s, Controller: %s"),
 		*GetName(), *GetNameSafe(NewControlle));
 
 	if (HasAuthority())
 	{
 		SetOwner(NewControlle);
-        
+
 		if (InventoryComponent)
 		{
 			InventoryComponent->AddItem(FName("RCCar"));
@@ -102,8 +102,8 @@ void ACameraPawn::PossessedBy(AController* NewControlle)
 			PlayerCharacter->SetPlayerState(TPS);
 		}
 	}
-	
-	
+
+
 }
 
 void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -113,7 +113,7 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	if (!IsLocallyControlled())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SetupPlayerInputComponent Failed"))
-		return;
+			return;
 	}
 
 	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
@@ -121,28 +121,34 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	{
 		MyPlayerController = Cast<AMyPlayerController>(GetController());
 		UE_LOG(LogTemp, Warning, TEXT("UEnhancedInputComponent"))
-		if (IsValid(MyPlayerController))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MyPlayerController"))
+			if (IsValid(MyPlayerController))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("MyPlayerController"))
 
-			EIC->BindAction(
-				MyPlayerController->CameraKeyMoveAction,
-				ETriggerEvent::Triggered,
-				this,
-				&ACameraPawn::CameraKeyMoveHandle);
+					EIC->BindAction(
+						MyPlayerController->LeftClickAction,
+						ETriggerEvent::Started,
+						this,
+						&ACameraPawn::LeftClickHandle);
 
-			EIC->BindAction(
-				MyPlayerController->CameraReturnAction,
-				ETriggerEvent::Started,
-				this,
-				&ACameraPawn::CameraReturnHandle);
-			//ChoSungMin - 취소키
-			EIC->BindAction(
-	            MyPlayerController->CancelAction,
-	            ETriggerEvent::Started,
-	            this,
-	            &ACameraPawn::CancelHandle);
-		}
+				EIC->BindAction(
+					MyPlayerController->CameraKeyMoveAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ACameraPawn::CameraKeyMoveHandle);
+
+				EIC->BindAction(
+					MyPlayerController->CameraReturnAction,
+					ETriggerEvent::Started,
+					this,
+					&ACameraPawn::CameraReturnHandle);
+				//ChoSungMin - 취소키
+				EIC->BindAction(
+					MyPlayerController->CancelAction,
+					ETriggerEvent::Started,
+					this,
+					&ACameraPawn::CancelHandle);
+			}
 	}
 }
 
@@ -173,17 +179,17 @@ void ACameraPawn::Tick(float DeltaTime)
 		UpdateMouseAim();
 		FVector TargetLocation = GetItemCameraTargetLocation();
 		FVector CurrentLocation = GetActorLocation();
-		
+
 		FVector NewLocation = FMath::VInterpTo(
-			CurrentLocation, 
+			CurrentLocation,
 			FVector(TargetLocation.X, TargetLocation.Y, CurrentLocation.Z),
-			DeltaTime, 
+			DeltaTime,
 			5.0f  // 추적 속도
 		);
 		SetActorLocation(NewLocation);
 		return;  // 마우스 엣지 이동 스킵
 	}
-	
+
 	if (IsValid(MyPlayerController))
 	{
 		if (ViewX == 0 || ViewY == 0)
@@ -308,7 +314,7 @@ APlayerCharacter* ACameraPawn::GetPlayerCharacter() const
 
 void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 {
-	
+
 
 	if (IsLocallyControlled() == false)
 	{
@@ -316,13 +322,13 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 	}
 
 	const FVector2D ArrowInput = Value.Get<FVector2D>();
-	
+
 
 	// Cho_SungMin 아이템 사용 중이면
 	if (InventoryComponent && InventoryComponent->IsUsingItem())
 	{
 		EItemUseType UseType = InventoryComponent->GetCurrentUseType();
-        
+
 		// DirectControl: WASD 이동
 		if (UseType == EItemUseType::DirectControl)
 		{
@@ -348,12 +354,12 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 			return;
 		}
 	}
-	
+
 	if (ArrowInput.IsNearlyZero())
 	{
 		return;
 	}
-   
+
 	const FRotator YawRotation(0.f, GetActorRotation().Yaw, 0.f);
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
@@ -366,8 +372,8 @@ void ACameraPawn::CameraKeyMoveHandle(const FInputActionValue& Value)
 // Cho_Sungmin Server RPC 구현
 void ACameraPawn::ServerRPC_SetItemControlInput_Implementation(FVector2D Input)
 {
-	
-    
+
+
 	if (InventoryComponent)
 	{
 		InventoryComponent->SetDirectControlInput(Input);
@@ -409,28 +415,28 @@ FVector ACameraPawn::GetItemCameraTargetLocation() const
 void ACameraPawn::UpdateMouseAim()
 {
 	if (!MyPlayerController) return;
-    
+
 	FHitResult HitResult;
 	bool bHit = MyPlayerController->GetHitResultUnderCursor(
 		ECC_Visibility,
 		false,
 		HitResult
 	);
-    
-	
-    
+
+
+
 	if (bHit && PlayerCharacter)
 	{
 		FVector CharacterLocation = PlayerCharacter->GetActorLocation();
 		FVector MouseWorldLocation = HitResult.Location;
-        
-		
-        
+
+
+
 		FVector Direction = MouseWorldLocation - CharacterLocation;
 		Direction.Z = 0;
 		Direction.Normalize();
-		
-        
+
+
 		if (!Direction.IsNearlyZero())
 		{
 			ServerRPC_SetMouseAimDirection(Direction);
@@ -473,7 +479,7 @@ void ACameraPawn::ServerRPCMove_Implementation()
 void ACameraPawn::CancelHandle(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CLIENT: Cancel (ESC)"));
-    
+
 	// 아이템 사용 중이면 취소
 	if (InventoryComponent && InventoryComponent->IsUsingItem())
 	{
@@ -495,5 +501,16 @@ void ACameraPawn::ServerRPC_CycleTileTarget_Implementation(bool bNext)
 	if (InventoryComponent)
 	{
 		InventoryComponent->CycleTileTarget(bNext);
+	}
+}
+
+void ACameraPawn::LeftClickHandle(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT: LeftClick"));
+	// 아이템 사용 중이면 확정
+	if (InventoryComponent && InventoryComponent->IsUsingItem())
+	{
+		ServerRPC_ConfirmItemUse();
+		return;
 	}
 }
