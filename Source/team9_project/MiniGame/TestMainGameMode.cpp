@@ -8,7 +8,7 @@ ATestMainGameMode::ATestMainGameMode()
 
 void ATestMainGameMode::ExecuteAfter5Seconds()
 {
-	GetWorld()->ServerTravel(TEXT("/Game/MiniGame/Maps/TimingGame?listen"), true);
+	GetWorld()->ServerTravel(TEXT("/Game/MiniGame/Maps/RapidInputRacingMinigame?listen"), true);
 }
 
 void ATestMainGameMode::BeginPlay()

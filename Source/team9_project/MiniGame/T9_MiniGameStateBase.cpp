@@ -108,6 +108,16 @@ FText AT9_MiniGameStateBase::GetGameName()
 	return FText();
 }
 
+FText AT9_MiniGameStateBase::GetGameDescription()
+{
+	return FText();
+}
+
+UTexture2D* AT9_MiniGameStateBase::GetGameTexture()
+{
+	return nullptr;
+}
+
 void AT9_MiniGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
